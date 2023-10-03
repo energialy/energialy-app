@@ -1,0 +1,11 @@
+[
+    {
+        "id": "8caccf83-a626-46e5-b170-960235d84aff",
+        "company": {
+            "id": "729d924d-49c3-4eae-8410-2421bfa8cfe6",
+            "name": "Empresa test 4",
+            "profilePicture": "https://www.logodesign.net/logo/line-art-house-roof-and-buildings-4485ld.png"
+        },
+        "isActive": true
+    }
+]

@@ -1,0 +1,62 @@
+[
+    {
+        "id": "c4f1a788-408b-4974-bc6c-9ba590e811dc",
+        "productName": "Home Banking",
+        "status": "sent",
+        "additionalData": null,
+        "bankAccount": {
+            "id": "8caccf83-a626-46e5-b170-960235d84aff",
+            "status": "open",
+            "Company": {
+                "id": "729d924d-49c3-4eae-8410-2421bfa8cfe6",
+                "name": "Empresa test 4"
+            }
+        },
+        "isActive": true
+    },
+    {
+        "id": "288c8514-9716-49a5-b3ef-a013fe78c734",
+        "productName": "CC en pesos $",
+        "status": "sent",
+        "additionalData": null,
+        "bankAccount": {
+            "id": "8caccf83-a626-46e5-b170-960235d84aff",
+            "status": "open",
+            "Company": {
+                "id": "729d924d-49c3-4eae-8410-2421bfa8cfe6",
+                "name": "Empresa test 4"
+            }
+        },
+        "isActive": true
+    },
+    {
+        "id": "29f3b944-5451-4a99-8bfe-58bc61c785fb",
+        "productName": "Tarjeta de crédito",
+        "status": "sent",
+        "additionalData": null,
+        "bankAccount": {
+            "id": "8caccf83-a626-46e5-b170-960235d84aff",
+            "status": "open",
+            "Company": {
+                "id": "729d924d-49c3-4eae-8410-2421bfa8cfe6",
+                "name": "Empresa test 4"
+            }
+        },
+        "isActive": true
+    },
+    {
+        "id": "931f31fa-87e7-419d-9a92-16df3c6629a1",
+        "productName": "Tarjeta de crédito",
+        "status": "sent",
+        "additionalData": null,
+        "bankAccount": {
+            "id": "8caccf83-a626-46e5-b170-960235d84aff",
+            "status": "open",
+            "Company": {
+                "id": "729d924d-49c3-4eae-8410-2421bfa8cfe6",
+                "name": "Empresa test 4"
+            }
+        },
+        "isActive": true
+    }
+]

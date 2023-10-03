@@ -90,7 +90,7 @@ const TABLE_ROWS = [
   },
 ];
 
-export function SortableTable() {
+export function SortableTable({data}) {
   return (
     <Card className="h-full w-full p-2">
       <CardHeader floated={false} shadow={false} className="rounded-none">
@@ -153,9 +153,17 @@ export function SortableTable() {
             </tr>
           </thead>
           <tbody>
-            {TABLE_ROWS.map(
+            {data.map(
               (
-                { img, companyName, email, product, account, state, date },
+                {
+                  id,
+                  bankAccount,
+                  productName,
+                  //product,
+                  //account,
+                  status,
+                  //date,
+                },
                 index
               ) => {
                 const isLast = index === TABLE_ROWS.length - 1;
@@ -164,16 +172,27 @@ export function SortableTable() {
                   : "p-4 border-b border-blue-gray-50";
 
                 return (
-                  <tr key={companyName} className={`${state === "Aprobado" ? "bg-green-200" : state === "Revisión Solicitada" ? "bg-red-200" : "bg-gray-50"}`}>
+                  <tr
+                    key={id}
+                    className={`${
+                      status === "accepted"
+                        ? "bg-green-200"
+                        : status === "declined"
+                        ? "bg-red-200"
+                        : "bg-gray-50"
+                    }`}
+                  >
                     <td className={classes}>
                       <div className="flex items-center gap-3 align-middle">
-                        <Avatar src={img} alt={companyName} size="sm" />
+                        <Avatar src={bankAccount.Company.profilePicture} alt={bankAccount.Company.name} size="sm" 
+                        className="rounded-full"
+                        />
                         <Typography
                           variant="small"
                           color="blue-gray"
                           className="font-normal"
                         >
-                          {companyName}
+                          {bankAccount.Company.name}
                         </Typography>
                       </div>
                     </td>
@@ -184,26 +203,26 @@ export function SortableTable() {
                           color="blue-gray"
                           className="font-normal"
                         >
-                          {product}
+                          {productName}
                         </Typography>
                       </div>
                     </td>
                     <td className={classes}>
                       <div className="w-max">
-                        <Chip variant="ghost" size="sm" value={state} />
+                        <Chip variant="ghost" size="sm" value={status} />
                       </div>
                     </td>
                     <td className={classes}>
-                      <Typography
+                      {/* <Typography
                         variant="small"
                         color="blue-gray"
                         className="font-normal"
                       >
                         {date}
-                      </Typography>
+                      </Typography> */}
                     </td>
                     <td className={classes}>
-                      <Typography
+                      {/* <Typography
                         variant="small"
                         color="blue-gray"
                         className="font-normal"
@@ -211,7 +230,7 @@ export function SortableTable() {
                         {typeof account === "number"
                           ? `U$S : ${account}`
                           : account}
-                      </Typography>
+                      </Typography> */}
                     </td>
                     <td className={classes}>
                       <Tooltip content="Ver Adjuntos">
