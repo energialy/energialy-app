@@ -42,55 +42,11 @@ const TABS = [
 
 const TABLE_HEAD = ["Empresa", "Producto", "Estado","Ultima revisión", "Monto", "Acciones"];
 
-const TABLE_ROWS = [
-  {
-    img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg",
-    companyName: "Tecpetrol S.A.",
-    email: "john@creative-tim.com",
-    product: "Prestamo a sola firma",
-    account: 10000,
-    state: "Solicitado",
-    date: "23/04/18",
-  },
-  {
-    img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-2.jpg",
-    companyName: "Energialy S.A.",
-    email: "alexa@creative-tim.com",
-    product: "Cheque de Terceros",
-    account: 5000,
-    state: "Solicitado",
-    date: "23/04/18",
-  },
-  {
-    img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-1.jpg",
-    companyName: "TSB S.A.",
-    email: "laurent@creative-tim.com",
-    product: "Apertura de cuenta",
-    account: 1200,
-    state: "Solicitado",
-    date: "19/09/17",
-  },
-  {
-    img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-4.jpg",
-    companyName: "Oil M&S",
-    email: "michael@creative-tim.com",
-    product: "Tarjeta de Credito",
-    account: "N/C",
-    state: "Aprobado",
-    date: "24/12/08",
-  },
-  {
-    img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-5.jpg",
-    companyName: "Pranzoil S.A.",
-    email: "richard@creative-tim.com",
-    product: "Home Banking",
-    account: "N/C",
-    state: "Revisión Solicitada",
-    date: "04/10/21",
-  },
-];
 
 export function SortableTable({data}) {
+  const changeStatus = (id) => {
+    alert("Se cambio el estado del producto con id: " + id + " a aprobado");
+  };
   return (
     <Card className="h-full w-full p-2">
       <CardHeader floated={false} shadow={false} className="rounded-none">
@@ -166,7 +122,7 @@ export function SortableTable({data}) {
                 },
                 index
               ) => {
-                const isLast = index === TABLE_ROWS.length - 1;
+                const isLast = index === data.length - 1;
                 const classes = isLast
                   ? "p-4"
                   : "p-4 border-b border-blue-gray-50";
@@ -239,7 +195,7 @@ export function SortableTable({data}) {
                         </IconButton>
                       </Tooltip>
                       <Tooltip content="Aprobar solicitud">
-                        <IconButton variant="text">
+                        <IconButton variant="text" onClick={() => changeStatus(id)}>
                           <CheckCircleIcon className="h-4 w-4 text-green-700" />
                         </IconButton>
                       </Tooltip>
