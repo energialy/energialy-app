@@ -22,12 +22,10 @@ export default function Login() {
 
   const dispatch = useDispatch();
 
-  console.log("URL:", urlProduction);
   const handleEmailChange = (event) => {
     const emailValue = event.target.value.toLowerCase();
     setEmail(emailValue);
   };
-  
 
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
@@ -81,10 +79,9 @@ export default function Login() {
       email: email,
       password: password,
     };
-    console.log(user)
+    console.log(user);
 
     try {
-      console.log("URL:", urlProduction );
       const response = await axios.post(`${urlProduction}/auth`, user);
       const accessToken = response.data.accessToken;
       // Después del inicio de sesión exitoso, obtén los detalles del usuario
@@ -106,9 +103,7 @@ export default function Login() {
       dispatch(setUserData(userDetails));
       dispatch(setAccessToken(accessToken));
 
-      
-      window.location.href = '/dashboard';
-     
+      window.location.href = "/dashboard";
     } catch (error) {
       // console.log("Error:", error);
       if (error.response.data.error == "Incorrect password.") {
@@ -161,24 +156,23 @@ export default function Login() {
               <label htmlFor="password" className="form-label w-40">
                 Contraseña
               </label>
-             
-                <input
-                  type={showPassword ? "text" : "password"}
-                  className="form-control"
-                  id="password"
-                  value={password}
-                  onChange={handlePasswordChange}
-                  onBlur={handlePasswordBlur}
-                  required
-                />
-                <button
-                  type="button"
-                  className="focus:outline-none pl-1"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <RiEyeLine /> : <RiEyeOffLine />}
-                </button>
-              
+
+              <input
+                type={showPassword ? "text" : "password"}
+                className="form-control"
+                id="password"
+                value={password}
+                onChange={handlePasswordChange}
+                onBlur={handlePasswordBlur}
+                required
+              />
+              <button
+                type="button"
+                className="focus:outline-none pl-1"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <RiEyeLine /> : <RiEyeOffLine />}
+              </button>
             </div>
             {passwordError && (
               <div className="text-danger mt- mb-2">{passwordError}</div>

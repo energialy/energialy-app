@@ -2,9 +2,20 @@ require('dotenv').config();
 const { Sequelize } = require('sequelize');
 const fs = require('fs');
 const path = require('path');
-const { POSTGRES_URL, SSL_MODE } = process.env;
+// const { POSTGRES_URL, SSL_MODE } = process.env;
 
-const sequelize = new Sequelize(`${POSTGRES_URL}${SSL_MODE}`, {
+const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME } = process.env;
+
+// Construir la cadena de conexión con el nombre de la base de datos
+const connectionString = `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`;
+
+// let connectionString = POSTGRES_URL;
+// if (SSL_MODE) {
+//   // Add SSL_MODE to the connection string if it's present
+//   connectionString += SSL_MODE;
+// }
+
+const sequelize = new Sequelize(connectionString, {
   logging: false, // set to console.log to see the raw SQL queries
   native: false, // lets Sequelize know we can use pg-native for ~30% more speed
   dialectModule: require('pg'),

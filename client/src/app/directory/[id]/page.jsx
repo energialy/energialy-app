@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { urlProduction } from "@/app/data/dataGeneric";
@@ -8,21 +8,21 @@ import { setAllCompanies } from "@/app/redux/features/companieSlice";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 
-function page({params}) {
-  const dispatch = useDispatch()
-  const companies = useSelector((state) => state.companies)
-  const [company, setCompany] = useState({})
-  const id = params.id
+import InfoBar from "./components/infoBar";
 
-  
+function page({ params }) {
+  const dispatch = useDispatch();
+  const companies = useSelector((state) => state.companies);
+  const [company, setCompany] = useState({});
+  const id = params.id;
+
   useEffect(() => {
     fetch(`${urlProduction}/companies/${id}`)
       .then((response) => response.json())
       .then((data) => setCompany(data))
       .catch((error) => console.error("Error fetching data:", error));
-    
   }, []);
-    
+
   return (
     <>
       {!company ? (
@@ -42,6 +42,12 @@ function page({params}) {
           <div className="mt-20">
             <CollapsedBar
               title={"Compañía"}
+              company={company}
+              intState={false}
+            />
+
+            <CollapsedBar
+              title={"Información"}
               company={company}
               intState={false}
             />
@@ -67,4 +73,4 @@ function page({params}) {
   );
 }
 
-export default page
+export default page;

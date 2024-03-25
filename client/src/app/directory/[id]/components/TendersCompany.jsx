@@ -1,13 +1,11 @@
-import { useSelector } from "react-redux"
-import CardTenderDetail from './CardTenderDetail'
+import CardTenderDetail from "./CardTenderDetail";
 
-function TendersCompany({company}) {
-   
+function TendersCompany({ company }) {
   return (
     <div>
-        <CardTenderDetail item={company}/>
+      <CardTenderDetail item={company} />
     </div>
-  )
+  );
 }
 
-export default TendersCompany
+export default TendersCompany;

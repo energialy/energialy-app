@@ -1,11 +1,12 @@
-'use client'
+"use client";
 import { useState, useEffect } from "react";
 import DetailCompany from "./DetailCompany";
 import TendersCompany from "./TendersCompany";
+import InfoBar from "./infoBar";
 
-function CollapsedBar({title, company, intState }) {
-     const [isCollapsed, setIsCollapsed] = useState(intState);
-     const toggleCollapse = () => {
+function CollapsedBar({ title, company, intState }) {
+  const [isCollapsed, setIsCollapsed] = useState(intState);
+  const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
   };
   return (
@@ -51,13 +52,17 @@ function CollapsedBar({title, company, intState }) {
           </button>
         </div>
         <div className={`${isCollapsed ? "hidden" : "block"}`}>
-          {title === 'Compañía' ? <DetailCompany company={company} /> : title === 'Licitaciones' ? <TendersCompany company={company}/> : null }
-          
-          
+          {title === "Compañía" ? (
+            <DetailCompany company={company} />
+          ) : title === "Licitaciones" ? (
+            <TendersCompany company={company} />
+          ) : title === "Información" ? (
+            <InfoBar company={company} />
+          ) : null}
         </div>
       </div>
     </>
   );
 }
 
-export default CollapsedBar
+export default CollapsedBar;
