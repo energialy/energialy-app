@@ -32,6 +32,7 @@ function page({ params }) {
           <div className="flex justify-center mt-10">
             <div className="w-full h-1/2 object-cover overflow-hidden -z-10">
               <Image
+                alt="banner"
                 className="max-h-[60%]"
                 src={company.bannerPicture}
                 fill={true}

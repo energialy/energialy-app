@@ -98,5 +98,14 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    productPictures: {
+      type: DataTypes.STRING,
+    },
+    licensePictures: {
+      type: DataTypes.STRING,
+    },
+    videos: {
+      type: DataTypes.STRING,
+    }
   });
 };

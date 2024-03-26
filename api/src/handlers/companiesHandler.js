@@ -47,6 +47,13 @@ const updateCompanyHandler = async (req, res) => {
   }
 };
 
+// const companiesProductsHandler = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const res = await companyProducts(id);
+//   }
+// };
+
 module.exports = {
   getCompaniesHandler,
   getCompanyByIdHandler,
