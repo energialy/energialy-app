@@ -18,6 +18,7 @@ function DetailCompany({company}) {
           <div className="w-full h-1/2 flex justify-center">
             <Image
               src={company.profilePicture}
+              alt="foto de la compañia"
               width={200}
               height={200}
             ></Image>
@@ -47,7 +48,7 @@ function DetailCompany({company}) {
         <div className="max-w-[40%] flex flex-col px-3">
           <div className="flex justify-center mb-4">
             {company.locations?.map((location) => (
-              <div className=" flex m-auto ">
+              <div key={location.id} className=" flex m-auto ">
                 <div className="w-2 h-2 bg-primary-200 rounded-full mr-1 mt-2 mb-2"></div>
                 <p className="text-sm m-auto" key={location.id}>
                   {location.name}
@@ -62,7 +63,7 @@ function DetailCompany({company}) {
             <span className="font-bold pb-4">Categorias:</span>
             <div className="min-w-full">
               {company.categories?.map((category) => (
-                <div className="flex m-auto">
+                <div key={category.id} className="flex m-auto">
                   <div className="w-2 h-2 bg-secondary-500 rounded-full mr-2 mt-2 mb-2"></div>
                   <p
                     className="text-sm font-semibold my-auto"
@@ -78,7 +79,7 @@ function DetailCompany({company}) {
             <span className="font-bold pb-4">Sub-Categorias:</span>
             <div className="min-w-full">
               {company.subcategories?.map((subcategory) => (
-                <div className="flex m-auto">
+                <div key={subcategory.id} className="flex m-auto">
                   <div className="w-2 h-2 bg-secondary-500 rounded-full mr-2 mt-2 mb-2"></div>
                   <p
                     className="text-sm font-semibold my-auto"

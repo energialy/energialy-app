@@ -53,7 +53,8 @@ function LocationFilter() {
     <div>
       {isLoading && <p>Cargando...</p>}
       {data?.map((item) => (
-        <div>
+        // ! ERROR SOLUCIONADO
+        <div key={item.id}>
           <input
             type="checkbox"
             name="cuenca"

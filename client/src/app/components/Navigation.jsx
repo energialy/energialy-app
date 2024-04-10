@@ -51,7 +51,7 @@ export default function Navigation() {
                       }
                     }}
                   >
-                    <Image src={Logo} />
+                    <Image src={Logo} alt="logo" />
                   </div>
                 </div>
 
