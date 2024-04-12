@@ -310,7 +310,7 @@ export default function Register() {
           )}
         </form>
         <div className="text-center p-2">
-          <Link href="login" className="text-decoration-none text-muted">
+          <Link as="document" href="login" className="text-decoration-none text-muted">
             ¿Ya tienes una cuenta? Iniciar sesión
           </Link>
         </div>

@@ -17,14 +17,6 @@ function CompanyDashboard({ user }) {
   const { data: tenders, isLoading: loadingTenders } = useGetTendersQuery();
 
   useEffect(() => {
-    // fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/users?email=${user.email}`)
-    // .then(function(data) {
-    //   return data.json();
-    // })
-    // .then(function(res) {
-    //   // console.log("res:", res)
-    //   return res;
-    // })
     if (user.company) {
       setUserProposals(proposals?.filter((proposal) => proposal.company.id === user.company.id));
       setProposalsToUser(proposals?.filter((proposal) => proposal.tender.Company.id === user.company.id));

@@ -7,6 +7,8 @@ const routes = require('./routes/index.js');
 const { BASE_URL } = process.env;
 
 const app = express();
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
 
 app.name = 'API';
 
@@ -38,4 +40,4 @@ app.use((err, req, res, next) => {
   res.status(status).send(message);
 });
 
-module.exports = app;
+module.exports = { app, io };

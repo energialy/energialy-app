@@ -23,7 +23,7 @@ export default function Login() {
   const dispatch = useDispatch();
 
   const handleEmailChange = (event) => {
-    const emailValue = event.target.value.toLowerCase();
+    const emailValue = event.target.value;
     setEmail(emailValue);
   };
 
@@ -172,7 +172,7 @@ export default function Login() {
           {error && <div className="flex justify-center text-danger mt-2 mb-2">{error}</div>}
         </form>
         <div className="text-center p-2">
-          <Link className="text-black" href="/forgot-password">
+          <Link as="document" className="text-black" href="/forgot-password">
             ¿Olvidaste tu contraseña?
           </Link>
         </div>

@@ -38,14 +38,13 @@ function SideBar() {
   useEffect(() => {
     const fetchData = async () => {
       const user = getLocalStorage();
+      console.log(user)
       setUser(user);
       const itemUserRole = menuBar.filter((item) => item.auth.includes(user?.role));
       setItemMenu(itemUserRole);
 
       // Llamar a bankAccountOpen y establecer el estado de isBankAccountOpen
       try {
-        // const result = await bankAccountOpen(user.company.id);
-        // ! ERROR SOLUCIONADO
         const result = user.company && await bankAccountOpen(user.company.id);
         setIsBankAccountOpen(result);
       } catch (error) {
