@@ -45,7 +45,7 @@ function SideBar() {
 
       // Llamar a bankAccountOpen y establecer el estado de isBankAccountOpen
       try {
-        const result = user.company && await bankAccountOpen(user.company.id);
+        const result = await bankAccountOpen(user.company.id);
         setIsBankAccountOpen(result);
       } catch (error) {
         console.error('Error fetching bank account status:', error);
