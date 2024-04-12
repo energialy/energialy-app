@@ -78,7 +78,6 @@ function DashboardTableData({title, data}) {
                       </th>
                     </tr>
                   </thead>
-                  {/* // ! ERROR SOLUCIONADO */}
                   <tbody>
                     {data && data.length > 0 ? (
                       tendersToShow?.map((item) => (
