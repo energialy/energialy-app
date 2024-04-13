@@ -354,10 +354,27 @@ const updateCompany = async (id, body) => {
   return cleanCompanies(updatedCompany);
 };
 
+const saveImage = async (req, res) => {
+  try {
+      const { profilePicture } = req.body;
+
+      // Crea una nueva instancia de la empresa con la URL de la imagen y guárdala en la base de datos
+      await Companies.create({
+          profilePicture: profilePicture
+      });
+
+      res.status(201).json({ message: 'Imagen guardada exitosamente en la base de datos' });
+  } catch (error) {
+      console.error('Error al guardar la imagen en la base de datos:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+
 module.exports = {
   getAllCompanies,
   filterCompaniesByName,
   getCompanyById,
   createCompany,
   updateCompany,
+  saveImage,
 };
