@@ -34,7 +34,9 @@ function page({params}) {
               <Image
                 className="max-h-[60%]"
                 src={company.bannerPicture}
+                alt="banner img company"
                 fill={true}
+                priority
               />
             </div>
           </div>
@@ -45,22 +47,13 @@ function page({params}) {
               company={company}
               intState={false}
             />
-            {/* <CollapsedBar
-              title={"Servicios"}
-              company={company}
-              intState={true}
-            />
-            <CollapsedBar
-              title={"Portfolio"}
-              company={company}
-              intState={true}
-            /> */}
             <CollapsedBar
               title={"Licitaciones"}
               company={company}
               intState={true}
             />
           </div>
+          <button>POP - UP</button>
         </div>
       )}
     </>

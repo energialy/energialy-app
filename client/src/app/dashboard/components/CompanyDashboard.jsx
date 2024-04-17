@@ -6,6 +6,7 @@ import DashboardKpiCard from '@/app/components/DashboardKpiCard';
 import DashboardTableData from '@/app/components/DashboardTableData';
 import { useGetProposalsQuery } from '@/app/redux/services/ProposalApi';
 import { useGetTendersQuery } from '@/app/redux/services/tendersApi';
+
 //import getLocalStorage from "../Func/localStorage";
 
 function CompanyDashboard({ user }) {
@@ -16,11 +17,13 @@ function CompanyDashboard({ user }) {
   const { data: proposals, isLoading: loadingProposals } = useGetProposalsQuery();
   const { data: tenders, isLoading: loadingTenders } = useGetTendersQuery();
 
+  
   useEffect(() => {
     if (user.company) {
       setUserProposals(proposals?.filter((proposal) => proposal.company.id === user.company.id));
       setProposalsToUser(proposals?.filter((proposal) => proposal.tender.Company.id === user.company.id));
       setUserTenders(tenders?.filter((tender) => tender.company.id === user.company.id));
+      console.log(user.role);
     }
   }, []);
 

@@ -79,21 +79,19 @@ function DashboardTableData({title, data}) {
                     </tr>
                   </thead>
                   <tbody>
-                    {!data ? <h5>No existen licitaciones</h5> : (data.length === 0 ? (
-                      <h5>No existen licitaciones</h5>
-                    ) : (
+                    {data && data.length > 0 ? (
                       tendersToShow?.map((item) => (
                         <tr
                           className={`border-b transition duration-300 ease-in-out cursor-pointer
-                           ${
-                             item.status === "working"
-                               ? "bg-green-300 hover:bg-green-200"
-                               : item.status === "completed"
-                               ? "bg-green-800 hover:bg-green-500"
-                               : item.status === "expired"
-                               ? "bg-red-300 hover:bg-red-200"
-                               : "hover:bg-neutral-100 dark:border-neutral-500 dark:hover:bg-neutral-600"
-                           }`}
+                            ${
+                              item.status === "working"
+                                ? "bg-green-300 hover:bg-green-200"
+                                : item.status === "completed"
+                                ? "bg-green-800 hover:bg-green-500"
+                                : item.status === "expired"
+                                ? "bg-red-300 hover:bg-red-200"
+                                : "hover:bg-neutral-100 dark:border-neutral-500 dark:hover:bg-neutral-600"
+                            }`}
                           key={item.id}
                           onClick={() => router.push(`/tenders/${item.id}`)}
                         >
@@ -116,14 +114,19 @@ function DashboardTableData({title, data}) {
                               ? "Vencido"
                               : item.status === "working"
                               ? "En ejecución"
-                              : item.statu === "completed"
+                              : item.status === "completed"
                               ? "Finalizado"
                               : null}
                           </td>
                         </tr>
                       ))
-                    ))}
-
+                    ) : (
+                      <tr>
+                        <td colSpan="6">
+                          <h5>No existen licitaciones</h5>
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
                 <PaginationComponent
