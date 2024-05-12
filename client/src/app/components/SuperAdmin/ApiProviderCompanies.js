@@ -13,7 +13,7 @@ const companyDataProvider = {
       }));
   },
   getOne: (resource, params) => {
-    const url = `${companyApiUrl}/companies/${resource}/${params.id}`;
+    const url = `${companyApiUrl}companies/${resource}/${params.id}`;
     return fetch(url)
       .then((response) => response.json())
       .then((json) => ({
