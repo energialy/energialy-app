@@ -1,9 +1,11 @@
-// Nuevo ApiProvider para manejar los datos de companies
-const companyApiUrl = "http://localhost:3001/companies";
+
+const companyApiUrl = process.env.NEXT_PUBLIC_BASE_URL;;
+
+
 
 const companyDataProvider = {
   getList: (resource, params) => {
-    const url = `${companyApiUrl}/${resource}`;
+    const url = `${companyApiUrl}/companies/${resource}`;
     return fetch(url)
       .then((response) => response.json())
       .then((json) => ({
@@ -11,14 +13,14 @@ const companyDataProvider = {
       }));
   },
   getOne: (resource, params) => {
-    const url = `${companyApiUrl}/${resource}/${params.id}`;
+    const url = `${companyApiUrl}/companies/${resource}/${params.id}`;
     return fetch(url)
       .then((response) => response.json())
       .then((json) => ({
         data: json,
       }));
   },
-  // Implementa las funciones restantes según sea necesario
+ 
 };
 
 export default companyDataProvider;

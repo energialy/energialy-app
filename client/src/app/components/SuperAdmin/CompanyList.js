@@ -6,7 +6,7 @@ const CompanyList = (props) => (
     <List {...props}>
         <Datagrid>
             <TextField source="name" />
-            {/* No agregamos la columna "id" */}
+
         </Datagrid>
     </List>
 );

@@ -1,9 +1,11 @@
-// Nuevo ApiProvider para manejar los datos de companies
-const tendersApiUrl = "http://localhost:3001/tenders";
+
+const tendersApiUrl = process.env.NEXT_PUBLIC_BASE_URL;;
+
+
 
 const tenderDataProvider = {
   getList: (resource, params) => {
-    const url = `${tendersApiUrl}/${resource}`;
+    const url = `${tendersApiUrl}/tenders/${resource}`;
     return fetch(url)
       .then((response) => response.json())
       .then((json) => ({
@@ -11,14 +13,14 @@ const tenderDataProvider = {
       }));
   },
   getOne: (resource, params) => {
-    const url = `${tendersApiUrl}/${resource}/${params.id}`;
+    const url = `${tendersApiUrl}/tenders/${resource}/${params.id}`;
     return fetch(url)
       .then((response) => response.json())
       .then((json) => ({
         data: json,
       }));
   },
-  // Implementa las funciones restantes según sea necesario
+
 };
 
 export default tenderDataProvider;
