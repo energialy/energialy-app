@@ -8,14 +8,10 @@ import { useGetProposalsQuery } from '@/app/redux/services/ProposalApi';
 import { useGetTendersQuery } from '@/app/redux/services/tendersApi';
 
 //import getLocalStorage from "../Func/localStorage";
-import io from "socket.io-client";
-import {
-  axiosGetAllMessages,
-  axiosGetAllUsers,
-  axiosPostMessage,
-} from "@/app/Func/axios";
-import { getCompanyId, getUserId } from "@/app/Func/sessionStorage";
-const socketIo = io("http://localhost:3001");
+import io from 'socket.io-client';
+import { axiosGetAllMessages, axiosGetAllUsers, axiosPostMessage } from '@/app/Func/axios';
+import { getCompanyId, getUserId } from '@/app/Func/sessionStorage';
+const socketIo = io('http://localhost:3001');
 
 function CompanyDashboard({ user }) {
   const [userProposals, setUserProposals] = useState([]);
@@ -49,12 +45,12 @@ function CompanyDashboard({ user }) {
     return filterMessage;
   });
 
-  const [messageText, setMessageText] = useState("");
+  const [messageText, setMessageText] = useState('');
 
   useEffect(() => {
     if (!socketIo) return;
 
-    socketIo.on("message", (message) => {
+    socketIo.on('message', (message) => {
       // * SE CREA UN OBJETO RAMDON TEMPORAL PARA LA VISUALIZACION EN TIEMPO REAL
       if (sender && receiver) {
         const newMessage = {
@@ -68,12 +64,12 @@ function CompanyDashboard({ user }) {
     });
 
     return () => {
-      socketIo.off("message");
+      socketIo.off('message');
     };
   }, [socketIo, messageText]);
 
   const scrollToBottom = () => {
-    const element = document.getElementById("chatMessages");
+    const element = document.getElementById('chatMessages');
     if (element) {
       element.scrollTop = element.scrollHeight;
     }
@@ -82,11 +78,11 @@ function CompanyDashboard({ user }) {
   const sendMessage = (e) => {
     e.preventDefault();
     if (!socketIo || !messageText.trim() || !receiver) {
-      setMessageText("");
+      setMessageText('');
       return;
     }
-    socketIo.emit("sendMessage", messageText);
-    setMessageText("");
+    socketIo.emit('sendMessage', messageText);
+    setMessageText('');
     axiosPostMessage({
       text: messageText,
       senderId: sender?.id,
@@ -120,37 +116,26 @@ function CompanyDashboard({ user }) {
       <div className="w-full h-screen rounded-md flex flex-col gap-3 p-2">
         <div className="w-full bg-white rounded-md flex gap-3 p-2">
           <div className="w-1/2">
-            <DashboardTextCard title={"Ingresos"} content={"-"} />
-            <DashboardKpiCard
-              title={"Propuestas Enviadas En Otras Licitaciones"}
-              content={userProposals}
-            />
-            <DashboardKpiCard
-              title={"Propuestas Recibidas En Mis Licitaciones"}
-              content={proposalsToUser}
-            />
+            <DashboardTextCard title={'Ingresos'} content={'-'} />
+            <DashboardKpiCard title={'Propuestas Enviadas En Otras Licitaciones'} content={userProposals} />
+            <DashboardKpiCard title={'Propuestas Recibidas En Mis Licitaciones'} content={proposalsToUser} />
           </div>
           <div className="w-1/2">
             <div className="flex justify-between gap-2">
-              <DashboardTextCard title={"Ingresos Pendientes"} content={"-"} />
-              <DashboardTextCard title={"Inversiones"} content={"-"} />
+              <DashboardTextCard title={'Ingresos Pendientes'} content={'-'} />
+              <DashboardTextCard title={'Inversiones'} content={'-'} />
             </div>
             <div className="h-full flex flex-col">
               <div className="max-h-80 overflow-y-auto" id="chatMessages">
                 <h1 className="text-xl font-bold mb-4">Historial de Chat</h1>
                 {allMessages.map((message, index) => {
                   return (
-                    <div
-                      key={message.id || index}
-                      className={`${message.sender.id === userId ? "text-right" : "text-left"} mb-2`}
-                    >
+                    <div key={message.id || index} className={`${message.sender.id === userId ? 'text-right' : 'text-left'} mb-2`}>
                       {message.sender.id === userId ? (
                         <div className="bg-gray-200 p-3 rounded-lg">
                           <p>
                             <strong>Tú: </strong>
-                            {!message.sender.fullName
-                              ? `${message.sender.firstName} ${message.sender.lastName}`
-                              : message.sender.fullName}
+                            {!message.sender.fullName ? `${message.sender.firstName} ${message.sender.lastName}` : message.sender.fullName}
                           </p>
                           <p>
                             <strong>Mensaje: </strong>
@@ -165,9 +150,7 @@ function CompanyDashboard({ user }) {
                         <div className="bg-purple-200 p-3 rounded-lg">
                           <p>
                             <strong>Usuario: </strong>
-                            {!message.sender.fullName
-                              ? `${message.sender.firstName} ${message.sender.lastName}`
-                              : message.sender.fullName}
+                            {!message.sender.fullName ? `${message.sender.firstName} ${message.sender.lastName}` : message.sender.fullName}
                           </p>
                           <p>
                             <strong>Mensaje: </strong>
@@ -191,11 +174,7 @@ function CompanyDashboard({ user }) {
                   onChange={(e) => setMessageText(e.target.value)}
                   placeholder="Escribe tu mensaje..."
                 />
-                <button
-                  type="submit"
-                  onClick={sendMessage}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-                >
+                <button type="submit" onClick={sendMessage} className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
                   Enviar
                 </button>
               </form>
@@ -203,11 +182,7 @@ function CompanyDashboard({ user }) {
           </div>
         </div>
         <div className="w-full bg-white rounded-md flex gap-3 p-2">
-          {!loadingTenders ? (
-            <DashboardTableData title={"MIS LICITACIONES"} data={userTenders} />
-          ) : (
-            <p>Cargando..</p>
-          )}
+          {!loadingTenders ? <DashboardTableData title={'MIS LICITACIONES'} data={userTenders} /> : <p>Cargando..</p>}
         </div>
       </div>
     </div>

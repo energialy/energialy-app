@@ -90,7 +90,6 @@ function page(props) {
                 src={company.bannerPicture}
                 alt="compay banner picture"
                 fill={true}
-                priority
               />
             </div>
           </div>

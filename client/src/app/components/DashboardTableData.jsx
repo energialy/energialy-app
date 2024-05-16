@@ -1,10 +1,9 @@
-'use client'
-import {useState} from 'react';
+'use client';
+import { useState } from 'react';
 import PaginationComponent from './PaginationComponent';
 import { useRouter } from 'next/navigation';
 
-function DashboardTableData({title, data}) {
-  
+function DashboardTableData({ title, data }) {
   //---- Logica de Paginación ----//
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
@@ -24,25 +23,21 @@ function DashboardTableData({title, data}) {
   const router = useRouter();
 
   const proposalWineer = (item) => {
-    const winner = item.proposals.find(
-      (proposal) => proposal.status === "accepted"
-    );
+    const winner = item.proposals.find((proposal) => proposal.status === 'accepted');
 
     if (winner !== undefined) {
       return winner.Company.name;
     } else {
-      return "No Adjudicada";
+      return 'No Adjudicada';
     }
   };
 
   const amountWinnerProposal = (item) => {
-    const winner = item.proposals.find(
-      (proposal) => proposal.status === "accepted"
-    );
+    const winner = item.proposals.find((proposal) => proposal.status === 'accepted');
     if (winner !== undefined) {
       return winner.totalAmount;
     } else {
-      return "No Adjudicada";
+      return 'No Adjudicada';
     }
   };
 
@@ -50,7 +45,7 @@ function DashboardTableData({title, data}) {
     <div className="h-full w-full p-2">
       <div>{title} </div>
 
-      <div className=''>
+      <div className="">
         <div className="flex flex-col p-2">
           <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 sm:px-6 lg:px-8">
@@ -120,20 +115,11 @@ function DashboardTableData({title, data}) {
                           </td>
                         </tr>
                       ))
-                    ) : (
-                      <tr>
-                        <td colSpan="6">
-                          <h5>No existen licitaciones</h5>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
+                    ))}
+
+                  </tbody> */}
                 </table>
-                <PaginationComponent
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                <PaginationComponent currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
               </div>
             </div>
           </div>
@@ -143,4 +129,4 @@ function DashboardTableData({title, data}) {
   );
 }
 
-export default DashboardTableData
+export default DashboardTableData;
