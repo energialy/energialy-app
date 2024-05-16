@@ -1,9 +1,10 @@
-'use client';
-import { useState } from 'react';
+'use client'
+import {useState} from 'react';
 import PaginationComponent from './PaginationComponent';
 import { useRouter } from 'next/navigation';
 
-function DashboardTableData({ title, data }) {
+function DashboardTableData({title, data}) {
+  
   //---- Logica de Paginación ----//
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
@@ -23,21 +24,25 @@ function DashboardTableData({ title, data }) {
   const router = useRouter();
 
   const proposalWineer = (item) => {
-    const winner = item.proposals.find((proposal) => proposal.status === 'accepted');
+    const winner = item.proposals.find(
+      (proposal) => proposal.status === "accepted"
+    );
 
     if (winner !== undefined) {
       return winner.Company.name;
     } else {
-      return 'No Adjudicada';
+      return "No Adjudicada";
     }
   };
 
   const amountWinnerProposal = (item) => {
-    const winner = item.proposals.find((proposal) => proposal.status === 'accepted');
+    const winner = item.proposals.find(
+      (proposal) => proposal.status === "accepted"
+    );
     if (winner !== undefined) {
       return winner.totalAmount;
     } else {
-      return 'No Adjudicada';
+      return "No Adjudicada";
     }
   };
 
@@ -45,7 +50,7 @@ function DashboardTableData({ title, data }) {
     <div className="h-full w-full p-2">
       <div>{title} </div>
 
-      <div className="">
+      <div className=''>
         <div className="flex flex-col p-2">
           <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 sm:px-6 lg:px-8">
@@ -73,20 +78,23 @@ function DashboardTableData({ title, data }) {
                       </th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {data && data.length > 0 ? (
+                  
+                  {/* <tbody>
+                    {!data ? <h5>No existen licitaciones</h5> : (data.length === 0 ? (
+                      <h5>No existen licitaciones</h5>
+                    ) : (
                       tendersToShow?.map((item) => (
                         <tr
                           className={`border-b transition duration-300 ease-in-out cursor-pointer
-                            ${
-                              item.status === "working"
-                                ? "bg-green-300 hover:bg-green-200"
-                                : item.status === "completed"
-                                ? "bg-green-800 hover:bg-green-500"
-                                : item.status === "expired"
-                                ? "bg-red-300 hover:bg-red-200"
-                                : "hover:bg-neutral-100 dark:border-neutral-500 dark:hover:bg-neutral-600"
-                            }`}
+                           ${
+                             item.status === "working"
+                               ? "bg-green-300 hover:bg-green-200"
+                               : item.status === "completed"
+                               ? "bg-green-800 hover:bg-green-500"
+                               : item.status === "expired"
+                               ? "bg-red-300 hover:bg-red-200"
+                               : "hover:bg-neutral-100 dark:border-neutral-500 dark:hover:bg-neutral-600"
+                           }`}
                           key={item.id}
                           onClick={() => router.push(`/tenders/${item.id}`)}
                         >
@@ -109,7 +117,7 @@ function DashboardTableData({ title, data }) {
                               ? "Vencido"
                               : item.status === "working"
                               ? "En ejecución"
-                              : item.status === "completed"
+                              : item.statu === "completed"
                               ? "Finalizado"
                               : null}
                           </td>
@@ -119,7 +127,11 @@ function DashboardTableData({ title, data }) {
 
                   </tbody> */}
                 </table>
-                <PaginationComponent currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+                <PaginationComponent
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
               </div>
             </div>
           </div>
@@ -129,4 +141,4 @@ function DashboardTableData({ title, data }) {
   );
 }
 
-export default DashboardTableData;
+export default DashboardTableData
