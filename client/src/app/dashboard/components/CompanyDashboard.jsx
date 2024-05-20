@@ -110,7 +110,7 @@ function CompanyDashboard({ user }) {
 
   return (
     <div>
-      <div className="flex items-center p-2 font-extralight font-jose text-lg text-gray-400">
+      <div className="flex items-center p-2 font-extralight font-jose text-6xl text-gray-400">
         Hola, {user.firstName}
         <div className="flex-grow">
           <Buttons />
