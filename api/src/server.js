@@ -5,6 +5,8 @@ const morgan = require('morgan');
 const routes = require('./routes/index.js');
 const cors = require('cors');
 const { BASE_URL } = process.env;
+const http = require('http');
+const socketIo = require('socket.io');
 
 require('./db.js');
 
@@ -15,6 +17,25 @@ const corsOptions = {
 const app = express();
 app.use(cors(corsOptions));
 
+const server = http.createServer(app);
+const io = socketIo(server, {
+    cors: {
+      origin: '*',
+    }
+});
+
+io.on('connection', (socket) => {
+  console.log('New user connected');
+    
+  socket.on('sendMessage', (message) => {
+    io.emit('message', message);
+  });
+  
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+});
+
 app.name = 'API';
 
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
@@ -22,7 +43,10 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(cookieParser());
 app.use(morgan('dev'));
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', BASE_URL);
+
+  // res.header('Access-Control-Allow-Origin', BASE_URL);
+
+  res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Authorization, Accept');
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
@@ -44,4 +68,4 @@ app.use((err, req, res, next) => {
   res.status(status).send(message);
 });
 
-module.exports = app;
+module.exports = { app, server, io };
