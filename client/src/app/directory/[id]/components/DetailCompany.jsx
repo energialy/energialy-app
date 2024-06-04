@@ -18,7 +18,6 @@ function DetailCompany({company}) {
           <div className="w-full h-1/2 flex justify-center">
             <Image
               src={company.profilePicture}
-              alt="foto de la compañia"
               width={200}
               height={200}
             ></Image>

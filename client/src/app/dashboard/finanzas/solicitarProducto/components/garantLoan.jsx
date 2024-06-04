@@ -74,10 +74,8 @@ export default function GarantLoan() {
       }
     }
   };
-  const Company = company.id
 
   const handleSubmit = async (e) => {
-    console.log("esta es la compania",company);
     e.preventDefault();
     const additionalData = {
       businessName,
@@ -88,15 +86,12 @@ export default function GarantLoan() {
       destination,
       amount: `${amountToRequest} ${currency}`,
       garantType,
-      Company,
     };
     const accountData = {
       productName: "Préstamo con garantía",
       bankAccountId,
       additionalData,
     };
-
-    console.log("Información enviada:", accountData);
     if (
       !businessName ||
       !fiscalAdress ||

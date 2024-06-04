@@ -14,7 +14,6 @@ function CompanyCard(props) {
           <Image
             className="rounded-tr-md rounded-tl-md"
             src={props.compBanner}
-            alt="banner de la compañia"
             width={360}
             height={120}
           />
@@ -25,7 +24,6 @@ function CompanyCard(props) {
             height={90}
             className="p-2 shadow rounded-md"
             src={props.compLogo}
-            alt="logo de la compañia"
           />
         </div>
         <div className="w-full h-1/2 rounded-br-md rounded-bl-md flex flex-col">
