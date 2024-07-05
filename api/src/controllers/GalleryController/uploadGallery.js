@@ -12,19 +12,17 @@ const uploadGallery = async (description, companyId, files) => {
 
     // Calcular cuántas imágenes se pueden subir
     const remainingSlots = 4 - existingImagesCount;
+   const filesToUpload = files.slice(0, remainingSlots);
 
-
-    for (const file of files) {
-      const uploadedImage = await handleUpload(file.path);
+    for (const file of filesToUpload) {    
+      const uploadedImage = await handleUpload(file.buffer);
       await CompanyGallery.create({
         companyId,
-        CompanyId: companyId,
-        publicId:uploadedImage.public_id,
+        publicId: uploadedImage.public_id,
         description,
-        imageUrl:uploadedImage.url
+        imageUrl: uploadedImage.url
       });
     }
-   // await fs.unlink(files.path);
 } catch (error) {
     throw new Error('Error uploading gallery: ' + error.message);
 }

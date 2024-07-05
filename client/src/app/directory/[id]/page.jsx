@@ -17,7 +17,6 @@ const Page = ({ params: { id } }) => {
       axiosGetGalleryCompanyById(id, setGallery);
     }
   }, [id]);
-
   if (!company) return "loading...";
 
   return (
@@ -27,7 +26,7 @@ const Page = ({ params: { id } }) => {
           <Image
             className="object-cover max-h-[60%]"
             src={company.bannerPicture}
-            alt="Company banner picture"
+            alt={"Company banner picture"}     
             layout="fill"
           />
         </div>
