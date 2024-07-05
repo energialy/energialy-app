@@ -7,30 +7,40 @@ cloudinary.config({
   api_secret: CLOUD_API_SECRET,
 });
 
-const handleUpload = async (file) => {
+const handleUpload = async (fileBuffer) => {
   try {
-    const result = await cloudinary.uploader.upload(file, {
-      resource_type: 'auto',
+    return new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream({ resource_type: 'auto' }, (error, result) => {
+        if (error) {
+          reject(new Error('Error al cargar la imagen a Cloudinary: ' + error.message));
+        } else {
+          resolve({
+            public_id: result.public_id,
+            url: result.secure_url 
+          });
+        }
+      }).end(fileBuffer);
     });
-
-    return result;
   } catch (error) {
-    throw new Error('Error al cargar la imagen a Cloudinary' + error);
+    throw new Error('Error al cargar la imagen a Cloudinary: ' + error.message);
   }
 };
 
 const handleUploadFiles = async (files) => {
   try {
     const promises = files.map((file) =>
-      cloudinary.uploader.upload(file.path, {
-        resource_type: 'auto',
+      new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream({ resource_type: 'auto' }, (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }).end(file.buffer);
       })
     );
 
     const results = await Promise.all(promises);
     return results;
   } catch (error) {
-    throw new Error('Error al cargar las imágenes a Cloudinary: ' + error);
+    throw new Error('Error al cargar las imágenes a Cloudinary: ' + error.message);
   }
 };
 
