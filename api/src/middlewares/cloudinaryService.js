@@ -1,3 +1,4 @@
+const path = require('path');
  const cloudinary = require('cloudinary').v2;
 const { CLOUD_NAME, CLOUD_API_KEY, CLOUD_API_SECRET } = process.env;
 
@@ -6,7 +7,7 @@ cloudinary.config({
   api_key: CLOUD_API_KEY,
   api_secret: CLOUD_API_SECRET,
 });
-
+// subir un solo archivo
 const handleUpload = async (fileBuffer) => {
   try {
     return new Promise((resolve, reject) => {
@@ -25,7 +26,7 @@ const handleUpload = async (fileBuffer) => {
     throw new Error('Error al cargar la imagen a Cloudinary: ' + error.message);
   }
 };
-
+//subir varios archivos
 const handleUploadFiles = async (files) => {
   try {
     const promises = files.map((file) =>
@@ -69,20 +70,24 @@ const deleteImageFromCloudinary = async (id) => {
 const getAllImagesFromCloudinary = async () => {
   try {
     const result = await cloudinary.search
-      .expression('resource_type:image')
+      .expression('resource_type:image OR resource_type:raw')
       .execute();
 
-    const images = result.resources.map((image) => ({
-      asset_id: image.asset_id,
-      public_id: image.public_id,
-      url: image.url,
-      format: image.format,
-      width: image.width,
-      height: image.height,
-      created_at: image.created_at,
-    }));
+    const resultAll = result.resources.map((resource) => {
+      const isPdf = resource.format === 'pdf';
+      return {
+        asset_id: resource.asset_id,
+        public_id: resource.public_id,
+        url: resource.secure_url,
+        format: resource.format,
+        width: resource.width,
+        height: resource.height,
+        created_at: resource.created_at,
+        type: isPdf ? 'pdf' : 'image'
+      };
+    });
 
-    return images;
+    return resultAll;
   } catch (error) {
     console.error(
       'Error al obtener las imágenes de Cloudinary:',
@@ -92,10 +97,35 @@ const getAllImagesFromCloudinary = async () => {
   }
 };
 
+const handleUploadPdfAndImages = async (fileBuffer, fileType,originalname) => {
+ 
+  try {
+    const resourceType = fileType === 'pdf' ? 'raw' : 'auto';
+
+    return new Promise((resolve, reject) => {
+      cloudinary.uploader.upload_stream({   resource_type: resourceType,
+        // public_id: originalname.replace(/\.[^/.]+$/, ""),
+       }, (error, result) => {
+        if (error) {
+          reject(new Error('Error al cargar el archivo a Cloudinary: ' + error.message));
+        } else {
+          resolve({
+            public_id: result.public_id,
+            url: result.secure_url,
+          });
+        }
+      }).end(fileBuffer);
+    });
+  } catch (error) {
+    throw new Error('Error al cargar el archivo a Cloudinary: ' + error.message);
+  }
+};
+
 module.exports = {
   getAllImagesFromCloudinary,
   deleteImageFromCloudinary,
   handleUpload,
   handleUploadFiles,
   updateUpload,
+  handleUploadPdfAndImages,
 };
