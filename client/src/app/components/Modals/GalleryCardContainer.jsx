@@ -16,7 +16,7 @@ return (
             )
         )
           ) : (
-            <h1>La compañia no tiene imagenes cargadas</h1>
+            <h1>La compañia no tiene Productos/Servicios cargados.</h1>
           )}
         </div>    
     </div>

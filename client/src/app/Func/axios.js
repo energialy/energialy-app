@@ -136,3 +136,90 @@ export async function axiosGetImageCount(companyId) {
     throw error; 
   }
 }
+
+// PARA PDF CERTIFICACIONES/HOMOLOGACIONES
+//
+//Traer todas las CERTIFICACIONES/HOMOLOGACIONES de una compañia
+export async function axiosGetCertificationCompanyById(companyid, setCertification) {
+ 
+  try {
+    if(companyid) {
+      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/certification/${companyid}`);
+      setCertification(data)
+    }
+  } catch (error) {
+    console.log("Error en axiosGetCertificationCompanyById por: ", error);
+  }
+}
+
+//ELIMINAR UNA IMAGEN DE UN CERTIFICACIONES/HOMOLOGACIONES DE UNA COMPAÑIA
+
+export async function axiosDeleteCertificationGalleryById (id, setCertification) {
+try {
+  if(id) {
+    await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/certification/${id}`);
+     // Actualiza la galería localmente eliminando la CERTIFICACIONES/HOMOLOGACIONES con el publicId
+     setCertification(prevCertification => prevCertification.filter(image => image.id !== id));
+  }
+} catch (error) {
+  console.log("Error en axiosDeleteCertificationGalleryById por: ", error);
+}
+}
+
+//EDITAR DESCRIPCION DE UNA CERTIFICACIONES/HOMOLOGACIONES DE UNA COMPAÑIA
+
+export async function axiosEditCertificationGalleryById (id, newDescription) {
+  try {
+    if(id) {
+      const response = await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/certification/${id}`, { description: newDescription });
+    return response.data;
+    }
+  } catch (error) {
+    console.log("Error en axiosEditCertificationGalleryById por: ", error);
+  }
+}
+
+//AGREGAR CERTIFICACIONES/HOMOLOGACIONES DE UNA COMPAÑIA
+
+
+export async function axiosPostCertificationGallery(description, companyId, files) {
+ 
+  try {
+    const formData = new FormData();
+
+    // Agregar archivos a FormData
+    if (files && files.length > 0) {
+      files.forEach((file, index) => {
+        formData.append('files', file); 
+      });
+    } else {
+      throw new Error("No files provided");
+    }
+
+    // Agregar otros datos a FormData
+    formData.append('description', description);
+    formData.append('companyId', companyId);
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/certification/files`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.log("Error en axiosPostCertificationGallery por: ", error);
+    throw error; 
+  }
+}
+
+// OBTENER EL NUMERO DE CERTIFICACIONES/HOMOLOGACIONES EN LA GALERIA DE UNA COMPAÑIA
+
+export async function axiosGetCertificationCount(companyId) {
+  try {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/certification/count/${companyId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener el número de certificaciones/homologaciones: ", error);
+    throw error; 
+  }
+}
