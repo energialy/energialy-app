@@ -3,8 +3,9 @@ import { useState, useEffect } from "react";
 import DetailCompany from "./DetailCompany";
 import TendersCompany from "./TendersCompany";
 import GalleryCompany from "./GalleryCompany";
+import CertificationCompany from "./CertificationCompany";
 
-function CollapsedBar({title, company, intState, gallery }) {
+function CollapsedBar({title, company, intState, gallery, certification }) {
      const [isCollapsed, setIsCollapsed] = useState(intState);
      const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -52,7 +53,7 @@ function CollapsedBar({title, company, intState, gallery }) {
           </button>
         </div>
         <div className={`${isCollapsed ? "hidden" : "block"}`}>
-          {title === 'Compañía' ? <DetailCompany company={company} /> : title === 'Licitaciones' ? <TendersCompany company={company}/> : title === 'Productos/Servicios' ? <GalleryCompany gallery={gallery}/> : null }
+          {title === 'Compañía' ? <DetailCompany company={company} /> : title === 'Licitaciones' ? <TendersCompany company={company}/> : title === 'Productos/Servicios' ? <GalleryCompany gallery={gallery}/> : title === 'Certificaciones/Homologaciones' ? <CertificationCompany certification={certification}/>: null }
           
           
         </div>

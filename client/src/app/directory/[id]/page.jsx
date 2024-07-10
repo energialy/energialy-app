@@ -5,16 +5,19 @@ import CollapsedBar from "./components/collapsedBar";
 import {
   axiosGetDetailCompany,
   axiosGetGalleryCompanyById,
+  axiosGetCertificationCompanyById,
 } from "@/app/Func/axios";
 import Chat from "@/app/components/Chat";
 const Page = ({ params: { id } }) => {
   const [company, setCompany] = useState({});
   const [gallery, setGallery] = useState([]); 
+  const [certification, setCertification] = useState([]);
 
   useEffect(() => {
     if (id) {
       axiosGetDetailCompany(id, setCompany);
       axiosGetGalleryCompanyById(id, setGallery);
+      axiosGetCertificationCompanyById(id,setCertification);
     }
   }, [id]);
   if (!company) return "loading...";
@@ -38,6 +41,12 @@ const Page = ({ params: { id } }) => {
             <CollapsedBar
               title={"Productos/Servicios"}
               gallery={gallery}
+              intState={true}
+              
+            />
+            <CollapsedBar
+              title={"Certificaciones/Homologaciones"}
+              certification={certification}
               intState={true}
               
             />
