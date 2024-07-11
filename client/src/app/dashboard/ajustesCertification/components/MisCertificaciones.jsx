@@ -79,7 +79,7 @@ const handleSaveDescription = async (id, newDescription) => {
 if ( certification == null) {
     return (
         <div className="certification flex flex-col bg-white m-4 rounded-md p-3 justify-between">
-        <div className="text-center text-gray-500">Todavía no agregaste ninguna Certificaciones/Homologaciones</div>
+        <div className="text-center text-gray-500">Todavía no agregaste ninguna Certificaciones/Homologaciones!</div>
       </div>
     );
 }
