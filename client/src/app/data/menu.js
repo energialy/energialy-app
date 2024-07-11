@@ -99,7 +99,7 @@ export const menuBar = [
     //spacing: true,
     submenuItems: [
       { title: "Productos/Servicios", url: "/dashboard/ajustesGallery" },
-      // { title: "Homologaciones/Certificaciones", url: "/dashboard/ajustesGallery" },
+      { title: "Homologaciones/Certificaciones", url: "/dashboard/ajustesCertification" },
     ],
   },
 ];

@@ -1,19 +1,19 @@
-
 const multer = require('multer');
-const uploadGallery = require('../../controllers/GalleryController/uploadGallery');
-const fs = require('fs-extra');
+const uploadCertification = require('../../controllers/CertificationGallery/postCertification');
 const storage = multer.memoryStorage();
 
 const fileFilter = function (req, file, cb) {
-  if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-    return cb(new Error('Solo se permiten archivos JPG, JPEG y PNG'));
+ 
+  if (!file.originalname.match(/\.(jpg|jpeg|png|pdf)$/)) {
+    return cb(new Error('Solo se permiten archivos JPG, JPEG, PNG y PDF'));
   }
   cb(null, true);
 };
 
 const upload = multer({ storage: storage, fileFilter: fileFilter }).array('files');
 
-const uploadGalleryHandler = async (req, res) => {
+const uploadCertificationHandler = async (req, res) => {
+
   upload(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message });
@@ -24,12 +24,12 @@ const uploadGalleryHandler = async (req, res) => {
         return res.status(400).json({ error: 'No files uploaded' });
       }
       const { description, companyId } = req.body;   
-      await uploadGallery(description, companyId, files);
-      res.status(200).json({ message: 'Gallery uploaded successfully' });
+      await uploadCertification(description, companyId, files);
+      res.status(200).json({ message: 'Certification uploaded successfully' });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   });
 };
 
-module.exports = uploadGalleryHandler;
+module.exports = uploadCertificationHandler;

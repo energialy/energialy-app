@@ -39,6 +39,28 @@ const Chat = ({ id, company }) => {
   const myName = getCompanyName(); //Nombre de la compañía logueada->sirve para filtro de chat
   let usuariosUnicos = new Set();
 
+  const convertirFecha = (fechaISO) => {
+    let fecha = new Date(fechaISO);
+
+    // Extraer componentes de la fecha
+    let dia = fecha.getUTCDate();
+    let mes = fecha.getUTCMonth() + 1; // Los meses empiezan desde 0
+    let año = fecha.getUTCFullYear();
+
+    // Convertir la hora a la zona horaria deseada (ejemplo: UTC-3)
+    let hora = fecha.getUTCHours() - 3;
+    let minutos = fecha.getUTCMinutes();
+
+    // Asegurarse de que la hora es válida después de la conversión
+    if (hora < 0) {
+      hora += 24;
+      dia -= 1;
+    }
+
+    // Formatear la fecha y hora en el nuevo formato
+    let fechaString = `${dia}-${mes}-${año}-${hora}:${minutos}`;
+    return (fechaString); // Ejemplo de salida: "26-6-2024-19:38"
+  };
   //Envio de usuarios a server para su asignacion
   //Se envia el id de la compañía
   useEffect(() => {
@@ -144,6 +166,7 @@ const Chat = ({ id, company }) => {
 
   //Recibe los mensajes
   useEffect(() => {
+    console.log("Recibe allMessages", allMessages);
     if (!socketIo) return;
     const messageListener = (message) => {
       const { _message, _sender, _receiver } = message;
@@ -188,6 +211,7 @@ const Chat = ({ id, company }) => {
   //Envia los mensajes
   const handleSendMessage = useCallback(
     (event) => {
+      console.log("Envia allMessages", allMessages);
       event.preventDefault();
 
       if (!socketIo || !messageText.trim()) return;
@@ -195,8 +219,9 @@ const Chat = ({ id, company }) => {
         text: messageText,
         sender,
         receiver,
-        createdAt: new Date().toISOString(),
+        createdAt: convertirFecha(new Date().toISOString()),
       };
+      console.log("Date", newMessage.createdAt);
 
       setAllMessages((prevMessages) => [...prevMessages, newMessage]);
 
