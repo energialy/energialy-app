@@ -37,7 +37,7 @@ if (gallery == null) {
       </div>
     </div>
   ) : (
-    <div>Cargando imágenes...</div>
+    <div>Cargando Productos/Servicios...</div>
   )}
   {modalOpen && selectedImage && ( 
         <ModalImage imageUrl={selectedImage} onClose={closeModal} /> 
