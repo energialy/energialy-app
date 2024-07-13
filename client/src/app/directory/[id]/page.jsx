@@ -25,12 +25,12 @@ const Page = ({ params: { id } }) => {
   return (
     <div className="md:max-w-[70%] m-auto">
       <div className="flex justify-center mt-10">
-        <div className="relative w-full h-1/2">
+        <div className="w-full h-1/2 object-cover overflow-hidden -z-10">
           <Image
-            className="object-cover max-h-[60%]"
+            className="max-h-[60%]"
             src={company.bannerPicture}
             alt={"Company banner picture"}     
-            layout="fill"
+            fill={true}
           />
         </div>
       </div>
