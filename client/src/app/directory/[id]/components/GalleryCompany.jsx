@@ -22,7 +22,7 @@ const closeModal = () => {
 if (gallery == null) {
   return (
     <div className="gallery flex flex-col bg-white m-4 rounded-md p-3 justify-between">
-      <div className="text-center text-gray-500">La compañía no posee Productos/Servicios</div>
+      <div className="text-center text-gray-500">La compañía no posee Productos/Servicios.</div>
     </div>
   );
 }
