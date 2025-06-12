@@ -1,6 +1,8 @@
 import Image from "next/image";
+import placeholder from "@/app/assets/placeholder.jpg";
 
 function dateTransform(string) {
+  if (!string) return "Fecha no disponible";
   const formatDate = new Date(string);
   const optionsDate = { year: "numeric", month: "long", day: "numeric" };
   const date = formatDate.toLocaleDateString(undefined, optionsDate);
@@ -8,87 +10,111 @@ function dateTransform(string) {
 }
 
 function DetailCompany({company}) {
+  // Si no hay datos de empresa, crear datos de ejemplo
+  const defaultCompany = {
+    name: "Empresa Ejemplo",
+    profilePicture: placeholder,
+    createdAt: new Date().toISOString(),
+    foundationYear: "2020",
+    annualRevenue: "$1,000,000",
+    description: "Esta es una descripción de ejemplo para la empresa. Aquí se mostraría información detallada sobre los servicios, historia y valores de la compañía.",
+    locations: [{ id: 1, name: "Ciudad Ejemplo" }],
+    categories: [{ id: 1, name: "Categoría Ejemplo" }],
+    subcategories: [{ id: 1, name: "Subcategoría Ejemplo" }]
+  };
   
-    const date = dateTransform(company.createdAt);
+  const companyData = company || defaultCompany;
+  const date = dateTransform(companyData.createdAt);
     
   return (
     <>
-      <div className="flex mt-2 pt-8 border-t-2 ">
-        <div className="flex flex-col justify-center align-middle min-w-[35%]">
-          <div className="w-full h-1/2 flex justify-center">
+      <div className="flex flex-col md:flex-row mt-2 pt-8 border-t-2">
+        {/* Columna 1: Logo, nombre y datos */}
+        <div className="flex flex-col justify-start align-middle w-full md:w-1/2 px-4">
+          <div className="w-full flex justify-center md:justify-start mb-4">
             <Image
-              src={company.profilePicture}
+              src={companyData.profilePicture || placeholder}
               width={200}
               height={200}
-            ></Image>
+              alt={companyData.name || "Logo de la empresa"}
+            />
           </div>
-          <div className="text-center p-3">
-            <h2 className="text-lg font-bold">{company.name}</h2>
+          <div className="text-center md:text-left p-3">
+            <h2 className="text-xl md:text-2xl font-bold">{companyData.name}</h2>
           </div>
-          {/* <div className="text-sm">
-            <p>Comentarios</p>
-          </div> */}
-          <div className="text-sm">
+          <div className="text-sm mb-2">
             <p>Miembro desde, {date}</p>
           </div>
-          <div>
+          <div className="mb-2">
             <p className="text-sm">
               <span className="font-bold">Año Fundación:</span>{" "}
-              {company.foundationYear}
+              {companyData.foundationYear || "No disponible"}
             </p>
           </div>
-          <div>
+          <div className="mb-4">
             <p className="text-sm">
               <span className="font-bold">Ingresos Ultimo Año:</span>{" "}
-              {company.annualRevenue}
+              {companyData.annualRevenue || "No disponible"}
             </p>
           </div>
-        </div>
-        <div className="max-w-[40%] flex flex-col px-3">
-          <div className="flex justify-center mb-4">
-            {company.locations?.map((location) => (
-              <div key={location.id} className=" flex m-auto ">
-                <div className="w-2 h-2 bg-primary-200 rounded-full mr-1 mt-2 mb-2"></div>
-                <p className="text-sm m-auto" key={location.id}>
-                  {location.name}
-                </p>
-              </div>
-            ))}
-          </div>
-          <p className="text-sm text-justify">{company.description}</p>
-        </div>
-        <div className="flex flex-col justify-center min-w-[25%] px-4">
-          <div className="min-h-[50%]">
-            <span className="font-bold pb-4">Categorias:</span>
-            <div className="min-w-full">
-              {company.categories?.map((category) => (
-                <div key={category.id} className="flex m-auto">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full mr-2 mt-2 mb-2"></div>
-                  <p
-                    className="text-sm font-semibold my-auto"
-                    key={category.id}
-                  >
-                    {category.name}
-                  </p>
+          
+          {/* Ubicaciones */}
+          <div className="flex flex-wrap mb-4">
+            <p className="font-bold text-sm w-full mb-2">Ubicaciones:</p>
+            {companyData.locations && companyData.locations.length > 0 ? (
+              companyData.locations.map((location) => (
+                <div key={location.id} className="flex mr-4 mb-2">
+                  <div className="w-2 h-2 bg-primary-200 rounded-full mr-1 mt-1"></div>
+                  <p className="text-sm">{location.name}</p>
                 </div>
-              ))}
+              ))
+            ) : (
+              <p className="text-sm">No hay ubicaciones disponibles</p>
+            )}
+          </div>
+          
+          {/* Categorías */}
+          <div className="mb-4">
+            <p className="font-bold text-sm mb-2">Categorías:</p>
+            <div className="flex flex-wrap">
+              {companyData.categories && companyData.categories.length > 0 ? (
+                companyData.categories.map((category) => (
+                  <div key={category.id} className="flex mr-4 mb-2">
+                    <div className="w-2 h-2 bg-secondary-500 rounded-full mr-2 mt-1"></div>
+                    <p className="text-sm font-semibold">{category.name}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm">No hay categorías disponibles</p>
+              )}
             </div>
           </div>
-          <div className="min-h-[50%]">
-            <span className="font-bold pb-4">Sub-Categorias:</span>
-            <div className="min-w-full">
-              {company.subcategories?.map((subcategory) => (
-                <div key={subcategory.id} className="flex m-auto">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full mr-2 mt-2 mb-2"></div>
-                  <p
-                    className="text-sm font-semibold my-auto"
-                    key={subcategory.id}
-                  >
-                    {subcategory.name}
-                  </p>
-                </div>
-              ))}
+          
+          {/* Subcategorías */}
+          <div className="mb-4">
+            <p className="font-bold text-sm mb-2">Sub-Categorías:</p>
+            <div className="flex flex-wrap">
+              {companyData.subcategories && companyData.subcategories.length > 0 ? (
+                companyData.subcategories.map((subcategory) => (
+                  <div key={subcategory.id} className="flex mr-4 mb-2">
+                    <div className="w-2 h-2 bg-secondary-500 rounded-full mr-2 mt-1"></div>
+                    <p className="text-sm font-semibold">{subcategory.name}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm">No hay subcategorías disponibles</p>
+              )}
             </div>
+          </div>
+        </div>
+        
+        {/* Columna 2: Descripción de la empresa */}
+        <div className="w-full md:w-1/2 flex flex-col px-4 mt-4 md:mt-0">
+          <h3 className="font-bold text-lg mb-4">Descripción de la Empresa</h3>
+          <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+            <p className="text-sm text-justify">
+              {companyData.description || "No hay descripción disponible para esta empresa."}
+            </p>
           </div>
         </div>
       </div>
