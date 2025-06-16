@@ -34,12 +34,32 @@ module.exports = (sequelize) => {
     },
     position: {
       type: DataTypes.STRING,
-    },
-    role: {
+    },    role: {
       type: DataTypes.ENUM,
-      values: ['admin', 'superAdmin', 'bank'],
+      values: ['admin', 'superAdmin', 'bank', 'company_owner', 'company_collaborator'],
       allowNull: false,
       defaultValue: 'admin',
+    },
+    permissions: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      defaultValue: [],
+      comment: 'Array of permissions for company collaborators'
+    },
+    invitedBy: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      comment: 'ID of the user who invited this collaborator'
+    },
+    invitationStatus: {
+      type: DataTypes.ENUM,
+      values: ['pending', 'accepted', 'rejected'],
+      defaultValue: 'accepted',
+      comment: 'Status of the invitation for collaborators'
+    },
+    invitationToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: 'Token for invitation verification'
     },
     isActive: {
       type: DataTypes.BOOLEAN,
