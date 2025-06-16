@@ -12,6 +12,7 @@ const {
   generateSendInviteCompanies,
   generatePasswordResetRequestEmail,
   generatePasswordResetSuccessfullyEmail,
+  generateCollaboratorInvitationEmail,
 } = require('./emailTemplates');
 
 const sendEmployerEmailProposalReceived = async (receiver, employerName, supplierCompanyName, tenderTitle, proposalAmount, proposalDuration) => {
@@ -146,6 +147,19 @@ const sendPasswordResetSuccessfullyEmail = async (receiver, username) => {
   console.log(response);
 };
 
+const sendCollaboratorInvitationEmail = async (receiver, collaboratorName, companyName, inviterName, invitationToken) => {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const invitationLink = `${process.env.FRONTEND_URL}/accept-invitation?token=${invitationToken}`;
+  
+  const response = await resend.emails.send({
+    from: 'Energialy <hola@energialy.ar>',
+    to: receiver,
+    subject: `Invitación para colaborar en ${companyName} - Energialy`,
+    html: generateCollaboratorInvitationEmail(collaboratorName, companyName, inviterName, invitationLink),
+  });
+  console.log(response);
+};
+
 module.exports = {
   sendEmployerEmailProposalReceived,
   sendSupplierEmailProposalAccepted,
@@ -159,4 +173,5 @@ module.exports = {
   sendInviteCompanies,
   sendPasswordResetRequestEmail,
   sendPasswordResetSuccessfullyEmail,
+  sendCollaboratorInvitationEmail,
 };

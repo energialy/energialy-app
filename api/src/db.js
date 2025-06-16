@@ -24,7 +24,7 @@ let entries = Object.entries(sequelize.models);
 let capsEntries = entries.map((entry) => [entry[0][0].toUpperCase() + entry[0].slice(1), entry[1]]);
 sequelize.models = Object.fromEntries(capsEntries);
 
-const { Users, Messages, Companies, Categories, Subcategories, Locations, Tenders, Proposals, Documents, BankAccounts, FinanceProducts, CompanyGallery, CertificationGallery } = sequelize.models;
+const { Users, Messages, Companies, Categories, Subcategories, Locations, Tenders, Proposals, Documents, BankAccounts, FinanceProducts, CompanyGallery, CertificationGallery, CompanyInvitations, Permissions } = sequelize.models;
 
 Companies.hasMany(Users);
 Users.belongsTo(Companies);
@@ -79,6 +79,17 @@ CompanyGallery.belongsTo(Companies);
 
 Companies.hasMany(CertificationGallery);
 CertificationGallery.belongsTo(Companies);
+
+// Company Invitations relationships
+Companies.hasMany(CompanyInvitations);
+CompanyInvitations.belongsTo(Companies);
+
+Users.hasMany(CompanyInvitations, { foreignKey: 'invitedBy', as: 'sentInvitations' });
+CompanyInvitations.belongsTo(Users, { foreignKey: 'invitedBy', as: 'inviter' });
+
+// User self-reference for invitation hierarchy
+Users.hasMany(Users, { foreignKey: 'invitedBy', as: 'invitedUsers' });
+Users.belongsTo(Users, { foreignKey: 'invitedBy', as: 'inviter' });
 
 module.exports = {
   ...sequelize.models,

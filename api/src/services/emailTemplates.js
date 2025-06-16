@@ -164,6 +164,48 @@ const generatePasswordResetSuccessfullyEmail = (username) => {
   return html;
 };
 
+const generateCollaboratorInvitationEmail = (collaboratorName, companyName, inviterName, invitationLink) => {
+  const html = `
+  <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+      <h2 style="color: #2c5282;">¡Invitación para colaborar en ${companyName}!</h2>
+      
+      <p>Hola ${collaboratorName},</p>
+      
+      <p><strong>${inviterName}</strong> te ha invitado a colaborar en <strong>${companyName}</strong> a través de la plataforma Energialy.</p>
+      
+      <p>Como colaborador, tendrás acceso a funciones específicas de la empresa según los permisos que te han sido asignados.</p>
+      
+      <div style="margin: 30px 0; text-align: center;">
+        <a href="${invitationLink}" 
+           style="background-color: #2c5282; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+          Aceptar Invitación
+        </a>
+      </div>
+      
+      <p><strong>Instrucciones:</strong></p>
+      <ol>
+        <li>Haz clic en el botón "Aceptar Invitación"</li>
+        <li>Crea tu contraseña para la cuenta</li>
+        <li>¡Comienza a colaborar con ${companyName}!</li>
+      </ol>
+      
+      <p style="font-size: 12px; color: #666; margin-top: 30px;">
+        <strong>Nota:</strong> Esta invitación expira en 7 días. Si no puedes acceder al enlace, copia y pega la siguiente URL en tu navegador:<br>
+        <span style="word-break: break-all;">${invitationLink}</span>
+      </p>
+      
+      <p style="margin-top: 30px;">
+        <em>Si tienes alguna duda puedes escribirnos a: hola@energialy.ar</em>
+      </p>
+      
+      <p><strong>Saludos del Equipo de Energialy</strong></p>
+    </div>
+  </body>
+  `;
+  return html;
+};
+
 module.exports = {
   generateEmployerEmailProposalReceived,
   generateSupplierEmailProposalAccepted,
@@ -177,4 +219,5 @@ module.exports = {
   generateSendInviteCompanies,
   generatePasswordResetRequestEmail,
   generatePasswordResetSuccessfullyEmail,
+  generateCollaboratorInvitationEmail,
 };

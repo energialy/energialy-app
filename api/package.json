@@ -1,11 +1,13 @@
 {
   "name": "api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "",  "main": "index.js",
   "scripts": {
     "start": "nodemon -L",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "node src/seeds/index.js",
+    "seed:permissions": "node src/seeds/seedPermissionsOnly.js",
+    "migrate:info": "echo 'Execute src/migrations/add_collaboration_features.sql in your PostgreSQL database'"
   },
   "author": "Energialy",
   "license": "ISC",
