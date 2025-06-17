@@ -8,7 +8,7 @@ import { urlProduction } from "@/app/data/dataGeneric";
 import {
   displayFailedMessage,
   displaySuccessMessage,
-} from "../../components/Toastify";
+} from "../components/Toastify";
 
 export default function AcceptInvitation() {
   const router = useRouter();
