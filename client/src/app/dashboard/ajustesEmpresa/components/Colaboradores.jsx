@@ -29,30 +29,69 @@ export default function Colaboradores() {
       LICITACIONES: false,
       FINANZAS: false
     }
-  });
-
-  useEffect(() => {
+  });  useEffect(() => {
     const userData = getLocalStorage();
+    console.log("User data from localStorage:", userData); // Debug log
+    console.log("User company data:", userData?.company); // Debug log
+    console.log("User CompanyId:", userData?.CompanyId); // Debug log
+    console.log("User company ID:", userData?.company?.id); // Debug log
+    
     setUser(userData);
-    if (userData?.company?.id) {
-      fetchCollaborators(userData.company.id);
+    
+    // Try different possible structures
+    const companyId = userData?.company?.id || userData?.CompanyId;
+    
+    if (companyId) {
+      console.log("Using company ID:", companyId); // Debug log
+      fetchCollaborators(companyId);
+    } else {
+      console.log("No company ID found. User data structure:", userData); // Debug log
+      // Don't show error message immediately, just log it
+      // displayFailedMessage("No se pudo obtener la información de la empresa. Estructura del usuario: " + JSON.stringify(userData));
     }
-  }, []);
-  const fetchCollaborators = async (companyId) => {
+  }, []);const fetchCollaborators = async (companyId) => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`${urlProduction}/collaborators/company-collaborators`, {
+      console.log("Fetching collaborators for company:", companyId); // Debug log
+      
+      // Get token from localStorage/sessionStorage
+      const userData = getLocalStorage();
+      const token = userData?.accessToken;
+      
+      console.log("Token found:", !!token); // Debug log
+      
+      const config = {
         withCredentials: true,
-      });
-      setCollaborators(response.data);
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
+      
+      // Only add Authorization header if token exists
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await axios.get(
+        `${urlProduction}/collaborators/company-collaborators`, 
+        config
+      );
+      
+      console.log("Collaborators response:", response.data); // Debug log
+      setCollaborators(response.data.collaborators || response.data);
     } catch (error) {
       console.error("Error fetching collaborators:", error);
-      displayFailedMessage("Error al cargar colaboradores");
+      console.error("Error response:", error.response?.data); // Debug log
+      
+      if (error.response?.status === 401) {
+        displayFailedMessage("No tienes permisos para ver colaboradores o tu sesión ha expirado.");
+      } else {
+        displayFailedMessage("Error al cargar colaboradores: " + (error.response?.data?.error || error.message));
+      }
     } finally {
       setIsLoading(false);
     }
-  };
-  const handleAddCollaborator = async () => {
+  };const handleAddCollaborator = async () => {
     if (!newCollaborator.email || !newCollaborator.name) {
       displayFailedMessage("Email y nombre son requeridos");
       return;
@@ -68,8 +107,34 @@ export default function Colaboradores() {
       return;
     }
 
-    try {
-      setIsLoading(true);
+    try {      setIsLoading(true);
+      
+      // Get token from localStorage/sessionStorage
+      const userData = getLocalStorage();
+      const token = userData?.accessToken;
+      
+      console.log("Token found for invite:", !!token); // Debug log
+
+      const config = {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
+      
+      // Only add Authorization header if token exists
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      console.log("Sending invite with data:", {
+        email: newCollaborator.email,
+        firstName: newCollaborator.name.split(' ')[0],
+        lastName: newCollaborator.name.split(' ').slice(1).join(' ') || '',
+        permissions: selectedPermissions,
+        position: 'Colaborador'
+      }); // Debug log
+
       const response = await axios.post(
         `${urlProduction}/collaborators/invite`,
         {
@@ -77,14 +142,12 @@ export default function Colaboradores() {
           firstName: newCollaborator.name.split(' ')[0],
           lastName: newCollaborator.name.split(' ').slice(1).join(' ') || '',
           permissions: selectedPermissions,
-          position: 'Colaborador'
-        },
-        { withCredentials: true }
-      );
-
-      // Refresh collaborators list
-      if (user?.company?.id) {
-        await fetchCollaborators(user.company.id);
+          position: 'Colaborador'        },
+        config
+      );// Refresh collaborators list
+      const companyId = user?.company?.id || user?.CompanyId;
+      if (companyId) {
+        await fetchCollaborators(companyId);
       }
       
       setNewCollaborator({
@@ -98,10 +161,15 @@ export default function Colaboradores() {
         }
       });
       setShowAddModal(false);
-      displaySuccessMessage("Invitación enviada exitosamente");
-    } catch (error) {
+      displaySuccessMessage("Invitación enviada exitosamente");    } catch (error) {
       console.error("Error adding collaborator:", error);
-      displayFailedMessage(error.response?.data?.error || "Error al enviar invitación");
+      console.error("Error response:", error.response?.data); // Debug log
+      
+      if (error.response?.status === 401) {
+        displayFailedMessage("No tienes permisos para invitar colaboradores.");
+      } else {
+        displayFailedMessage(error.response?.data?.error || "Error al enviar invitación");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -115,20 +183,43 @@ export default function Colaboradores() {
         [permission]: value
       }
     }));
-  };
-  const handleRemoveCollaborator = async (collaboratorId) => {
+  };  const handleRemoveCollaborator = async (collaboratorId) => {
     try {
-      await axios.delete(`${urlProduction}/collaborators/${collaboratorId}`, {
+      // Get token from localStorage/sessionStorage
+      const userData = getLocalStorage();
+      const token = userData?.accessToken;
+      
+      console.log("Token found for remove:", !!token); // Debug log
+
+      const config = {
         withCredentials: true,
-      });
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
+      
+      // Only add Authorization header if token exists
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      await axios.delete(`${urlProduction}/collaborators/${collaboratorId}`, config);
+        
       // Refresh collaborators list
-      if (user?.company?.id) {
-        await fetchCollaborators(user.company.id);
+      const companyId = user?.company?.id || user?.CompanyId;
+      if (companyId) {
+        await fetchCollaborators(companyId);
       }
       displaySuccessMessage("Colaborador eliminado exitosamente");
     } catch (error) {
       console.error("Error removing collaborator:", error);
-      displayFailedMessage("Error al eliminar colaborador");
+      console.error("Error response:", error.response?.data); // Debug log
+      
+      if (error.response?.status === 401) {
+        displayFailedMessage("No tienes permisos para eliminar colaboradores.");
+      } else {
+        displayFailedMessage("Error al eliminar colaborador: " + (error.response?.data?.error || error.message));
+      }
     }
   };
 

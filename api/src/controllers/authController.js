@@ -23,9 +23,18 @@ const userLogin = async (email, password) => {
     const error = new Error('Incorrect password.');
     error.status = 401;
     throw error;
-  }
-  const accessToken = jwt.sign({ email: foundUser.email }, ACCESS_TOKEN_SECRET, { expiresIn: 60 * 60 });
-  const refreshToken = jwt.sign({ email: foundUser.email }, REFRESH_TOKEN_SECRET, { expiresIn: 24 * 60 * 60 });
+  }  const accessToken = jwt.sign({ 
+    email: foundUser.email, 
+    userId: foundUser.id,
+    role: foundUser.role,
+    companyId: foundUser.CompanyId
+  }, ACCESS_TOKEN_SECRET, { expiresIn: 60 * 60 });
+  const refreshToken = jwt.sign({ 
+    email: foundUser.email, 
+    userId: foundUser.id,
+    role: foundUser.role,
+    companyId: foundUser.CompanyId
+  }, REFRESH_TOKEN_SECRET, { expiresIn: 24 * 60 * 60 });
   await foundUser.update({ refreshToken });
   return { accessToken, refreshToken };
 };
