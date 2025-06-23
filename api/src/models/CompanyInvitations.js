@@ -13,9 +13,8 @@ module.exports = (sequelize) => {
       validate: {
         isEmail: true,
       },
-    },
-    invitationToken: {
-      type: DataTypes.STRING,
+    },    invitationToken: {
+      type: DataTypes.TEXT, // Changed from STRING to TEXT to allow longer tokens
       allowNull: false,
       unique: true,
     },

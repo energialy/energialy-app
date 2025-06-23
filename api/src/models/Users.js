@@ -19,12 +19,11 @@ module.exports = (sequelize) => {
     hashedPassword: {
       type: DataTypes.STRING(64),
       allowNull: false,
-    },
-    refreshToken: {
-      type: DataTypes.STRING,
+    },    refreshToken: {
+      type: DataTypes.TEXT, // Changed from STRING to TEXT to allow longer tokens
     },
     resetToken: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT, // Changed from STRING to TEXT to allow longer tokens
     },
     firstName: {
       type: DataTypes.STRING,
