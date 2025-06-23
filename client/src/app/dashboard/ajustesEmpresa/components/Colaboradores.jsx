@@ -198,12 +198,12 @@ export default function Colaboradores() {
       }
     }
   };
-
   return (
-    <div className={`p-6 ${montserrat.className}`}>
+    <div className={`p-4 sm:p-6 ${montserrat.className}`}>
       <div className="bg-white rounded-lg shadow-sm">
+        <div className="p-4 sm:p-6">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
           <div>
             <h2 className="text-xl font-semibold text-gray-800 mb-2">
               Agregar Colaboradores
@@ -214,9 +214,9 @@ export default function Colaboradores() {
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2"
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 w-full sm:w-auto"
           >
-            <span>+ AGREGAR COLABORADOR</span>
+            <span className="text-sm sm:text-base">+ AGREGAR COLABORADOR</span>
           </button>
         </div>
 
@@ -231,16 +231,15 @@ export default function Colaboradores() {
             <div className="text-center py-8 text-gray-500">
               <p>No hay colaboradores agregados</p>
               <p className="text-sm">Agrega tu primer colaborador usando el botón superior</p>
-            </div>
-          ) : (            collaborators.map((collaborator) => (
+            </div>          ) : (            collaborators.map((collaborator) => (
               <div key={collaborator.id} className="border rounded-lg p-4 bg-gray-50">
-                <div className="flex justify-between items-start">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-gray-800">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                      <h3 className="font-semibold text-gray-800 text-base">
                         {collaborator.firstName} {collaborator.lastName}
                       </h3>
-                      <span className={`text-xs px-2 py-1 rounded ${
+                      <span className={`text-xs px-2 py-1 rounded w-fit ${
                         collaborator.status === 'accepted' 
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-yellow-100 text-yellow-800'
@@ -248,11 +247,11 @@ export default function Colaboradores() {
                         {collaborator.status === 'accepted' ? 'Activo' : 'Pendiente'}
                       </span>
                     </div>
-                    <p className="text-gray-600 text-sm">{collaborator.email}</p>
+                    <p className="text-gray-600 text-sm mb-1 break-all">{collaborator.email}</p>
                     {collaborator.position && (
-                      <p className="text-gray-500 text-xs">{collaborator.position}</p>
+                      <p className="text-gray-500 text-xs mb-2">{collaborator.position}</p>
                     )}
-                    <div className="mt-2 flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {(collaborator.permissions || []).map((permission) => (
                         <span key={permission} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
                           {permission}
@@ -262,7 +261,7 @@ export default function Colaboradores() {
                   </div>
                   <button
                     onClick={() => handleRemoveCollaborator(collaborator.id)}
-                    className="text-red-600 hover:text-red-800 text-sm"
+                    className="text-red-600 hover:text-red-800 text-sm px-3 py-1 rounded border border-red-200 hover:border-red-300 transition-colors w-full sm:w-auto text-center"
                   >
                     {collaborator.status === 'accepted' ? 'Eliminar' : 'Cancelar invitación'}
                   </button>
@@ -270,46 +269,44 @@ export default function Colaboradores() {
               </div>
             ))
           )}
-        </div>
-
-        {/* Add Collaborator Modal */}
+        </div>        {/* Add Collaborator Modal */}
         {showAddModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">Agregar Nuevo Colaborador</h3>
                 <button
                   onClick={() => setShowAddModal(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-500 hover:text-gray-700 p-1"
                 >
                   ✕
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {/* Basic Info */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Nombre Completo
                     </label>
                     <input
                       type="text"
                       value={newCollaborator.name}
                       onChange={(e) => setNewCollaborator(prev => ({...prev, name: e.target.value}))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                       placeholder="Nombre del colaborador"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Email
                     </label>
                     <input
                       type="email"
                       value={newCollaborator.email}
                       onChange={(e) => setNewCollaborator(prev => ({...prev, email: e.target.value}))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                       placeholder="email@ejemplo.com"
                     />
                   </div>
@@ -317,10 +314,10 @@ export default function Colaboradores() {
 
                 {/* Permissions */}
                 <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">
+                  <h4 className="text-sm font-medium text-gray-700 mb-4">
                     Selecciona las funciones para este Usuario Colaborador:
                   </h4>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {[
                       {
                         key: 'INSTITUCIONAL',
@@ -344,18 +341,18 @@ export default function Colaboradores() {
                       }
                     ].map((permission) => (
                       <div key={permission.key} className="border rounded-lg p-4">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="flex items-center gap-2 mb-2">
                               <span className="bg-green-100 text-green-800 px-3 py-1 rounded text-sm font-medium">
                                 {permission.title}
                               </span>
                             </div>
-                            <p className="text-sm text-gray-600 whitespace-pre-line">
+                            <p className="text-sm text-gray-600 whitespace-pre-line leading-relaxed">
                               {permission.description}
                             </p>
                           </div>
-                          <div className="flex items-center gap-2 ml-4">
+                          <div className="flex items-center justify-center sm:justify-end gap-3 sm:ml-4">
                             <span className="text-sm text-gray-500">NO</span>
                             <label className="relative inline-flex items-center cursor-pointer">
                               <input
@@ -375,32 +372,32 @@ export default function Colaboradores() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex justify-end gap-3 pt-4 border-t">
+                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t">
                   <button
                     onClick={() => setShowAddModal(false)}
-                    className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                    className="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors order-2 sm:order-1"
                   >
                     Cancelar
                   </button>
                   <button
                     onClick={handleAddCollaborator}
                     disabled={isLoading}
-                    className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+                    className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 order-1 sm:order-2"
                   >
                     {isLoading ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        Procesando...
+                        <span className="text-sm">Procesando...</span>
                       </>
                     ) : (
-                      'CONFIRMAR >'
+                      <span className="text-sm font-medium">CONFIRMAR</span>
                     )}
                   </button>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          </div>        )}
+        </div>
       </div>
       <ToastContainer />
     </div>
