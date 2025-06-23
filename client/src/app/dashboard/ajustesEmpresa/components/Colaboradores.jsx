@@ -56,25 +56,17 @@ export default function Colaboradores() {
       
       // Get token from localStorage/sessionStorage
       const userData = getLocalStorage();
-      const token = userData?.accessToken;
-      
+      const token = userData?.accessToken;      
       console.log("Token found:", !!token); // Debug log
       
-      const config = {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-      
-      // Only add Authorization header if token exists
-      if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`;
-      }
-
       const response = await axios.get(
         `${urlProduction}/collaborators/company-collaborators`, 
-        config
+        {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+            'Content-Type': 'application/json'
+          }
+        }
       );
       
       console.log("Collaborators response:", response.data); // Debug log
@@ -112,20 +104,7 @@ export default function Colaboradores() {
       // Get token from localStorage/sessionStorage
       const userData = getLocalStorage();
       const token = userData?.accessToken;
-      
-      console.log("Token found for invite:", !!token); // Debug log
-
-      const config = {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };
-      
-      // Only add Authorization header if token exists
-      if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`;
-      }
+        console.log("Token found for invite:", !!token); // Debug log
 
       console.log("Sending invite with data:", {
         email: newCollaborator.email,
@@ -143,7 +122,12 @@ export default function Colaboradores() {
           lastName: newCollaborator.name.split(' ').slice(1).join(' ') || '',
           permissions: selectedPermissions,
           position: 'Colaborador'        },
-        config
+        {
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+            'Content-Type': 'application/json'
+          }
+        }
       );// Refresh collaborators list
       const companyId = user?.company?.id || user?.CompanyId;
       if (companyId) {
@@ -188,22 +172,14 @@ export default function Colaboradores() {
       // Get token from localStorage/sessionStorage
       const userData = getLocalStorage();
       const token = userData?.accessToken;
-      
-      console.log("Token found for remove:", !!token); // Debug log
+        console.log("Token found for remove:", !!token); // Debug log
 
-      const config = {
-        withCredentials: true,
+      await axios.delete(`${urlProduction}/collaborators/${collaboratorId}`, {
         headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
           'Content-Type': 'application/json'
         }
-      };
-      
-      // Only add Authorization header if token exists
-      if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      await axios.delete(`${urlProduction}/collaborators/${collaboratorId}`, config);
+      });
         
       // Refresh collaborators list
       const companyId = user?.company?.id || user?.CompanyId;

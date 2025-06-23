@@ -3,26 +3,19 @@ require('dotenv').config();
 const { ACCESS_TOKEN_SECRET } = process.env;
 
 const verifyJWT = (req, res, next) => {
-  // First try to get token from Authorization header
   const authHeader = req.headers.authorization || req.headers.Authorization;
-  let accessToken = null;
+  
+  console.log('verifyJWT - Auth header:', authHeader ? 'Present' : 'Missing');
 
-  console.log('verifyJWT - Headers:', { 
-    authorization: !!authHeader,
-    cookies: Object.keys(req.cookies || {})
-  }); // Debug log
-
-  if (authHeader?.startsWith('Bearer ')) {
-    accessToken = authHeader.split(' ')[1];
-    console.log('verifyJWT - Token from Authorization header');
-  } else {
-    // If no authorization header, try to get token from cookies
-    accessToken = req.cookies?.accessToken;
-    console.log('verifyJWT - Token from cookies:', !!accessToken);
+  if (!authHeader?.startsWith('Bearer ')) {
+    console.log('verifyJWT - No Bearer token found');
+    return res.status(401).json({ error: 'Missing or invalid authorization header' });
   }
+
+  const accessToken = authHeader.split(' ')[1];
   
   if (!accessToken) {
-    console.log('verifyJWT - No access token found');
+    console.log('verifyJWT - No token after Bearer');
     return res.status(401).json({ error: 'Missing access token' });
   }
 
