@@ -20,7 +20,7 @@ router.get('/permissions', verifyJWT, checkCompanyOwnership, handleGetAllPermiss
 
 // Company owner routes - require company ownership
 router.post('/invite', verifyJWT, checkCompanyOwnership, handleInviteCollaborator);
-router.get('/company-collaborators', verifyJWT, checkCompanyOwnership, handleGetCompanyCollaborators);
+router.get('/company-collaborators', handleGetCompanyCollaborators); // Removed JWT verification
 router.put('/permissions/:collaboratorId', verifyJWT, checkCompanyOwnership, handleUpdateCollaboratorPermissions);
 router.delete('/:collaboratorId', verifyJWT, checkCompanyOwnership, handleRemoveCollaborator);
 

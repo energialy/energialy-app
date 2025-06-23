@@ -48,11 +48,10 @@ module.exports = (sequelize) => {
       type: DataTypes.UUID,
       allowNull: true,
       comment: 'ID of the user who invited this collaborator'
-    },
-    invitationStatus: {
-      type: DataTypes.ENUM,
-      values: ['pending', 'accepted', 'rejected'],
+    },    invitationStatus: {
+      type: DataTypes.ENUM('pending', 'accepted', 'rejected'),
       defaultValue: 'accepted',
+      allowNull: false,
       comment: 'Status of the invitation for collaborators'
     },
     invitationToken: {

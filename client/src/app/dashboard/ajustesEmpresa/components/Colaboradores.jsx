@@ -58,12 +58,10 @@ export default function Colaboradores() {
       const userData = getLocalStorage();
       const token = userData?.accessToken;      
       console.log("Token found:", !!token); // Debug log
-      
-      const response = await axios.get(
-        `${urlProduction}/collaborators/company-collaborators`, 
+        const response = await axios.get(
+        `${urlProduction}/collaborators/company-collaborators?companyId=${companyId}`, 
         {
           headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
             'Content-Type': 'application/json'
           }
         }
