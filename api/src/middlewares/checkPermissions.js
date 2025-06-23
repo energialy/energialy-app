@@ -4,8 +4,12 @@ const checkPermission = (requiredPermission) => {
   return async (req, res, next) => {
     try {
       const userEmail = req.user; // From JWT middleware
+      const userId = req.userId; // From JWT middleware
+      const userRole = req.userRole; // From JWT middleware
       
-      if (!userEmail) {
+      console.log('checkPermission - User info:', { userEmail, userId, userRole }); // Debug log
+      
+      if (!userEmail || !userId) {
         return res.status(401).json({ error: 'Unauthorized: No user found' });
       }
 
@@ -19,11 +23,13 @@ const checkPermission = (requiredPermission) => {
         return res.status(401).json({ error: 'Unauthorized: User not found' });
       }
 
+      console.log('checkPermission - Database user:', { id: user.id, role: user.role, companyId: user.CompanyId }); // Debug log
+
       // Super admin and admin have all permissions
       if (user.role === 'superAdmin' || user.role === 'admin') {
         req.userRole = user.role;
         req.userId = user.id;
-        req.companyId = user.Company?.id;
+        req.companyId = user.CompanyId;
         return next();
       }
 
@@ -31,7 +37,7 @@ const checkPermission = (requiredPermission) => {
       if (user.role === 'company_owner') {
         req.userRole = user.role;
         req.userId = user.id;
-        req.companyId = user.Company?.id;
+        req.companyId = user.CompanyId;
         return next();
       }
 
@@ -81,6 +87,15 @@ const checkPermission = (requiredPermission) => {
 const checkCompanyOwnership = async (req, res, next) => {
   try {
     const userEmail = req.user;
+    const userId = req.userId;
+    const userRole = req.userRole;
+    
+    console.log('checkCompanyOwnership - User info from token:', { userEmail, userId, userRole }); // Debug log
+    
+    if (!userEmail) {
+      console.log('checkCompanyOwnership - No user email found');
+      return res.status(401).json({ error: 'Unauthorized: No user found' });
+    }
     
     const user = await Users.findOne({
       where: { email: userEmail },
@@ -88,19 +103,37 @@ const checkCompanyOwnership = async (req, res, next) => {
     });
 
     if (!user) {
+      console.log('checkCompanyOwnership - User not found in database');
       return res.status(401).json({ error: 'Unauthorized: User not found' });
     }
 
-    // Only company owners can manage collaborators
-    if (user.role !== 'company_owner' && user.role !== 'superAdmin' && user.role !== 'admin') {
+    console.log('checkCompanyOwnership - Database user found:', { 
+      id: user.id, 
+      role: user.role, 
+      companyId: user.CompanyId,
+      hasCompany: !!user.Company 
+    }); // Debug log
+
+    // Be more permissive - allow company_owner, admin, and superAdmin
+    if (!['company_owner', 'admin', 'superAdmin'].includes(user.role)) {
+      console.log('checkCompanyOwnership - User role not authorized:', user.role);
       return res.status(403).json({ 
-        error: 'Forbidden: Only company owners can perform this action' 
+        error: 'Forbidden: Insufficient permissions',
+        userRole: user.role,
+        allowedRoles: ['company_owner', 'admin', 'superAdmin']
       });
     }
 
+    // Set request properties
     req.userRole = user.role;
     req.userId = user.id;
-    req.companyId = user.Company?.id;
+    req.companyId = user.CompanyId || user.Company?.id;
+    
+    console.log('checkCompanyOwnership - Authorization successful:', { 
+      userId: req.userId, 
+      userRole: req.userRole, 
+      companyId: req.companyId 
+    }); // Debug log
     
     next();
   } catch (error) {

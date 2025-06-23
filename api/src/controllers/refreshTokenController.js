@@ -30,9 +30,13 @@ const refreshToken = async (cookies) => {
         const error = new Error("User with a refresh token from other user.");
         error.status = 403;
         throw error;
-      };
-      newAccessToken = jwt.sign(
-        { email: decoded.email },
+      };      newAccessToken = jwt.sign(
+        { 
+          email: decoded.email, 
+          userId: foundUser.id,
+          role: foundUser.role,
+          companyId: foundUser.CompanyId
+        },
         ACCESS_TOKEN_SECRET,
         { expiresIn: 60 * 60 }
       );
