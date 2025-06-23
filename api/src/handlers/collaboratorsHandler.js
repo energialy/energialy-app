@@ -61,7 +61,12 @@ const handleAcceptInvitation = async (req, res) => {
 
 const handleGetCompanyCollaborators = async (req, res) => {
   try {
-    const companyId = req.companyId;
+    // Get companyId from query parameters instead of JWT middleware
+    const companyId = req.query.companyId;
+    
+    if (!companyId) {
+      return res.status(400).json({ error: 'Company ID is required' });
+    }
 
     const collaborators = await getCompanyCollaborators(companyId);
 
