@@ -11,6 +11,7 @@ import {
 import { useRouter } from "next/navigation";
 import getLocalStorage from "@/app/Func/localStorage";
 import { urlProduction } from "@/app/data/dataGeneric";
+import { getCompanyId, getUserId } from "@/app/utils/userHelpers";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
 
@@ -32,22 +33,17 @@ export default function Colaboradores() {
   });  useEffect(() => {
     const userData = getLocalStorage();
     console.log("User data from localStorage:", userData); // Debug log
-    console.log("User company data:", userData?.company); // Debug log
-    console.log("User CompanyId:", userData?.CompanyId); // Debug log
-    console.log("User company ID:", userData?.company?.id); // Debug log
     
     setUser(userData);
     
-    // Try different possible structures
-    const companyId = userData?.company?.id || userData?.CompanyId;
+    const companyId = getCompanyId(userData);
     
     if (companyId) {
       console.log("Using company ID:", companyId); // Debug log
       fetchCollaborators(companyId);
     } else {
-      console.log("No company ID found. User data structure:", userData); // Debug log
-      // Don't show error message immediately, just log it
-      // displayFailedMessage("No se pudo obtener la información de la empresa. Estructura del usuario: " + JSON.stringify(userData));
+      console.log("No company ID found. User data structure:", JSON.stringify(userData, null, 2)); // Debug log
+      displayFailedMessage("No se pudo obtener la información de la empresa. Por favor, verifica tu sesión.");
     }
   }, []);const fetchCollaborators = async (companyId) => {
     try {
@@ -97,19 +93,24 @@ export default function Colaboradores() {
       return;
     }
 
-    try {      setIsLoading(true);
-      
-      // Get token from localStorage/sessionStorage
+    try {      setIsLoading(true);        // Get user and company data
       const userData = getLocalStorage();
-      const token = userData?.accessToken;
-        console.log("Token found for invite:", !!token); // Debug log
+      const userId = getUserId(userData);
+      const companyId = getCompanyId(userData);
+
+      if (!userId || !companyId) {
+        toast.error("Error: No se pudo obtener la información del usuario o empresa");
+        return;
+      }
 
       console.log("Sending invite with data:", {
         email: newCollaborator.email,
         firstName: newCollaborator.name.split(' ')[0],
         lastName: newCollaborator.name.split(' ').slice(1).join(' ') || '',
         permissions: selectedPermissions,
-        position: 'Colaborador'
+        position: 'Colaborador',
+        inviterUserId: userId,
+        companyId: companyId
       }); // Debug log
 
       const response = await axios.post(
@@ -119,15 +120,17 @@ export default function Colaboradores() {
           firstName: newCollaborator.name.split(' ')[0],
           lastName: newCollaborator.name.split(' ').slice(1).join(' ') || '',
           permissions: selectedPermissions,
-          position: 'Colaborador'        },
+          position: 'Colaborador',
+          inviterUserId: userId,
+          companyId: companyId
+        },
         {
           headers: {
-            'Authorization': token ? `Bearer ${token}` : '',
             'Content-Type': 'application/json'
           }
-        }
-      );// Refresh collaborators list
-      const companyId = user?.company?.id || user?.CompanyId;
+        }      );
+
+      // Refresh collaborators list
       if (companyId) {
         await fetchCollaborators(companyId);
       }
@@ -177,10 +180,9 @@ export default function Colaboradores() {
           'Authorization': token ? `Bearer ${token}` : '',
           'Content-Type': 'application/json'
         }
-      });
-        
+      });        
       // Refresh collaborators list
-      const companyId = user?.company?.id || user?.CompanyId;
+      const companyId = getCompanyId(userData);
       if (companyId) {
         await fetchCollaborators(companyId);
       }

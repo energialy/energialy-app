@@ -9,12 +9,10 @@ const {
 
 const handleInviteCollaborator = async (req, res) => {
   try {
-    const { email, permissions, firstName, lastName, position } = req.body;
-    const inviterUserId = req.userId;
-    const companyId = req.companyId;
+    const { email, permissions, firstName, lastName, position, inviterUserId, companyId } = req.body;
 
-    if (!email || !permissions) {
-      return res.status(400).json({ error: 'Email and permissions are required' });
+    if (!email || !permissions || !inviterUserId || !companyId) {
+      return res.status(400).json({ error: 'Email, permissions, inviterUserId, and companyId are required' });
     }
 
     if (!Array.isArray(permissions) || permissions.length === 0) {
