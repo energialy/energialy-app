@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import getLocalStorage from "@/app/Func/localStorage";
 import { urlProduction } from "@/app/data/dataGeneric";
+import { getCompanyId } from "@/app/utils/userHelpers";
 import { useGetCompaniesByIdQuery } from "@/app/redux/services/companiesApi";
 
 const annualRevenueOptions = [
@@ -115,14 +116,19 @@ export default function DetallesEmpresa() {
     }
     if (employeeCount.trim() !== "") {
       updatedData.employeeCount = employeeCount.trim();
+    }    const companyId = getCompanyId(user);
+    if (!companyId) {
+      console.error("No company ID found, cannot update company data");
+      displayFailedMessage("Error: No se pudo obtener la información de la empresa");
+      return;
     }
-
-    updatedData.id = user.company.id;
+    
+    updatedData.id = companyId;
 
     console.log("Datos enviados:", updatedData);
     try {
       const response = await axios.put(
-        `${urlProduction}/companies/${user.company.id}`,
+        `${urlProduction}/companies/${companyId}`,
         updatedData
       );
       displaySuccessMessage("Cambios guardados con éxito");
