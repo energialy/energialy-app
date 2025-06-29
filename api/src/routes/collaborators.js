@@ -4,6 +4,7 @@ const { checkCompanyOwnership, checkPermission } = require('../middlewares/check
 const {
   handleInviteCollaborator,
   handleAcceptInvitation,
+  handleValidateInvitation,
   handleGetCompanyCollaborators,
   handleUpdateCollaboratorPermissions,
   handleRemoveCollaborator,
@@ -14,6 +15,9 @@ const router = Router();
 
 // Public route - Accept invitation (no JWT required)
 router.post('/accept-invitation', handleAcceptInvitation);
+
+// Public route - Validate invitation token (no JWT required)
+router.get('/validate-invitation', handleValidateInvitation);
 
 // Get all available permissions (for company owners to select)
 router.get('/permissions', verifyJWT, checkCompanyOwnership, handleGetAllPermissions);

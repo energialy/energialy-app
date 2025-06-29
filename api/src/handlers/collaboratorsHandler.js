@@ -4,7 +4,8 @@ const {
   getCompanyCollaborators,
   updateCollaboratorPermissions,
   removeCollaborator,
-  getAllPermissions
+  getAllPermissions,
+  validateInvitation
 } = require('../controllers/collaboratorsController');
 
 const handleInviteCollaborator = async (req, res) => {
@@ -125,11 +126,36 @@ const handleGetAllPermissions = async (req, res) => {
   }
 };
 
+const handleValidateInvitation = async (req, res) => {
+  try {
+    const { token } = req.query;
+    
+    if (!token) {
+      return res.status(400).json({ error: 'Invitation token is required' });
+    }
+
+    const invitation = await validateInvitation(token);
+
+    res.status(200).json({
+      success: true,
+      invitationData: invitation
+    });
+  } catch (error) {
+    console.error('Error validating invitation:', error);
+    if (error.message.includes('not found') || error.message.includes('expired')) {
+      res.status(404).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
+  }
+};
+
 module.exports = {
   handleInviteCollaborator,
   handleAcceptInvitation,
   handleGetCompanyCollaborators,
   handleUpdateCollaboratorPermissions,
   handleRemoveCollaborator,
-  handleGetAllPermissions
+  handleGetAllPermissions,
+  handleValidateInvitation
 };
