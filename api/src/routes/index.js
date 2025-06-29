@@ -20,6 +20,7 @@ const messagesRouter = require('./resources/messagesRouter');
 const galleryRouter = require('./resources/CompanyGalleryRouter');
 const certificationRouter = require('./resources/certificationGalleryRouter');
 const collaboratorsRouter = require('./collaborators');
+const notificationsRouter = require('./notifications');
 const router = Router();
 
 // Auth Server
@@ -30,6 +31,9 @@ router.use('/logout', logoutRouter);
 
 // Collaborators routes (some public, some protected)
 router.use('/collaborators', collaboratorsRouter);
+
+// Notifications routes (protected)
+router.use('/notifications', notificationsRouter);
 
 // Resource Server
 // router.use(verifyJWT);

@@ -148,16 +148,49 @@ const sendPasswordResetSuccessfullyEmail = async (receiver, username) => {
 };
 
 const sendCollaboratorInvitationEmail = async (receiver, collaboratorName, companyName, inviterName, invitationToken) => {
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  const invitationLink = `${process.env.FRONTEND_URL}/accept-invitation?token=${invitationToken}`;
-  
-  const response = await resend.emails.send({
-    from: 'Energialy <hola@energialy.ar>',
-    to: receiver,
-    subject: `Invitación para colaborar en ${companyName} - Energialy`,
-    html: generateCollaboratorInvitationEmail(collaboratorName, companyName, inviterName, invitationLink),
-  });
-  console.log(response);
+  try {
+    console.log('📧 Preparing to send invitation email...');
+    console.log('📧 Receiver:', receiver);
+    console.log('📧 Collaborator name:', collaboratorName);
+    console.log('📧 Company name:', companyName);
+    console.log('📧 Inviter name:', inviterName);
+    console.log('📧 Invitation token:', invitationToken);
+    console.log('📧 RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
+    console.log('📧 FRONTEND_URL:', process.env.FRONTEND_URL);
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const invitationLink = `${process.env.FRONTEND_URL}/accept-invitation?token=${invitationToken}`;
+    
+    console.log('📧 Invitation link:', invitationLink);
+
+    // In development, check if email is using a test domain and skip sending
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+    const isTestEmail = receiver.includes('example.com') || receiver.includes('test.com');
+    
+    if (isDevelopment && isTestEmail) {
+      console.log('⚠️ Development mode: Skipping email send for test email');
+      console.log('📧 Email would be sent to:', receiver);
+      console.log('📧 With link:', invitationLink);
+      return { 
+        statusCode: 200, 
+        message: 'Email skipped in development mode for test email',
+        id: 'dev-mode-skip'
+      };
+    }
+
+    const response = await resend.emails.send({
+      from: 'Energialy <hola@energialy.ar>',
+      to: receiver,
+      subject: `Invitación para colaborar en ${companyName} - Energialy`,
+      html: generateCollaboratorInvitationEmail(collaboratorName, companyName, inviterName, invitationLink),
+    });
+    
+    console.log('✅ Email sent successfully:', response);
+    return response;
+  } catch (error) {
+    console.error('❌ Error sending invitation email:', error);
+    throw error;
+  }
 };
 
 module.exports = {
