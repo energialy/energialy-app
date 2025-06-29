@@ -69,8 +69,8 @@ function Licitaciones() {
               </Link>
               <div>
                 
-                {tendersUserToShow.map((tender) => (
-                  <CardUserTender item={tender} />
+                {tendersUserToShow.map((tender, index) => (
+                  <CardUserTender key={index} item={tender} />
                 ))}
               </div>
             </div>
