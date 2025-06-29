@@ -211,11 +211,51 @@ const getAllPermissions = async () => {
   }
 };
 
+const validateInvitation = async (invitationToken) => {
+  try {
+    // Find invitation with company and inviter data
+    const invitation = await CompanyInvitations.findOne({
+      where: { 
+        invitationToken,
+        status: 'pending'
+      },
+      include: [
+        { 
+          model: Companies,
+          attributes: ['name', 'id']
+        }
+      ]
+    });
+
+    if (!invitation) {
+      throw new Error('Invitation not found or has expired');
+    }
+
+    // Get inviter data
+    const inviter = await Users.findByPk(invitation.invitedBy, {
+      attributes: ['firstName', 'lastName']
+    });
+
+    return {
+      email: invitation.email,
+      firstName: invitation.firstName,
+      lastName: invitation.lastName,
+      permissions: invitation.permissions,
+      companyName: invitation.Company.name,
+      inviterName: inviter ? `${inviter.firstName} ${inviter.lastName}` : 'Usuario'
+    };
+
+  } catch (error) {
+    throw new Error(`Failed to validate invitation: ${error.message}`);
+  }
+};
+
 module.exports = {
   inviteCollaborator,
   acceptInvitation,
   getCompanyCollaborators,
   updateCollaboratorPermissions,
   removeCollaborator,
-  getAllPermissions
+  getAllPermissions,
+  validateInvitation
 };
