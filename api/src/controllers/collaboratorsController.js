@@ -5,9 +5,12 @@ const { sendCollaboratorInvitationEmail } = require('../services/resend');
 
 const inviteCollaborator = async (email, permissions, firstName, lastName, position, inviterUserId, companyId) => {
   try {
+    console.log('🔄 Starting invitation process for:', { email, companyId, inviterUserId });
+
     // Check if user already exists
     const existingUser = await Users.findOne({ where: { email } });
     if (existingUser) {
+      console.log('❌ User already exists:', email);
       throw new Error('User with this email already exists');
     }
 
@@ -21,11 +24,13 @@ const inviteCollaborator = async (email, permissions, firstName, lastName, posit
     });
 
     if (existingInvitation) {
+      console.log('❌ Pending invitation already exists:', email);
       throw new Error('There is already a pending invitation for this email');
     }
 
     // Generate invitation token
     const invitationToken = crypto.randomBytes(32).toString('hex');
+    console.log('🔑 Generated invitation token for:', email);
 
     // Create invitation
     const invitation = await CompanyInvitations.create({
@@ -39,10 +44,25 @@ const inviteCollaborator = async (email, permissions, firstName, lastName, posit
       position,
       status: 'pending'
     });
+    console.log('✅ Invitation created with ID:', invitation.id);
 
     // Get company info for email
     const company = await Companies.findByPk(companyId);
     const inviter = await Users.findByPk(inviterUserId);
+    
+    if (!company) {
+      console.log('❌ Company not found:', companyId);
+      throw new Error('Company not found');
+    }
+    
+    if (!inviter) {
+      console.log('❌ Inviter not found:', inviterUserId);
+      throw new Error('Inviter not found');
+    }
+
+    console.log('📧 Preparing to send email to:', email);
+    console.log('📧 Company:', company.name);
+    console.log('📧 Inviter:', inviter.firstName + ' ' + inviter.lastName);
 
     // Send invitation email
     await sendCollaboratorInvitationEmail(
@@ -53,6 +73,8 @@ const inviteCollaborator = async (email, permissions, firstName, lastName, posit
       invitationToken
     );
 
+    console.log('✅ Email sent successfully to:', email);
+
     return {
       success: true,
       message: 'Invitation sent successfully',
@@ -60,6 +82,7 @@ const inviteCollaborator = async (email, permissions, firstName, lastName, posit
     };
 
   } catch (error) {
+    console.error('❌ Error in inviteCollaborator:', error);
     throw new Error(`Failed to invite collaborator: ${error.message}`);
   }
 };
@@ -118,7 +141,8 @@ const acceptInvitation = async (invitationToken, password) => {
 
 const getCompanyCollaborators = async (companyId) => {
   try {
-    const collaborators = await Users.findAll({
+    // Get active collaborators from Users table
+    const activeCollaborators = await Users.findAll({
       where: { 
         CompanyId: companyId,
         role: ['company_owner', 'company_collaborator']
@@ -127,7 +151,51 @@ const getCompanyCollaborators = async (companyId) => {
       order: [['createdAt', 'DESC']]
     });
 
-    return collaborators;
+    // Get pending invitations from CompanyInvitations table
+    const pendingInvitations = await CompanyInvitations.findAll({
+      where: { 
+        companyId: companyId,
+        status: 'pending'
+      },
+      attributes: ['id', 'email', 'firstName', 'lastName', 'position', 'permissions', 'createdAt'],
+      order: [['createdAt', 'DESC']]
+    });
+
+    // Format active collaborators
+    const formattedActiveCollaborators = activeCollaborators.map(collab => ({
+      id: collab.id,
+      email: collab.email,
+      firstName: collab.firstName,
+      lastName: collab.lastName,
+      position: collab.position,
+      role: collab.role,
+      permissions: collab.permissions,
+      isActive: collab.isActive,
+      status: 'accepted', // Change from 'active' to 'accepted' to match frontend
+      createdAt: collab.createdAt
+    }));
+
+    // Format pending invitations
+    const formattedPendingInvitations = pendingInvitations.map(invitation => ({
+      id: invitation.id,
+      email: invitation.email,
+      firstName: invitation.firstName,
+      lastName: invitation.lastName,
+      position: invitation.position,
+      role: 'company_collaborator',
+      permissions: invitation.permissions,
+      isActive: true,
+      status: 'pending',
+      createdAt: invitation.createdAt
+    }));
+
+    // Combine both arrays
+    const allCollaborators = [...formattedActiveCollaborators, ...formattedPendingInvitations];
+    
+    // Sort by creation date (newest first)
+    allCollaborators.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    return allCollaborators;
   } catch (error) {
     throw new Error(`Failed to get collaborators: ${error.message}`);
   }

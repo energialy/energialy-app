@@ -22,8 +22,8 @@ const CardTender = ({item}) => {
   
   return (
     <>
-      {tenders?.map((tender) => (
-        <div class="rounded-lg bg-white p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700 md:min-w-[1000px] mb-4 flex justify-between">
+      {tenders?.map((tender, index) => (
+        <div key={index} class="rounded-lg bg-white p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700 md:min-w-[1000px] mb-4 flex justify-between">
           <div className="md:min-w-[800px]">
             <h5 class="mb-2 text-xl font-semibold leading-tight text-neutral-800 dark:text-neutral-50">
               {tender.title}

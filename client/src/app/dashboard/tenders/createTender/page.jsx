@@ -227,8 +227,8 @@ function CreateTenderForm() {
                   name="contractType"
                 >
                   <option>TIPO DE CONTRATACIÓN</option>
-                  {tendersTypes?.map((type) => (
-                    <option>{type}</option>
+                  {tendersTypes?.map((type, index) => (
+                    <option key={index}>{type}</option>
                   ))}
                 </select>
                 {inputError.contractType !== '' ? <ErrorMensage message={inputError.contractType} /> : null}
@@ -238,8 +238,8 @@ function CreateTenderForm() {
                   onChange={handleInputsChanges}
                 >
                   <option>DURACIÓN DE LA LICITACIÓN</option>
-                  {duration.map((d) => (
-                    <option>{d}</option>
+                  {duration.map((d, index) => (
+                    <option key={index}>{d}</option>
                   ))}
                 </select>
                 {inputError.projectDuration !== '' ? <ErrorMensage message={inputError.projectDuration} /> : null}
@@ -251,8 +251,8 @@ function CreateTenderForm() {
                   onChange={handleInputsChanges}
                 >
                   <option>ETAPA</option>
-                  {etapa.map((e) => (
-                    <option>{e}</option>
+                  {etapa.map((e, index) => (
+                    <option key={index}>{e}</option>
                   ))}
                 </select>
                 {inputError.majorSector !== '' ? <ErrorMensage message={inputError.majorSector} /> : null}

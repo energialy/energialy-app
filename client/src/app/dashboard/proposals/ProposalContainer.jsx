@@ -22,7 +22,7 @@ function ProposalContainer({ proposals }) {
   return (
     <div className="px-5">
       <h2 className="text-2xl font-bold mb-3">Mis propuestas</h2>
-      {userProposals.length > 0 ? userProposals?.map((item) => <CardProposal item={item} />) : <h1>No existen propuestas</h1>}
+      {userProposals.length > 0 ? userProposals?.map((item, index) => <CardProposal key={index} item={item} />) : <h1>No existen propuestas</h1>}
     </div>
   );
 }
