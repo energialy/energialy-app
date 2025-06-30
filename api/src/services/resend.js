@@ -147,7 +147,7 @@ const sendPasswordResetSuccessfullyEmail = async (receiver, username) => {
   console.log(response);
 };
 
-const sendCollaboratorInvitationEmail = async (receiver, collaboratorName, companyName, inviterName, invitationToken) => {
+const sendCollaboratorInvitationEmail = async (receiver, collaboratorName, companyName, inviterName, invitationToken, frontendUrl) => {
   try {
     console.log('📧 Preparing to send invitation email...');
     console.log('📧 Receiver:', receiver);
@@ -156,10 +156,10 @@ const sendCollaboratorInvitationEmail = async (receiver, collaboratorName, compa
     console.log('📧 Inviter name:', inviterName);
     console.log('📧 Invitation token:', invitationToken);
     console.log('📧 RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
-    console.log('📧 FRONTEND_URL:', process.env.FRONTEND_URL);
+    console.log('📧 FRONTEND_URL:', frontendUrl);
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const invitationLink = `${process.env.FRONTEND_URL}/accept-invitation?token=${invitationToken}`;
+    const invitationLink = `${frontendUrl}/accept-invitation?token=${invitationToken}`;
     
     console.log('📧 Invitation link:', invitationLink);
 

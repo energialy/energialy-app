@@ -2,6 +2,7 @@ const { Users, Companies, CompanyInvitations, Permissions } = require('../db');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const { sendCollaboratorInvitationEmail } = require('../services/resend');
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 const inviteCollaborator = async (email, permissions, firstName, lastName, position, inviterUserId, companyId) => {
   try {
@@ -70,7 +71,8 @@ const inviteCollaborator = async (email, permissions, firstName, lastName, posit
       firstName || 'Usuario', 
       company.name,
       inviter.firstName + ' ' + inviter.lastName,
-      invitationToken
+      invitationToken,
+      FRONTEND_URL // Pasar la URL del frontend explícitamente
     );
 
     console.log('✅ Email sent successfully to:', email);
