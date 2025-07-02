@@ -2,9 +2,9 @@ require('dotenv').config();
 const { Sequelize } = require('sequelize');
 const fs = require('fs');
 const path = require('path');
-const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME, SSL_MODE } = process.env;
+const { DB_USER, DB_PASSWORD, DB_HOST, DB_NAME } = process.env;
 
-const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}${SSL_MODE}`, {
+const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`, {
   logging: false, // set to console.log to see the raw SQL queries
   native: false, // lets Sequelize know we can use pg-native for ~30% more speed
   dialectModule: require('pg'),
@@ -47,7 +47,7 @@ let entries = Object.entries(sequelize.models);
 let capsEntries = entries.map((entry) => [entry[0][0].toUpperCase() + entry[0].slice(1), entry[1]]);
 sequelize.models = Object.fromEntries(capsEntries);
 
-const { Users, Messages, Companies, Categories, Subcategories, Locations, Tenders, Proposals, Documents, BankAccounts, FinanceProducts, CompanyGallery, CertificationGallery, CompanyInvitations, Permissions, Notifications } = sequelize.models;
+const { Users, Messages, Companies, Categories, Subcategories, Locations, Tenders, Proposals, Documents, BankAccounts, FinanceProducts, CompanyGallery, CertificationGallery, CompanyInvitations, Permissions, Notifications, TenderInvitations } = sequelize.models;
 
 Companies.hasMany(Users);
 Users.belongsTo(Companies);
@@ -117,6 +117,16 @@ CompanyInvitations.belongsTo(Users, { foreignKey: 'invitedBy', as: 'inviter' });
 // User self-reference for invitation hierarchy
 Users.hasMany(Users, { foreignKey: 'invitedBy', as: 'invitedUsers' });
 Users.belongsTo(Users, { foreignKey: 'invitedBy', as: 'inviter' });
+
+// TenderInvitations relationships
+Tenders.hasMany(TenderInvitations);
+TenderInvitations.belongsTo(Tenders);
+
+Users.hasMany(TenderInvitations, { foreignKey: 'userId', as: 'receivedInvitations' });
+TenderInvitations.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
+
+Users.hasMany(TenderInvitations, { foreignKey: 'invitedBy', as: 'sentTenderInvitations' });
+TenderInvitations.belongsTo(Users, { foreignKey: 'invitedBy', as: 'invitedByUser' });
 
 module.exports = {
   ...sequelize.models,

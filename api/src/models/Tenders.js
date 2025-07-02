@@ -70,5 +70,25 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    customFields: {
+      type: DataTypes.JSON,
+      defaultValue: [],
+      comment: 'Campos personalizados para recopilar información específica de los proveedores'
+    },
+    priceType: {
+      type: DataTypes.ENUM,
+      values: ['fixed', 'per_unit'],
+      defaultValue: 'fixed',
+      comment: 'Tipo de precio: fijo o por unidad'
+    },
+    priceUnit: {
+      type: DataTypes.STRING,
+      comment: 'Unidad de precio cuando es per_unit (kilometro, hora, dia, etc.)'
+    },
+    servicePrices: {
+      type: DataTypes.JSON,
+      defaultValue: [],
+      comment: 'Array de servicios con precios variables'
+    },
   });
 };
