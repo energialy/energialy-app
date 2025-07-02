@@ -10,6 +10,7 @@ import { tendersApi } from "./services/tendersApi";
 import { proposalsApi } from "./services/ProposalApi";
 import { bankAccountApi } from "./services/bankAccountApi";
 import { financeProductsApi } from "./services/financeProductsApi";
+import { usersApi } from "./services/usersApi";
 
 
 
@@ -25,6 +26,7 @@ const store = configureStore({
     [proposalsApi.reducerPath]: proposalsApi.reducer,
     [bankAccountApi.reducerPath]: bankAccountApi.reducer,
     [financeProductsApi.reducerPath]: financeProductsApi.reducer,
+    [usersApi.reducerPath]: usersApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -34,7 +36,8 @@ const store = configureStore({
       tendersApi.middleware,
       proposalsApi.middleware,
       bankAccountApi.middleware,
-      financeProductsApi.middleware
+      financeProductsApi.middleware,
+      usersApi.middleware
     ),
 });
 

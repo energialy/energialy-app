@@ -21,6 +21,7 @@ const galleryRouter = require('./resources/CompanyGalleryRouter');
 const certificationRouter = require('./resources/certificationGalleryRouter');
 const collaboratorsRouter = require('./collaborators');
 const notificationsRouter = require('./notifications');
+const tenderInvitationsRouter = require('./tenderInvitations');
 const router = Router();
 
 // Auth Server
@@ -44,6 +45,7 @@ router.use('/categories', categoriesRouter);
 router.use('/subcategories', subcategoriesRouter);
 router.use('/locations', locationsRouter);
 router.use('/tenders', tendersRouter);
+router.use('/tenders', tenderInvitationsRouter); // Para las rutas de invitaciones
 router.use('/proposals', proposalsRouter);
 router.use('/documents', documentsRouter);
 router.use('/bankAccounts', bankAccountsRouter);

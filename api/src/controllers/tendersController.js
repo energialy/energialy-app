@@ -19,6 +19,10 @@ const cleanTenders = (tenders) => {
       projectDuration: tender.projectDuration,
       proposals: tender.Proposals,
       isActive: tender.isActive,
+      customFields: tender.customFields || [],
+      priceType: tender.priceType || 'fixed',
+      priceUnit: tender.priceUnit,
+      servicePrices: tender.servicePrices || [],
     }));
     return cleanTendersArray;
   } else {
@@ -43,6 +47,10 @@ const cleanTenders = (tenders) => {
       isActive: tenders.isActive,
       createdAt: tenders.createdAt,
       updatedAt: tenders.updatedAt,
+      customFields: tenders.customFields || [],
+      priceType: tenders.priceType || 'fixed',
+      priceUnit: tenders.priceUnit,
+      servicePrices: tenders.servicePrices || [],
     };
     return cleanTenderDetail;
   }

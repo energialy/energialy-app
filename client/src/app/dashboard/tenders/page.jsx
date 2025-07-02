@@ -18,8 +18,8 @@ function Licitaciones() {
   const [currentPage, setCurrentPage] = useState(1);
  
 
-  const userTenders = !isLoading
-    ? tenders.filter((tender) => tender.company.id === userData.company.id)
+  const userTenders = !isLoading && tenders && Array.isArray(tenders) && userData?.company?.id
+    ? tenders.filter((tender) => tender.company?.id === userData?.company?.id)
     : [];
 
   const propuestas = userTenders.map((Ids)=>(Ids.id)) //ID de cada Licitacion
