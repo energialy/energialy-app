@@ -8,18 +8,18 @@ export const menuBar = [
   {
     title: "Dashboard",
     url: "/dashboard",
-    auth: ["admin", "superAdmin", "bank"],
+    auth: ["admin", "superAdmin", "bank", "company_collaborator"],
     icon: <MdSpaceDashboard />,
   },
   {
     title: "Inbox",
-    auth: ["admin", "superAdmin", "bank"],
+    auth: ["admin", "superAdmin", "bank", "company_collaborator"],
     url: "/dashboard/inbox",
     icon: <BiSolidMessageRounded />,
   },
   {
     title: "Perfiles",
-    auth: ["admin", "superAdmin", "bank"],
+    auth: ["admin", "superAdmin", "bank", "company_collaborator"],
     url: "",
     icon: <MdAccountBox />,
     submenu: true,
@@ -32,7 +32,7 @@ export const menuBar = [
   {
     title: "Licitaciones",
     // url: "/dashboard/licitaciones",
-    auth: ["admin", "superAdmin"],
+    auth: ["admin", "superAdmin", "company_collaborator"],
     spacing: true,
     icon: <FaBriefcase />,
     submenu: true,
@@ -48,7 +48,7 @@ export const menuBar = [
   {
     title: "Financiamiento",
     url: "/dashboard/finanzas",
-    auth: ["admin", "superAdmin"],
+    auth: ["admin", "superAdmin", "company_collaborator"],
     icon: <BiSolidBank />,
     submenu: true,
     submenuItems: [
@@ -92,7 +92,7 @@ export const menuBar = [
 
   {
     title: "Galerias",
-    auth: ["admin", "superAdmin"],
+    auth: ["admin", "superAdmin", "company_collaborator"],
     url: "",
     icon: <BiSolidImage />,
     submenu: true,
