@@ -41,8 +41,6 @@ function CreateTenderForm() {
     companyId: userData?.company.id,
     files: [],
     customFields: [], // Campos personalizados
-    priceType: 'fixed', // 'fixed' o 'per_unit'
-    priceUnit: '', // unidad de precio (kilometro, hora, etc)
     servicePrices: [] // array de servicios con precios
   });
 
@@ -80,8 +78,6 @@ function CreateTenderForm() {
   });
 
   // Estados para servicios y precios
-  const [priceType, setPriceType] = useState('fixed'); // fixed, per_unit
-  const [priceUnit, setPriceUnit] = useState(''); // kilometro, hora, dia, etc.
   const [servicePrices, setServicePrices] = useState([]);
 
   //Handlers
@@ -191,7 +187,7 @@ function CreateTenderForm() {
       name: '',
       description: '',
       price: 0,
-      unit: priceUnit
+      priceType: 'fixed' // 'fixed' o 'per_day'
     };
     setServicePrices([...servicePrices, newService]);
     setTenderData({ ...tenderData, servicePrices: [...servicePrices, newService] });
@@ -275,10 +271,12 @@ function CreateTenderForm() {
     // Validación para servicios y precios
     if (tenderData.servicePrices && tenderData.servicePrices.length > 0) {
       const invalidServices = tenderData.servicePrices.filter(service => 
-        !service.name || service.name.trim() === '' || service.price <= 0
+        !service.name || service.name.trim() === '' || 
+        service.price <= 0 ||
+        !service.priceType || service.priceType.trim() === ''
       );
       if (invalidServices.length > 0) {
-        errors.servicePrices = 'Todos los servicios deben tener un nombre y un precio válido';
+        errors.servicePrices = 'Todos los servicios deben tener un nombre, un tipo de precio y un precio válido';
       }
     }
 
@@ -297,7 +295,11 @@ function CreateTenderForm() {
         payload.budget = Number(payload.budget);
         // Limpiar servicePrices (remover id y asegurar price como número)
         if (Array.isArray(payload.servicePrices)) {
-          payload.servicePrices = payload.servicePrices.map(({ id, ...rest }) => ({ ...rest, price: Number(rest.price) }));
+          payload.servicePrices = payload.servicePrices.map(({ id, ...rest }) => ({ 
+            ...rest, 
+            price: Number(rest.price),
+            priceType: rest.priceType || 'fixed'
+          }));
         }
         // Eliminar customFields del payload porque la tabla Tenders no lo soporta
         delete payload.customFields;
@@ -640,63 +642,21 @@ function CreateTenderForm() {
                 Servicios y Precios
               </Typography>
               <Typography variant="small" className="ml-5 text-gray-600">
-                Configura servicios específicos con precios diferenciados
+                Configura servicios específicos como viáticos, transporte, etc. con precios fijos o por día
               </Typography>
             </div>
             
             <div className="ml-5 space-y-4">
-              {/* Tipo de precio */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium">Tipo de Precio:</label>
-                <select 
-                  value={priceType} 
-                  onChange={(e) => {
-                    setPriceType(e.target.value);
-                    setTenderData({ ...tenderData, priceType: e.target.value });
-                  }}
-                  className="w-fit border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="fixed">Precio Fijo</option>
-                  <option value="per_unit">Precio por Unidad</option>
-                </select>
-                <p className="text-xs text-gray-500">
-                  {priceType === 'fixed' 
-                    ? 'Los proveedores cotizarán un precio total fijo para el proyecto'
-                    : 'Los proveedores cotizarán precios por unidad (ej: U$D45/kilómetro, U$D78/hora)'
-                  }
-                </p>
+              {/* Información sobre servicios */}
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                <h4 className="text-sm font-medium text-blue-800 mb-1">Ejemplos de servicios:</h4>
+                <ul className="text-sm text-blue-700 space-y-1">
+                  <li>• <strong>Viáticos:</strong> Gastos de comida y alojamiento por día</li>
+                  <li>• <strong>Transporte:</strong> Precio fijo para movilización del equipo</li>
+                  <li>• <strong>Equipamiento:</strong> Alquiler de maquinaria por día</li>
+                  <li>• <strong>Personal especializado:</strong> Costo por día de técnicos</li>
+                </ul>
               </div>
-
-              {/* Unidad de precio */}
-              {priceType === 'per_unit' && (
-                <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium">Unidad de Medida:</label>
-                  <select 
-                    value={priceUnit} 
-                    onChange={(e) => {
-                      setPriceUnit(e.target.value);
-                      setTenderData({ ...tenderData, priceUnit: e.target.value });
-                    }}
-                    className="w-fit border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Seleccionar unidad</option>
-                    <option value="kilometro">Kilómetro</option>
-                    <option value="hora">Hora</option>
-                    <option value="dia">Día</option>
-                    <option value="mes">Mes</option>
-                    <option value="metro">Metro</option>
-                    <option value="metro2">Metro cuadrado</option>
-                    <option value="metro3">Metro cúbico</option>
-                    <option value="unidad">Unidad</option>
-                    <option value="tonelada">Tonelada</option>
-                    <option value="litro">Litro</option>
-                    <option value="kilo">Kilogramo</option>
-                  </select>
-                  <p className="text-xs text-gray-500">
-                    Los precios se mostrarán como "U$D [precio] / {priceUnit || 'unidad'}"
-                  </p>
-                </div>
-              )}
 
               {/* Botón para agregar servicio */}
               <div className="flex items-center gap-3">
@@ -731,7 +691,7 @@ function CreateTenderForm() {
                         <label className="block text-xs font-medium text-gray-600 mb-1">Nombre del Servicio *</label>
                         <input
                           type="text"
-                          placeholder="Ej: Transporte de personal"
+                          placeholder="Ej: Viáticos de alimentación"
                           value={service.name}
                           onChange={(e) => handleUpdateServicePrice(service.id, 'name', e.target.value)}
                           className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -741,17 +701,28 @@ function CreateTenderForm() {
                         <label className="block text-xs font-medium text-gray-600 mb-1">Descripción</label>
                         <input
                           type="text"
-                          placeholder="Descripción del servicio"
+                          placeholder="Ej: Gastos de comida y alojamiento"
                           value={service.description}
                           onChange={(e) => handleUpdateServicePrice(service.id, 'description', e.target.value)}
                           className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
                       <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">Tipo de Precio *</label>
+                        <select 
+                          value={service.priceType || 'fixed'} 
+                          onChange={(e) => handleUpdateServicePrice(service.id, 'priceType', e.target.value)}
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="fixed">Precio Fijo</option>
+                          <option value="per_day">Precio por Día</option>
+                        </select>
+                      </div>
+                      <div>
                         <label className="block text-xs font-medium text-gray-600 mb-1">
                           Precio de Referencia *
-                          {priceType === 'per_unit' && priceUnit && (
-                            <span className="text-gray-500"> (por {priceUnit})</span>
+                          {service.priceType === 'per_day' && (
+                            <span className="text-gray-500"> (por día)</span>
                           )}
                         </label>
                         <div className="flex items-center gap-2">
@@ -765,19 +736,16 @@ function CreateTenderForm() {
                             onChange={(e) => handleUpdateServicePrice(service.id, 'price', parseFloat(e.target.value) || 0)}
                             className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
-                          {priceType === 'per_unit' && priceUnit && (
-                            <span className="text-sm text-gray-600">/ {priceUnit}</span>
+                          {service.priceType === 'per_day' && (
+                            <span className="text-sm text-gray-600">/ día</span>
                           )}
                         </div>
+                        {service.priceType === 'per_day' && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            Vista previa: U$D {service.price || 0} por día
+                          </p>
+                        )}
                       </div>
-                      {priceType === 'per_unit' && (
-                        <div className="flex items-end">
-                          <div className="text-sm text-gray-600 p-2 bg-blue-50 rounded border">
-                            <div className="font-medium">Vista previa:</div>
-                            <div>U$D {service.price || 0} / {priceUnit || 'unidad'}</div>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
                 ))}
@@ -786,7 +754,7 @@ function CreateTenderForm() {
                   <div className="text-center py-6 border-2 border-dashed border-gray-300 rounded-md">
                     <p className="text-gray-500 italic mb-2">No hay servicios agregados</p>
                     <p className="text-sm text-gray-400">
-                      Agrega servicios específicos para que los proveedores puedan cotizar con mayor precisión
+                      Agrega servicios como viáticos, transporte, equipamiento, etc. para que los proveedores puedan cotizar con mayor precisión
                     </p>
                   </div>
                 )}
