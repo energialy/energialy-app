@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { getCompanyId, getUserId } from "@/app/Func/sessionStorage";
+import getLocalStorage from "@/app/Func/localStorage";
 import io from "socket.io-client";
 import axios from "axios";
 
@@ -10,9 +11,24 @@ function ChatComponent({ user }) {
   const [allUsers, setAllUsers] = useState([]);
   const [allMessages, setAllMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
+  const [hasPermission, setHasPermission] = useState(true);
 
   const companyId = getCompanyId();
   const userId = getUserId();
+
+  // Función para verificar permisos de comunicación
+  const checkCommunicationPermission = () => {
+    const userData = getLocalStorage();
+    if (!userData) return false;
+    
+    // Si es company_collaborator, verificar que tenga permiso COMUNICACIONES
+    if (userData.role === 'company_collaborator') {
+      return userData.permissions && userData.permissions.includes('COMUNICACIONES');
+    }
+    
+    // Otros roles (admin, superAdmin, company_owner, bank) tienen acceso por defecto
+    return true;
+  };
 
   // * QUIEN ENVIA EL MENSAJE
   const sender = allUsers.find(el => el.company === companyId);
@@ -31,6 +47,9 @@ function ChatComponent({ user }) {
   const contactos = allUsers.map(user => user.company);
 
   useEffect(() => {
+    // Verificar permisos de comunicación al cargar el componente
+    setHasPermission(checkCommunicationPermission());
+    
     socket.on("receiveMessage", (message) => {
       setAllMessages((prevMessages) => [...prevMessages, message]);
     });
@@ -66,7 +85,12 @@ function ChatComponent({ user }) {
         <h2 className="text-base">Mensajes ///</h2>
       </div>
       
-      {!companyId ? (
+      {!hasPermission ? (
+        <div className="p-4 text-center text-gray-500">
+          <p className="text-sm">No tienes permisos para acceder al chat.</p>
+          <p className="text-xs">Contacta a tu administrador para solicitar permisos de comunicación.</p>
+        </div>
+      ) : !companyId ? (
         <h3>Necesitas una Empresa para acceder al chat.</h3>
       ) : (
         <div className="flex flex-col h-full">

@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Popup from "../directory/[id]/components/popup";
 import Messages from "./Messages";
+import getLocalStorage from "@/app/Func/localStorage";
 
 import {
   axiosGetAllMessages,
@@ -24,6 +25,7 @@ const Chat = ({ id, company }) => {
   const [allMessages, setAllMessages] = useState([]); //Mantiene todos los mensajes
   const [messageText, setMessageText] = useState(""); //Texto del mensaje a enviar
   const [showPopup, setShowPopup] = useState(false); //Muestra/esconde caja chat
+  const [hasPermission, setHasPermission] = useState(true); //Verifica permisos de comunicación
 
   //FILTRADO EN CHAT
   const [buttonChat, setButtonChat] = useState([]); //Botones para seleccionar empresas en el chat
@@ -38,6 +40,20 @@ const Chat = ({ id, company }) => {
   const userId = getUserId(); //Id de usuario logueado
   const myName = getCompanyName(); //Nombre de la compañía logueada->sirve para filtro de chat
   let usuariosUnicos = new Set();
+
+  // Función para verificar permisos de comunicación
+  const checkCommunicationPermission = () => {
+    const userData = getLocalStorage();
+    if (!userData) return false;
+    
+    // Si es company_collaborator, verificar que tenga permiso COMUNICACIONES
+    if (userData.role === 'company_collaborator') {
+      return userData.permissions && userData.permissions.includes('COMUNICACIONES');
+    }
+    
+    // Otros roles (admin, superAdmin, company_owner, bank) tienen acceso por defecto
+    return true;
+  };
 
   const convertirFecha = (fechaISO) => {
     let fecha = new Date(fechaISO);
@@ -64,6 +80,9 @@ const Chat = ({ id, company }) => {
   //Envio de usuarios a server para su asignacion
   //Se envia el id de la compañía
   useEffect(() => {
+    // Verificar permisos de comunicación al cargar el componente
+    setHasPermission(checkCommunicationPermission());
+    
     // Emitir evento de autenticación para guardar el socket
     socketIo.emit("authenticate", { companyId });
 
@@ -249,98 +268,108 @@ const Chat = ({ id, company }) => {
 
   return (
     <>
-      {company && (
-        <button
-          className="flex items-center justify-center px-4 py-2 text-white bg-green-500 rounded-full hover:bg-green-600"
-          onClick={() => setShowPopup(true)}
-        >
-          <div className="flex items-center justify-center w-16 h-16 mr-2 overflow-hidden rounded-full">
-            <img
-              className="object-cover w-full h-full"
-              src={company.profilePicture}
-              alt="Profile"
-            />
-          </div>
-          <span className="text-center">Inicia un Chat con {company.name}</span>
-        </button>
-      )}
-      {company ? (
-        <Popup show={showPopup} onClose={() => setShowPopup(false)}>
-          <h2>Chat</h2>
-
-          <div className="grid grid-cols-12 gap-2">
-            <div className="flex flex-col h-64 col-span-2 overflow-y-auto">
-              {buttonChat.map((item) => (
-                <button
-                  key={item}
-                  className={`w-full px-2 py-1 mb-2 text-sm text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                    selectedCompany === item
-                      ? "bg-blue-500"
-                      : "bg-gray-600 hover:bg-gray-800"
-                  }`}
-                  onClick={() => handleSelectCompany(item)}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-            <Messages filteredMessages={filteredMessages} userId={userId} />
-          </div>
-          <form className="flex mt-4" onSubmit={handleSendMessage}>
-            <input
-              type="text"
-              className="flex-1 px-4 py-2 mr-2 border rounded focus:outline-none"
-              value={messageText}
-              onChange={(event) => setMessageText(event.target.value)}
-              placeholder="Type your message..."
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 text-black bg-blue-400 rounded hover:bg-blue-600"
-            >
-              Send
-            </button>
-          </form>
-        </Popup>
-      ) : (
-        <div>
-          <h2 className="font-bold text-center text-md">Chat</h2>
-
-          <div className="grid grid-cols-12 gap-2">
-            <div className="h-64 col-span-2 overflow-y-auto text-sm">
-              {buttonChat.map((item) => (
-                <button
-                  key={item}
-                  className={`w-full px-2 py-1 mb-2 text-sm text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                    selectedCompany === item
-                      ? "bg-blue-500"
-                      : "bg-gray-600 hover:bg-gray-800"
-                  }`}
-                  onClick={() => handleSelectCompany(item)}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-            <Messages filteredMessages={filteredMessages} userId={userId} />
-          </div>
-
-          <form className="flex mt-4" onSubmit={handleSendMessage}>
-            <input
-              type="text"
-              className="flex-1 px-4 py-2 mr-2 border rounded focus:outline-none"
-              value={messageText}
-              onChange={(event) => setMessageText(event.target.value)}
-              placeholder="Type your message..."
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 text-black bg-blue-400 rounded hover:bg-blue-600"
-            >
-              Send
-            </button>
-          </form>
+      {/* Verificar permisos antes de mostrar cualquier funcionalidad de chat */}
+      {!hasPermission ? (
+        <div className="p-4 text-center text-gray-500">
+          <p className="text-sm">No tienes permisos para acceder al chat.</p>
+          <p className="text-xs">Contacta a tu administrador para solicitar permisos de comunicación.</p>
         </div>
+      ) : (
+        <>
+          {company && (
+            <button
+              className="flex items-center justify-center px-4 py-2 text-white bg-green-500 rounded-full hover:bg-green-600"
+              onClick={() => setShowPopup(true)}
+            >
+              <div className="flex items-center justify-center w-16 h-16 mr-2 overflow-hidden rounded-full">
+                <img
+                  className="object-cover w-full h-full"
+                  src={company.profilePicture}
+                  alt="Profile"
+                />
+              </div>
+              <span className="text-center">Inicia un Chat con {company.name}</span>
+            </button>
+          )}
+          {company ? (
+            <Popup show={showPopup} onClose={() => setShowPopup(false)}>
+              <h2>Chat</h2>
+
+              <div className="grid grid-cols-12 gap-2">
+                <div className="flex flex-col h-64 col-span-2 overflow-y-auto">
+                  {buttonChat.map((item) => (
+                    <button
+                      key={item}
+                      className={`w-full px-2 py-1 mb-2 text-sm text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                        selectedCompany === item
+                          ? "bg-blue-500"
+                          : "bg-gray-600 hover:bg-gray-800"
+                      }`}
+                      onClick={() => handleSelectCompany(item)}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+                <Messages filteredMessages={filteredMessages} userId={userId} />
+              </div>
+              <form className="flex mt-4" onSubmit={handleSendMessage}>
+                <input
+                  type="text"
+                  className="flex-1 px-4 py-2 mr-2 border rounded focus:outline-none"
+                  value={messageText}
+                  onChange={(event) => setMessageText(event.target.value)}
+                  placeholder="Type your message..."
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-black bg-blue-400 rounded hover:bg-blue-600"
+                >
+                  Send
+                </button>
+              </form>
+            </Popup>
+          ) : (
+            <div>
+              <h2 className="font-bold text-center text-md">Chat</h2>
+
+              <div className="grid grid-cols-12 gap-2">
+                <div className="h-64 col-span-2 overflow-y-auto text-sm">
+                  {buttonChat.map((item) => (
+                    <button
+                      key={item}
+                      className={`w-full px-2 py-1 mb-2 text-sm text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                        selectedCompany === item
+                          ? "bg-blue-500"
+                          : "bg-gray-600 hover:bg-gray-800"
+                      }`}
+                      onClick={() => handleSelectCompany(item)}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+                <Messages filteredMessages={filteredMessages} userId={userId} />
+              </div>
+
+              <form className="flex mt-4" onSubmit={handleSendMessage}>
+                <input
+                  type="text"
+                  className="flex-1 px-4 py-2 mr-2 border rounded focus:outline-none"
+                  value={messageText}
+                  onChange={(event) => setMessageText(event.target.value)}
+                  placeholder="Type your message..."
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-black bg-blue-400 rounded hover:bg-blue-600"
+                >
+                  Send
+                </button>
+              </form>
+            </div>
+          )}
+        </>
       )}
     </>
   );

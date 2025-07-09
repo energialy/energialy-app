@@ -206,7 +206,7 @@ export default function Colaboradores() {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
           <div>
             <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              Agregar Colaboradores
+              Mi Equipo
             </h2>
             <p className="text-gray-600 text-sm">
               Gestiona los usuarios colaboradores de tu empresa y sus permisos
