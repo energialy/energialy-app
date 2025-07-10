@@ -209,7 +209,7 @@ function CreateTenderForm() {
       id: Date.now(),
       name: "",
       description: "",
-      price: 0,
+      price: "",
       priceType: "fixed", // 'fixed' o 'per_day'
     };
     setServicePrices([...servicePrices, newService]);
@@ -313,7 +313,8 @@ function CreateTenderForm() {
         (service) =>
           !service.name ||
           service.name.trim() === "" ||
-          service.price <= 0 ||
+          service.price === "" ||
+          parseFloat(service.price) <= 0 ||
           !service.priceType ||
           service.priceType.trim() === ""
       );
@@ -341,7 +342,7 @@ function CreateTenderForm() {
           payload.servicePrices = payload.servicePrices.map(
             ({ id, ...rest }) => ({
               ...rest,
-              price: Number(rest.price),
+              price: rest.price === "" ? 0 : Number(rest.price),
               priceType: rest.priceType || "fixed",
             })
           );
@@ -872,7 +873,7 @@ function CreateTenderForm() {
                           <span className="text-sm font-medium">U$D</span>
                           <input
                             type="number"
-                            placeholder="0"
+                            placeholder="Ingresa el precio"
                             min="0"
                             step="0.01"
                             value={service.price}
@@ -880,7 +881,7 @@ function CreateTenderForm() {
                               handleUpdateServicePrice(
                                 service.id,
                                 "price",
-                                parseFloat(e.target.value) || 0
+                                e.target.value === "" ? "" : parseFloat(e.target.value)
                               )
                             }
                             className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -891,7 +892,7 @@ function CreateTenderForm() {
                         </div>
                         {service.priceType === "per_day" && (
                           <p className="text-xs text-gray-500 mt-1">
-                            Vista previa: U$D {service.price || 0} por día
+                            Vista previa: U$D {service.price || "0"} por día
                           </p>
                         )}
                       </div>
