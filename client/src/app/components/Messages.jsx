@@ -24,29 +24,31 @@ const Messages = ({ filteredMessages, userId }) => {
     <div className="col-span-10 max-h-[300px] overflow-y-auto">
       {filteredMessages.map((message, index) => {
         const isSender = message.sender.id === userId;
+        const userName = message.sender.fullName ||
+          `${message.sender.firstName} ${message.sender.lastName}`;
+        
         return (
           <div
             key={message.id || index}
-            className={`mb-2 ${isSender ? "text-right" : "text-left"}`}
+            className={`mb-3 ${isSender ? "text-right" : "text-left"}`}
           >
+            {/* Nombre del usuario */}
+            <div className={`text-xs text-gray-600 mb-1 ${isSender ? "text-right" : "text-left"}`}>
+              {userName}
+            </div>
+            
+            {/* Mensaje */}
             <div
-              className={`text-sm p-3 rounded-lg ${
+              className={`text-sm p-3 rounded-lg inline-block max-w-[70%] ${
                 isSender ? "bg-gray-200" : "bg-purple-200"
               }`}
             >
-              <p className="mb-0">
-                <strong>{isSender ? "Tú" : "Usuario"}: </strong>
-                {message.sender.fullName ||
-                  `${message.sender.firstName} ${message.sender.lastName}`}
-              </p>
-              <p className="mb-0">
-                <strong>Mensaje: </strong>
-                {message.text}
-              </p>
-              <p className="mb-0">
-                <strong>Fecha: </strong>
-                {message.createdAt}
-              </p>
+              {message.text}
+            </div>
+            
+            {/* Fecha */}
+            <div className={`text-xs text-gray-500 mt-1 ${isSender ? "text-right" : "text-left"}`}>
+              {message.createdAt}
             </div>
           </div>
         );

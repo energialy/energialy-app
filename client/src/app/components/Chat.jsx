@@ -99,6 +99,18 @@ const Chat = ({ id, company }) => {
     !company && setShowPopup(true);
   }, []);
 
+  // Debug: Verificar estructura de datos
+  useEffect(() => {
+    console.log('All Users:', allUsers);
+    console.log('Button Chat:', buttonChat);
+    if (allUsers.length > 0) {
+      console.log('Sample user structure:', allUsers[0]);
+      if (allUsers[0]?.company) {
+        console.log('Sample company structure:', allUsers[0].company);
+      }
+    }
+  }, [allUsers, buttonChat]);
+
   //Carga sender y receiver
   useEffect(() => {
     if (allUsers.length > 0 && id) {
@@ -134,13 +146,13 @@ const Chat = ({ id, company }) => {
       }
 
       const filtered = allMessages.filter((message) => {
-        const senderCompany = message.sender.company
+        const senderCompany = message.sender?.company
           ? message.sender.company.name
-          : message.sender.Company.name;
+          : message.sender?.Company?.name;
 
-        const receiverCompany = message.receiver.company
+        const receiverCompany = message.receiver?.company
           ? message.receiver.company.name
-          : message.receiver.Company.name;
+          : message.receiver?.Company?.name;
 
         return (
           (senderCompany === selectedCompany && receiverCompany === myName) ||
@@ -149,11 +161,13 @@ const Chat = ({ id, company }) => {
       });
 
       const newReceiver = allUsers.find(
-        (user) => user.company.name === selectedCompany
+        (user) => user.company?.name === selectedCompany
       );
 
       setFilteredMessages(filtered);
-      setReceiver(newReceiver);
+      if (newReceiver) {
+        setReceiver(newReceiver);
+      }
     }
   }, [allMessages, selectedCompany, myName, allUsers]);
 
@@ -162,7 +176,7 @@ const Chat = ({ id, company }) => {
   useEffect(() => {
     if (allUsers.length > 0) {
       allUsers.forEach((item) => {
-        if (item.company.name !== myName) {
+        if (item.company?.name && item.company.name !== myName) {
           usuariosUnicos.add(item.company.name);
         }
       });
@@ -175,7 +189,9 @@ const Chat = ({ id, company }) => {
         const newButtonChat = usuariosUnicosArray.filter(
           (element) => element !== company.name
         );
-        newButtonChat.unshift(button);
+        if (button) {
+          newButtonChat.unshift(button);
+        }
         setButtonChat(newButtonChat);
       } else {
         setButtonChat(usuariosUnicosArray);
@@ -208,15 +224,17 @@ const Chat = ({ id, company }) => {
         setAllMessages((prevMessages) => [...prevMessages, newMessage]);
       }
 
-      const foundCompanyName = foundReceiver.company.name;
-      if (selectedCompany !== foundCompanyName) {
+      const foundCompanyName = foundReceiver?.company?.name;
+      if (selectedCompany !== foundCompanyName && foundCompanyName) {
         const button = buttonChat.find((button) => button === foundCompanyName);
-        const button2 = button.concat("🔔");
-        const newButtonChat = buttonChat.filter(
-          (element) => element !== foundCompanyName
-        );
-        newButtonChat.unshift(button2);
-        setButtonChat(newButtonChat);
+        if (button) {
+          const button2 = button.concat("🔔");
+          const newButtonChat = buttonChat.filter(
+            (element) => element !== foundCompanyName
+          );
+          newButtonChat.unshift(button2);
+          setButtonChat(newButtonChat);
+        }
       }
     };
 
@@ -234,6 +252,13 @@ const Chat = ({ id, company }) => {
       event.preventDefault();
 
       if (!socketIo || !messageText.trim()) return;
+      
+      // Validar que haya una compañía seleccionada
+      if (!receiver || !receiver.company) {
+        alert("Por favor, selecciona una empresa para enviar el mensaje.");
+        return;
+      }
+      
       const newMessage = {
         text: messageText,
         sender,
@@ -297,19 +322,44 @@ const Chat = ({ id, company }) => {
 
               <div className="grid grid-cols-12 gap-2">
                 <div className="flex flex-col h-64 col-span-2 overflow-y-auto">
-                  {buttonChat.map((item) => (
-                    <button
-                      key={item}
-                      className={`w-full px-2 py-1 mb-2 text-sm text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                        selectedCompany === item
-                          ? "bg-blue-500"
-                          : "bg-gray-600 hover:bg-gray-800"
-                      }`}
-                      onClick={() => handleSelectCompany(item)}
-                    >
-                      {item}
-                    </button>
-                  ))}
+                  {buttonChat.map((item) => {
+                    const companyUser = allUsers.find(user => user.company?.name === item);
+                    const profilePicture = companyUser?.company?.profilePicture;
+                    
+                    return (
+                      <button
+                        key={item}
+                        className={`w-full p-1 mb-2 text-sm text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center min-h-[40px] ${
+                          selectedCompany === item
+                            ? "bg-blue-500 hover:bg-blue-600"
+                            : "bg-gray-600 hover:bg-gray-700"
+                        }`}
+                        onClick={() => handleSelectCompany(item)}
+                        title={item}
+                      >
+                        {profilePicture ? (
+                          <img
+                            src={profilePicture}
+                            alt={item}
+                            className="w-8 h-8 rounded-full object-cover"
+                            onError={(e) => {
+                              console.log('Error loading image for company:', item);
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div 
+                          className="flex items-center justify-center w-full px-2 py-1"
+                          style={{ display: profilePicture ? 'none' : 'flex' }}
+                        >
+                          <span className="text-xs font-medium text-white text-center leading-tight break-words">
+                            {item}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
                 <Messages filteredMessages={filteredMessages} userId={userId} />
               </div>
@@ -319,11 +369,17 @@ const Chat = ({ id, company }) => {
                   className="flex-1 px-4 py-2 mr-2 border rounded focus:outline-none"
                   value={messageText}
                   onChange={(event) => setMessageText(event.target.value)}
-                  placeholder="Type your message..."
+                  placeholder={selectedCompany ? "Type your message..." : "Selecciona una empresa para chatear..."}
+                  disabled={!selectedCompany}
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 text-black bg-blue-400 rounded hover:bg-blue-600"
+                  className={`px-4 py-2 text-black rounded ${
+                    selectedCompany && messageText.trim()
+                      ? "bg-blue-400 hover:bg-blue-600"
+                      : "bg-gray-300 cursor-not-allowed"
+                  }`}
+                  disabled={!selectedCompany || !messageText.trim()}
                 >
                   Send
                 </button>
@@ -335,19 +391,44 @@ const Chat = ({ id, company }) => {
 
               <div className="grid grid-cols-12 gap-2">
                 <div className="h-64 col-span-2 overflow-y-auto text-sm">
-                  {buttonChat.map((item) => (
-                    <button
-                      key={item}
-                      className={`w-full px-2 py-1 mb-2 text-sm text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                        selectedCompany === item
-                          ? "bg-blue-500"
-                          : "bg-gray-600 hover:bg-gray-800"
-                      }`}
-                      onClick={() => handleSelectCompany(item)}
-                    >
-                      {item}
-                    </button>
-                  ))}
+                  {buttonChat.map((item) => {
+                    const companyUser = allUsers.find(user => user.company?.name === item);
+                    const profilePicture = companyUser?.company?.profilePicture;
+                    
+                    return (
+                      <button
+                        key={item}
+                        className={`w-full p-1 mb-2 text-sm text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center min-h-[40px] ${
+                          selectedCompany === item
+                            ? "bg-blue-500 hover:bg-blue-600"
+                            : "bg-gray-600 hover:bg-gray-700"
+                        }`}
+                        onClick={() => handleSelectCompany(item)}
+                        title={item}
+                      >
+                        {profilePicture ? (
+                          <img
+                            src={profilePicture}
+                            alt={item}
+                            className="w-8 h-8 rounded-full object-cover"
+                            onError={(e) => {
+                              console.log('Error loading image for company:', item);
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div 
+                          className="flex items-center justify-center w-full px-2 py-1"
+                          style={{ display: profilePicture ? 'none' : 'flex' }}
+                        >
+                          <span className="text-xs font-medium text-white text-center leading-tight break-words">
+                            {item}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
                 <Messages filteredMessages={filteredMessages} userId={userId} />
               </div>
@@ -358,11 +439,17 @@ const Chat = ({ id, company }) => {
                   className="flex-1 px-4 py-2 mr-2 border rounded focus:outline-none"
                   value={messageText}
                   onChange={(event) => setMessageText(event.target.value)}
-                  placeholder="Type your message..."
+                  placeholder={selectedCompany ? "Type your message..." : "Selecciona una empresa para chatear..."}
+                  disabled={!selectedCompany}
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 text-black bg-blue-400 rounded hover:bg-blue-600"
+                  className={`px-4 py-2 text-black rounded ${
+                    selectedCompany && messageText.trim()
+                      ? "bg-blue-400 hover:bg-blue-600"
+                      : "bg-gray-300 cursor-not-allowed"
+                  }`}
+                  disabled={!selectedCompany || !messageText.trim()}
                 >
                   Send
                 </button>
