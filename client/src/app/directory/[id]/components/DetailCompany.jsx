@@ -1,5 +1,6 @@
 import Image from "next/image";
 import placeholder from "@/app/assets/placeholder.jpg";
+import Chat from "@/app/components/Chat";
 
 function dateTransform(string) {
   if (!string) return "Fecha no disponible";
@@ -111,10 +112,20 @@ function DetailCompany({company}) {
         {/* Columna 2: Descripción de la empresa */}
         <div className="w-full md:w-1/2 flex flex-col px-4 mt-4 md:mt-0">
           <h3 className="font-bold text-lg mb-4">Descripción de la Empresa</h3>
-          <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+          <div className="bg-gray-50 p-4 rounded-lg shadow-sm mb-6">
             <p className="text-sm text-justify">
               {companyData.description || "No hay descripción disponible para esta empresa."}
             </p>
+          </div>
+          
+          {/* Chat integrado */}
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+            <h3 className="font-bold text-lg mb-4 text-gray-800 border-b border-gray-200 pb-2">
+              💬 Chat con {companyData.name}
+            </h3>
+            <div className="min-h-[400px]">
+              <Chat id={companyData.id} company={companyData} />
+            </div>
           </div>
         </div>
       </div>
