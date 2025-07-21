@@ -297,7 +297,7 @@ const Chat = ({ id, company }) => {
       {!hasPermission ? (
         <div className="p-4 text-center text-gray-500">
           <p className="text-sm">No tienes permisos para acceder al chat.</p>
-          <p className="text-xs">Contacta a tu administrador para solicitar permisos de comunicación.</p>
+          <p className="text-xs">Contacta a tu empleador para solicitar permisos de comunicación.</p>
         </div>
       ) : (
         <>
