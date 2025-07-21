@@ -253,10 +253,18 @@ const Chat = ({ id, company }) => {
 
       if (!socketIo || !messageText.trim()) return;
       
-      // Validar que haya una compañía seleccionada
-      if (!receiver || !receiver.company) {
-        alert("Por favor, selecciona una empresa para enviar el mensaje.");
-        return;
+      // Si hay una empresa específica (company prop), validar receiver
+      // Si no hay empresa específica, validar que haya una compañía seleccionada
+      if (company) {
+        if (!receiver || !receiver.company) {
+          alert(`No se pudo establecer conexión con ${company.name}. Inténtalo nuevamente.`);
+          return;
+        }
+      } else {
+        if (!receiver || !receiver.company) {
+          alert("Por favor, selecciona una empresa para enviar el mensaje.");
+          return;
+        }
       }
       
       const newMessage = {
@@ -283,7 +291,7 @@ const Chat = ({ id, company }) => {
 
       setMessageText("");
     },
-    [messageText, sender, receiver, companyId, id]
+    [messageText, sender, receiver, companyId, id, company]
   );
 
   //Establece compañía seleccionada en boton del chat
@@ -301,91 +309,40 @@ const Chat = ({ id, company }) => {
         </div>
       ) : (
         <>
-          {company && (
-            <button
-              className="flex items-center justify-center px-4 py-2 text-white bg-green-500 rounded-full hover:bg-green-600"
-              onClick={() => setShowPopup(true)}
-            >
-              <div className="flex items-center justify-center w-16 h-16 mr-2 overflow-hidden rounded-full">
-                <img
-                  className="object-cover w-full h-full"
-                  src={company.profilePicture}
-                  alt="Profile"
-                />
-              </div>
-              <span className="text-center">Inicia un Chat con {company.name}</span>
-            </button>
-          )}
           {company ? (
-            <Popup show={showPopup} onClose={() => setShowPopup(false)}>
-              <h2>Chat</h2>
-
-              <div className="grid grid-cols-12 gap-2">
-                <div className="flex flex-col h-64 col-span-2 overflow-y-auto">
-                  {buttonChat.map((item) => {
-                    const companyUser = allUsers.find(user => user.company?.name === item);
-                    const profilePicture = companyUser?.company?.profilePicture;
-                    
-                    return (
-                      <button
-                        key={item}
-                        className={`w-full p-1 mb-2 text-sm text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center min-h-[40px] ${
-                          selectedCompany === item
-                            ? "bg-blue-500 hover:bg-blue-600"
-                            : "bg-gray-600 hover:bg-gray-700"
-                        }`}
-                        onClick={() => handleSelectCompany(item)}
-                        title={item}
-                      >
-                        {profilePicture ? (
-                          <img
-                            src={profilePicture}
-                            alt={item}
-                            className="w-8 h-8 rounded-full object-cover"
-                            onError={(e) => {
-                              console.log('Error loading image for company:', item);
-                              e.target.style.display = 'none';
-                              e.target.nextSibling.style.display = 'flex';
-                            }}
-                          />
-                        ) : null}
-                        <div 
-                          className="flex items-center justify-center w-full px-2 py-1"
-                          style={{ display: profilePicture ? 'none' : 'flex' }}
-                        >
-                          <span className="text-xs font-medium text-white text-center leading-tight break-words">
-                            {item}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
+            // Vista específica para chatear con una empresa en particular
+            <div className="w-full">
+              <div className="flex flex-col h-80">
+                {/* Área de mensajes */}
+                <div className="flex-1 overflow-y-auto border border-gray-200 rounded-lg p-3 mb-4">
+                  <Messages filteredMessages={filteredMessages} userId={userId} />
                 </div>
-                <Messages filteredMessages={filteredMessages} userId={userId} />
               </div>
-              <form className="flex mt-4" onSubmit={handleSendMessage}>
+              
+              {/* Formulario para enviar mensajes */}
+              <form className="flex border-t border-gray-200 pt-4" onSubmit={handleSendMessage}>
                 <input
                   type="text"
-                  className="flex-1 px-4 py-2 mr-2 border rounded focus:outline-none"
+                  className="flex-1 px-4 py-3 mr-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   value={messageText}
                   onChange={(event) => setMessageText(event.target.value)}
-                  placeholder={selectedCompany ? "Type your message..." : "Selecciona una empresa para chatear..."}
-                  disabled={!selectedCompany}
+                  placeholder={`Escribe un mensaje a ${company.name}...`}
                 />
                 <button
                   type="submit"
-                  className={`px-4 py-2 text-black rounded ${
-                    selectedCompany && messageText.trim()
-                      ? "bg-blue-400 hover:bg-blue-600"
-                      : "bg-gray-300 cursor-not-allowed"
+                  className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 min-w-[80px] ${
+                    messageText.trim()
+                      ? "bg-blue-500 hover:bg-blue-600 text-white shadow-md hover:shadow-lg"
+                      : "bg-gray-200 hover:bg-gray-300 text-gray-600 cursor-not-allowed border border-gray-300"
                   }`}
-                  disabled={!selectedCompany || !messageText.trim()}
+                  disabled={!messageText.trim()}
                 >
-                  Send
+                  Enviar
                 </button>
               </form>
-            </Popup>
+            </div>
           ) : (
+            // Vista original para cuando no hay company específica
             <div>
               <h2 className="font-bold text-center text-md">Chat</h2>
 

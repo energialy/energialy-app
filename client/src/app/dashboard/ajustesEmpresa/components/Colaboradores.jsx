@@ -52,12 +52,13 @@ export default function Colaboradores() {
       
       // Get token from localStorage/sessionStorage
       const userData = getLocalStorage();
-      const token = userData?.accessToken;      
+      const token = userData?.token || userData?.accessToken;      
       console.log("Token found:", !!token); // Debug log
         const response = await axios.get(
         `${urlProduction}/collaborators/company-collaborators?companyId=${companyId}`, 
         {
           headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
             'Content-Type': 'application/json'
           }
         }
@@ -113,6 +114,9 @@ export default function Colaboradores() {
         companyId: companyId
       }); // Debug log
 
+      // Get token for authorization
+      const token = userData?.token || userData?.accessToken;
+
       const response = await axios.post(
         `${urlProduction}/collaborators/invite`,
         {
@@ -126,6 +130,7 @@ export default function Colaboradores() {
         },
         {
           headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
             'Content-Type': 'application/json'
           }
         }      );
@@ -172,12 +177,18 @@ export default function Colaboradores() {
     try {
       // Get token from localStorage/sessionStorage
       const userData = getLocalStorage();
-      const token = userData?.accessToken;
+      const token = userData?.token || userData?.accessToken;
         console.log("Token found for remove:", !!token); // Debug log
+      console.log("User data for remove:", userData); // Debug log
+
+      if (!token) {
+        displayFailedMessage("No se encontró token de autenticación. Por favor, inicia sesión nuevamente.");
+        return;
+      }
 
       await axios.delete(`${urlProduction}/collaborators/${collaboratorId}`, {
         headers: {
-          'Authorization': token ? `Bearer ${token}` : '',
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });        
@@ -192,7 +203,9 @@ export default function Colaboradores() {
       console.error("Error response:", error.response?.data); // Debug log
       
       if (error.response?.status === 401) {
-        displayFailedMessage("No tienes permisos para eliminar colaboradores.");
+        displayFailedMessage("No tienes permisos para eliminar colaboradores. Verifica que seas el propietario de la empresa.");
+      } else if (error.response?.status === 403) {
+        displayFailedMessage("Acceso denegado. Solo el propietario de la empresa puede eliminar colaboradores.");
       } else {
         displayFailedMessage("Error al eliminar colaborador: " + (error.response?.data?.error || error.message));
       }

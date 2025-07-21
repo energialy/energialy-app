@@ -51,8 +51,6 @@ const Page = ({ params: { id } }) => {
               
             />
       </div>
-
-      <Chat id={id} company={company} />
     </div>
   );
 };
