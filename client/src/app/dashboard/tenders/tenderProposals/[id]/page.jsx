@@ -1,6 +1,6 @@
 'use client'
 import { useGetTenderByIdQuery } from "@/app/redux/services/tendersApi";
-import { getLocalStorage } from "@/app/Func/localStorage";
+import getLocalStorage from "@/app/Func/localStorage";
 import { useRouter } from "next/navigation";
 import { handleChangeStatus, bankAccountOpen } from "@/app/Func/controllers";
 import { useState, useEffect } from "react";

@@ -28,7 +28,7 @@ import {
 import { useEffect, useState } from "react";
 import { filterData } from "../Func/controllers";
 import BankModal from "./Modals/BankModal";
-import AttachmentsModal from "./AttachmentsModal";
+import { AttachmentsModal } from "./AttachmentsModal";
 import TextModal from "./Modals/TextModal";
 import PaginationComponent from "./PaginationComponent";
 import { financeProducts } from "../dashboard/bank/financialProducts/data";
