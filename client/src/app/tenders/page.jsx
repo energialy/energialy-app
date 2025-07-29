@@ -4,7 +4,7 @@ import FilterBar from '../components/FilterBar';
 import { useGetTendersQuery } from '@/app/redux/services/tendersApi';
 import TenderContainer from '../components/TenderContainer';
 
-function page() {
+function Page() {
   const { data, isLoading } = useGetTendersQuery();
 
   return (
@@ -19,4 +19,4 @@ function page() {
   );
 }
 
-export default page;
+export default Page;

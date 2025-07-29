@@ -21,7 +21,7 @@ const optionsNav = [
   "Suscripciones"
 ];
 
-function pageProfileCompany() {
+function PageProfileCompany() {
   const [selectedOption, setSelectedOption] = useState(0);
 
   const handleOptions = (option) => {
@@ -44,4 +44,4 @@ function pageProfileCompany() {
   );
 }
 
-export default pageProfileCompany;
+export default PageProfileCompany;

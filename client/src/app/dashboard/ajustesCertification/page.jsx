@@ -10,7 +10,7 @@ const optionsNav = [
   "Agregar Certificaciones/Homologaciones",
 ];
 
-function pageProfileCertificationGallery() {
+function PageProfileCertificationGallery() {
   const [selectedOption, setSelectedOption] = useState(0);
 
   const handleOptions = (option) => {
@@ -30,4 +30,4 @@ function pageProfileCertificationGallery() {
   );
 }
 
-export default pageProfileCertificationGallery;
+export default PageProfileCertificationGallery;

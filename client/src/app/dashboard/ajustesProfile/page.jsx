@@ -5,7 +5,7 @@ import EditProfile from "./components/EditProfile";
 
 const optionsNav = ["Datos personales"];
 
-function pageProfile() {
+function PageProfile() {
   const [selectedOption, setSelectedOption] = useState("");
   console.log('selectedoption profile:',selectedOption)
   console.log('optionsnav profile:',optionsNav)
@@ -26,4 +26,4 @@ function pageProfile() {
   );
 }
 
-export default pageProfile;
+export default PageProfile;

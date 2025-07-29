@@ -38,8 +38,8 @@ export function AttachmentsModal({ open, handleOpen, data }) {
             {!bankAccount.company.Documents ? (
               <p>No tiene documentos</p>
             ) : (
-              bankAccount.company.Documents.map((e) => (
-                <div className="flex gap-8">
+              bankAccount.company.Documents.map((e, index) => (
+                <div key={index} className="flex gap-8">
                   <p className="font-bold w-[250px] uppercase">{e.name}</p>
                   <Link href={e.attachment} target="_blank">
                     <Button variant="outlined" size="sm">
