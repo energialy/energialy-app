@@ -70,7 +70,7 @@ const TenderInvitationsPanel = ({ tenderId, tenderTitle }) => {
           ) : (
             <div className="text-center py-4 text-gray-500">
               <p className="text-sm">No hay invitaciones enviadas</p>
-              <p className="text-xs">Haz clic en "Invitar Usuarios" para comenzar</p>
+              <p className="text-xs">Haz clic en &quot;Invitar Usuarios&quot; para comenzar</p>
             </div>
           )}
         </>

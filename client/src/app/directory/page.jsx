@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { urlProduction } from "../data/dataGeneric";
 
-function page() {
+function Page() {
 
  const dispatch = useDispatch();
    
@@ -16,7 +16,7 @@ function page() {
       .then((response) => response.json())
       .then((data) => dispatch(setAllCompanies(data)))
       .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+  }, [dispatch]);
 
 
   return (
@@ -33,4 +33,4 @@ function page() {
   );
 }
 
-export default page
+export default Page

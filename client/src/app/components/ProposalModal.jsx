@@ -261,8 +261,8 @@ export function ProposalModal({open, handleOpen, data}) {
                   <span className="font-bold">(U$S) {serviceAmount}</span>{" "}
                   {"  "}
                   <span className="font-bold text-secondary-600">
-                    "Energialy"
-                  </span>{""}
+                    &quot;Energialy&quot;
+                  </span>
                   ServiceFee ( Fee: entre 2,5% y 0.5%)
                 </div>
                 <div className="text-xs">

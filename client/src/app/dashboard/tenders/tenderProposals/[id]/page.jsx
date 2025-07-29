@@ -1,11 +1,11 @@
 'use client'
-import { useGetTenderByIdQuery } from "@/app/redux/services/tendersApi"
-import getLocalStorage from "@/app/Func/localStorage"
+import { useGetTenderByIdQuery } from "@/app/redux/services/tendersApi";
+import getLocalStorage from "@/app/Func/localStorage";
 import { useRouter } from "next/navigation";
 import { handleChangeStatus, bankAccountOpen } from "@/app/Func/controllers";
 import { useState, useEffect } from "react";
 
-function page({params}) {
+function Page({params}) {
   console.log("y que es esto?",params)
   const { data:tender, isLoading, isError } = useGetTenderByIdQuery(params.id);
   console.log("Consulta la propuesta por el ID",tender)
@@ -85,7 +85,7 @@ function page({params}) {
           <h4 className="text-center mb-3">Propuestas Recibidas</h4>
           <div>
             {tender.proposals?.map((proposal) => (
-              <div className="p-4 border rounded-md">
+              <div key={proposal.id} className="p-4 border rounded-md">
                 <div>
                   <p>
                     Empresa Oferente:{" "}
@@ -221,4 +221,4 @@ function page({params}) {
   );
 }
 
-export default page
+export default Page

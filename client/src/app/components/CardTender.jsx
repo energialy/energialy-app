@@ -39,8 +39,8 @@ const CardTender = ({item}) => {
           {item.description}
         </p> */}
         <div className="w-full mb-3 flex justify-start gap-3">
-          {item.subcategories.map((sub) => (
-            <span className="inline-block whitespace-nowrap rounded-full bg-neutral-200 p-3   text-center align-baseline text-[0.70em] font-bold leading-none text-neutral-600">
+          {item.subcategories.map((sub, index) => (
+            <span key={index} className="inline-block whitespace-nowrap rounded-full bg-neutral-200 p-3   text-center align-baseline text-[0.70em] font-bold leading-none text-neutral-600">
               {sub.name}
             </span>
           ))}

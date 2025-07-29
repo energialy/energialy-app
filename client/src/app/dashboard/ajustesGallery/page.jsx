@@ -10,7 +10,7 @@ const optionsNav = [
   "Agregar Productos/Servicios",
 ];
 
-function pageProfileGallery() {
+function PageProfileGallery() {
   const [selectedOption, setSelectedOption] = useState(0);
 
   const handleOptions = (option) => {
@@ -30,4 +30,4 @@ function pageProfileGallery() {
   );
 }
 
-export default pageProfileGallery;
+export default PageProfileGallery;

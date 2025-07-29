@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,PieChart, Pie, Cell} from 'recharts';
 import { useDataProvider, Loading } from 'react-admin';
+import AdminDashboard from './AdminDashboard';
 
 const COLORS = {
-  free: '#0088FE',
-  base: '#00C49F',
-  plus: '#FFBB28',
+  free: '#3C50E0',
+  base: '#10B981',
+  plus: '#FFBA00',
 };
+
 const UserRolesChart = () => {
   const [userData, setUserData] = useState([]);
   const [companyData, setCompanyData] = useState([]);
@@ -16,7 +18,8 @@ const UserRolesChart = () => {
   const [bankAccountsData, setBankAccountsData] = useState([]);
   const [bankAccountsStatusData, setBankAccountsStatusData] = useState([]);
   const [financeProductsData, setFinanceProductsData] = useState([]);
-  const dataProvider = typeof window !== 'undefined' ? useDataProvider() : null;
+  
+  const dataProvider = useDataProvider();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -147,66 +150,206 @@ const UserRolesChart = () => {
   }
 
   return (
-    <div>
-      <BarChart width={300} height={300} data={userData}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="role" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="count" fill="#8884d8" />
-      </BarChart>
+    <div className="space-y-6">
+      {/* Dashboard Stats */}
+      <AdminDashboard />
 
-      <PieChart width={600} height={300}>
-      <Pie
-    data={companyData}
-    dataKey="value"
-    nameKey="name"
-    cx="50%"
-    cy="50%"
-    outerRadius={80}
-    fill="#8884d8"
-    label
-    labelLine={false}
-  >
-    {companyData.map((entry, index) => (
-      <Cell key={`cell-${index}`} fill={COLORS[entry.name]} />
-    ))}
-  </Pie>
-        <Tooltip />
-        <Legend />
-      </PieChart>
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-2 2xl:gap-7.5">
+        
+        {/* Users by Role Chart */}
+        <div className="rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark">
+          <div className="mb-5">
+            <h5 className="text-xl font-semibold text-black dark:text-white">
+              Usuarios por Rol
+            </h5>
+          </div>
+          <div className="flex justify-center">
+            <BarChart width={400} height={300} data={userData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+              <XAxis dataKey="role" />
+              <YAxis />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: '#24303F',
+                  border: 'none',
+                  borderRadius: '6px',
+                  color: '#ffffff'
+                }}
+              />
+              <Legend />
+              <Bar dataKey="count" fill="#3C50E0" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </div>
+        </div>
 
-      <BarChart width={800} height={400} data={financeProductsData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="productName" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="sent" stackId="a" fill="#8884d8" />
-        <Bar dataKey="accepted" stackId="a" fill="#82ca9d" />
-        <Bar dataKey="declined" stackId="a" fill="#ffc658" />
-      </BarChart>
+        {/* Companies by Subscription Chart */}
+        <div className="rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark">
+          <div className="mb-5">
+            <h5 className="text-xl font-semibold text-black dark:text-white">
+              Empresas por Suscripción
+            </h5>
+          </div>
+          <div className="flex justify-center">
+            <PieChart width={400} height={300}>
+              <Pie
+                data={companyData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                fill="#8884d8"
+                label
+                labelLine={false}
+              >
+                {companyData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[entry.name]} />
+                ))}
+              </Pie>
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: '#24303F',
+                  border: 'none',
+                  borderRadius: '6px',
+                  color: '#ffffff'
+                }}
+              />
+              <Legend />
+            </PieChart>
+          </div>
+        </div>
 
-      <PieChart width={600} height={300}>
-      <Pie data={bankAccountsData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#82ca9d" label />
-        <Tooltip />
-        <Legend />
-      </PieChart>
+        {/* Tenders Status Chart */}
+        <div className="rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark">
+          <div className="mb-5">
+            <h5 className="text-xl font-semibold text-black dark:text-white">
+              Estado de Licitaciones
+            </h5>
+          </div>
+          <div className="flex justify-center">
+            <PieChart width={400} height={300}>
+              <Pie 
+                data={tendersStatusData} 
+                dataKey="value" 
+                nameKey="name" 
+                cx="50%" 
+                cy="50%" 
+                outerRadius={80} 
+                fill="#10B981" 
+                label 
+              />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: '#24303F',
+                  border: 'none',
+                  borderRadius: '6px',
+                  color: '#ffffff'
+                }}
+              />
+              <Legend />
+            </PieChart>
+          </div>
+        </div>
 
-      <PieChart width={600} height={300}>
-      <Pie data={tendersData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#82ca9d" label />
-        <Tooltip />
-        <Legend />
-      </PieChart>
+        {/* Finance Products Chart */}
+        <div className="rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark">
+          <div className="mb-5">
+            <h5 className="text-xl font-semibold text-black dark:text-white">
+              Productos Financieros
+            </h5>
+          </div>
+          <div className="flex justify-center">
+            <BarChart width={400} height={300} data={financeProductsData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+              <XAxis dataKey="productName" />
+              <YAxis />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: '#24303F',
+                  border: 'none',
+                  borderRadius: '6px',
+                  color: '#ffffff'
+                }}
+              />
+              <Legend />
+              <Bar dataKey="sent" stackId="a" fill="#3C50E0" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="accepted" stackId="a" fill="#10B981" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="declined" stackId="a" fill="#DC3545" radius={[2, 2, 0, 0]} />
+            </BarChart>
+          </div>
+        </div>
 
+      </div>
 
-      <PieChart width={600} height={300}>
-      <Pie data={tendersStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} fill="#82ca9d" label />
-        <Tooltip />
-        <Legend />
-      </PieChart>
+      {/* Additional Charts Row */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-2 2xl:gap-7.5">
+        
+        {/* Bank Accounts Chart */}
+        <div className="rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark">
+          <div className="mb-5">
+            <h5 className="text-xl font-semibold text-black dark:text-white">
+              Cuentas Bancarias
+            </h5>
+          </div>
+          <div className="flex justify-center">
+            <PieChart width={400} height={300}>
+              <Pie 
+                data={bankAccountsData} 
+                dataKey="value" 
+                nameKey="name" 
+                cx="50%" 
+                cy="50%" 
+                outerRadius={80} 
+                fill="#FFBA00" 
+                label 
+              />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: '#24303F',
+                  border: 'none',
+                  borderRadius: '6px',
+                  color: '#ffffff'
+                }}
+              />
+              <Legend />
+            </PieChart>
+          </div>
+        </div>
 
+        {/* Tenders Public Status Chart */}
+        <div className="rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark">
+          <div className="mb-5">
+            <h5 className="text-xl font-semibold text-black dark:text-white">
+              Licitaciones Públicas
+            </h5>
+          </div>
+          <div className="flex justify-center">
+            <PieChart width={400} height={300}>
+              <Pie 
+                data={tendersData} 
+                dataKey="value" 
+                nameKey="name" 
+                cx="50%" 
+                cy="50%" 
+                outerRadius={80} 
+                fill="#259AE6" 
+                label 
+              />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: '#24303F',
+                  border: 'none',
+                  borderRadius: '6px',
+                  color: '#ffffff'
+                }}
+              />
+              <Legend />
+            </PieChart>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 };
