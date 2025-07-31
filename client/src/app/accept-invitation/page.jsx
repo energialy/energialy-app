@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -10,7 +10,7 @@ import {
   displaySuccessMessage,
 } from "../components/Toastify";
 
-export default function AcceptInvitation() {
+function AcceptInvitationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [invitationToken, setInvitationToken] = useState("");
@@ -160,5 +160,13 @@ export default function AcceptInvitation() {
       </div>
       <ToastContainer />
     </div>
+  );
+}
+
+export default function AcceptInvitation() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <AcceptInvitationContent />
+    </Suspense>
   );
 }
