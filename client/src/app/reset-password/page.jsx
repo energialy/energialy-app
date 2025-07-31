@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ResetPasswordForm from '../components/ResetPasswordForm';
 
 function page() {
   return (
     <div className="bg-gray-100">
-      <ResetPasswordForm />
+      <Suspense fallback={<div>Cargando...</div>}>
+        <ResetPasswordForm />
+      </Suspense>
     </div>
   );
 }
