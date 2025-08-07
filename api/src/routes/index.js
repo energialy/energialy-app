@@ -19,6 +19,8 @@ const inviteCompaniesRouter = require('./resources/inviteCompaniesRouter');
 const messagesRouter = require('./resources/messagesRouter');
 const galleryRouter = require('./resources/CompanyGalleryRouter');
 const certificationRouter = require('./resources/certificationGalleryRouter');
+const subscriptionsRouter = require('./resources/subscriptionsRouter');
+const companySubscriptionsRouter = require('./resources/companySubscriptionsRouter');
 const collaboratorsRouter = require('./collaborators');
 const notificationsRouter = require('./notifications');
 const tenderInvitationsRouter = require('./tenderInvitations');
@@ -55,5 +57,9 @@ router.use('/inviteCompanies', inviteCompaniesRouter);
 
 router.use('/gallery', galleryRouter);
 router.use('/certification', certificationRouter);
+
+// Subscription management routes
+router.use('/subscriptions', subscriptionsRouter);
+router.use('/companySubscriptions', companySubscriptionsRouter);
 
 module.exports = router;

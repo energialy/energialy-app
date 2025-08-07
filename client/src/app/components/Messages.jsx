@@ -21,38 +21,44 @@ const Messages = ({ filteredMessages, userId }) => {
   }, [filteredMessages]);
 
   return (
-    <div className="col-span-10 max-h-[300px] overflow-y-auto">
-      {filteredMessages.map((message, index) => {
-        const isSender = message.sender.id === userId;
-        const userName = message.sender.fullName ||
-          `${message.sender.firstName} ${message.sender.lastName}`;
-        
-        return (
-          <div
-            key={message.id || index}
-            className={`mb-3 ${isSender ? "text-right" : "text-left"}`}
-          >
-            {/* Nombre del usuario */}
-            <div className={`text-xs text-gray-600 mb-1 ${isSender ? "text-right" : "text-left"}`}>
-              {userName}
-            </div>
-            
-            {/* Mensaje */}
+    <div className="col-span-10 h-[300px] overflow-y-auto border border-gray-300 rounded-lg p-3 bg-white">
+      {filteredMessages.length === 0 ? (
+        <div className="flex items-center justify-center h-full text-gray-500">
+          {filteredMessages.length === 0 ? "No hay mensajes para mostrar" : "Selecciona una empresa para ver los mensajes"}
+        </div>
+      ) : (
+        filteredMessages.map((message, index) => {
+          const isSender = message.sender.id === userId;
+          const userName = message.sender.fullName ||
+            `${message.sender.firstName} ${message.sender.lastName}`;
+          
+          return (
             <div
-              className={`text-sm p-3 rounded-lg inline-block max-w-[70%] ${
-                isSender ? "bg-gray-200" : "bg-purple-200"
-              }`}
+              key={message.id || index}
+              className={`mb-3 ${isSender ? "text-right" : "text-left"}`}
             >
-              {message.text}
+              {/* Nombre del usuario */}
+              <div className={`text-xs text-gray-600 mb-1 ${isSender ? "text-right" : "text-left"}`}>
+                {userName}
+              </div>
+              
+              {/* Mensaje */}
+              <div
+                className={`text-sm p-3 rounded-lg inline-block max-w-[70%] ${
+                  isSender ? "bg-gray-200" : "bg-purple-200"
+                }`}
+              >
+                {message.text}
+              </div>
+              
+              {/* Fecha */}
+              <div className={`text-xs text-gray-500 mt-1 ${isSender ? "text-right" : "text-left"}`}>
+                {message.createdAt}
+              </div>
             </div>
-            
-            {/* Fecha */}
-            <div className={`text-xs text-gray-500 mt-1 ${isSender ? "text-right" : "text-left"}`}>
-              {message.createdAt}
-            </div>
-          </div>
-        );
-      })}
+          );
+        })
+      )}
       <div ref={messagesEndRef} />
     </div>
   );

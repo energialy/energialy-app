@@ -343,72 +343,92 @@ const Chat = ({ id, company }) => {
             </div>
           ) : (
             // Vista original para cuando no hay company específica
-            <div>
-              <h2 className="font-bold text-center text-md">Chat</h2>
+            <div className="w-full">
+              <h2 className="font-bold text-center text-md mb-4">Chat</h2>
 
-              <div className="grid grid-cols-12 gap-2">
-                <div className="h-64 col-span-2 overflow-y-auto text-sm">
-                  {buttonChat.map((item) => {
-                    const companyUser = allUsers.find(user => user.company?.name === item);
-                    const profilePicture = companyUser?.company?.profilePicture;
-                    
-                    return (
-                      <button
-                        key={item}
-                        className={`w-full p-1 mb-2 text-sm text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center min-h-[40px] ${
-                          selectedCompany === item
-                            ? "bg-blue-500 hover:bg-blue-600"
-                            : "bg-gray-600 hover:bg-gray-700"
-                        }`}
-                        onClick={() => handleSelectCompany(item)}
-                        title={item}
-                      >
-                        {profilePicture ? (
-                          <img
-                            src={profilePicture}
-                            alt={item}
-                            className="w-8 h-8 rounded-full object-cover"
-                            onError={(e) => {
-                              console.log('Error loading image for company:', item);
-                              e.target.style.display = 'none';
-                              e.target.nextSibling.style.display = 'flex';
-                            }}
-                          />
-                        ) : null}
-                        <div 
-                          className="flex items-center justify-center w-full px-2 py-1"
-                          style={{ display: profilePicture ? 'none' : 'flex' }}
+              <div className="grid grid-cols-12 gap-4 mb-4">
+                {/* Lista de empresas */}
+                <div className="col-span-3">
+                  <h3 className="text-sm font-semibold mb-2 text-gray-700">Empresas</h3>
+                  <div className="h-64 overflow-y-auto border border-gray-200 rounded-lg p-2">
+                    {buttonChat.map((item) => {
+                      const companyUser = allUsers.find(user => user.company?.name === item);
+                      const profilePicture = companyUser?.company?.profilePicture;
+                      
+                      console.log('Company:', item, 'ProfilePicture:', profilePicture); // Debug log
+                      
+                      return (
+                        <button
+                          key={item}
+                          className={`w-full p-2 mb-2 text-sm text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center space-x-2 ${
+                            selectedCompany === item
+                              ? "bg-blue-500 hover:bg-blue-600"
+                              : "bg-gray-600 hover:bg-gray-700"
+                          }`}
+                          onClick={() => handleSelectCompany(item)}
+                          title={item}
                         >
-                          <span className="text-xs font-medium text-white text-center leading-tight break-words">
-                            {item}
-                          </span>
-                        </div>
-                      </button>
-                    );
-                  })}
+                          {profilePicture ? (
+                            <div className="flex items-center space-x-2 w-full">
+                              <img
+                                src={profilePicture}
+                                alt={item}
+                                className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                                onError={(e) => {
+                                  console.log('Error loading image for company:', item, 'URL:', profilePicture);
+                                  e.target.style.display = 'none';
+                                  e.target.parentNode.querySelector('.fallback-text').style.display = 'block';
+                                }}
+                              />
+                              <span className="text-xs font-medium text-white truncate flex-1">
+                                {item}
+                              </span>
+                              <span className="fallback-text text-xs font-medium text-white w-full text-center" style={{ display: 'none' }}>
+                                {item}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-center w-full">
+                              <span className="text-xs font-medium text-white text-center">
+                                {item}
+                              </span>
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-                <Messages filteredMessages={filteredMessages} userId={userId} />
+                
+                {/* Área de mensajes */}
+                <div className="col-span-9">
+                  <h3 className="text-sm font-semibold mb-2 text-gray-700">
+                    {selectedCompany ? `Conversación con ${selectedCompany}` : 'Selecciona una empresa'}
+                  </h3>
+                  <Messages filteredMessages={filteredMessages} userId={userId} />
+                </div>
               </div>
 
+              {/* Formulario para enviar mensajes */}
               <form className="flex mt-4" onSubmit={handleSendMessage}>
                 <input
                   type="text"
-                  className="flex-1 px-4 py-2 mr-2 border rounded focus:outline-none"
+                  className="flex-1 px-4 py-2 mr-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={messageText}
                   onChange={(event) => setMessageText(event.target.value)}
-                  placeholder={selectedCompany ? "Type your message..." : "Selecciona una empresa para chatear..."}
+                  placeholder={selectedCompany ? "Escribe tu mensaje..." : "Selecciona una empresa para chatear..."}
                   disabled={!selectedCompany}
                 />
                 <button
                   type="submit"
-                  className={`px-4 py-2 text-black rounded ${
+                  className={`px-4 py-2 rounded-lg font-medium ${
                     selectedCompany && messageText.trim()
-                      ? "bg-blue-400 hover:bg-blue-600"
-                      : "bg-gray-300 cursor-not-allowed"
+                      ? "bg-blue-500 hover:bg-blue-600 text-white"
+                      : "bg-gray-300 text-gray-600 cursor-not-allowed"
                   }`}
                   disabled={!selectedCompany || !messageText.trim()}
                 >
-                  Send
+                  Enviar
                 </button>
               </form>
             </div>
