@@ -22,9 +22,9 @@ const { conn } = require('./src/db.js');
 
 const port = process.env.PORT ?? 3001;
 
-// Only use alter: true in development - disabled temporarily due to syntax issues
-// const syncOptions = process.env.NODE_ENV === 'production' ? {} : { alter: true };
-const syncOptions = { force: false };
+// Use force: true in development to recreate tables with correct structure
+// Use force: false in production to preserve data
+const syncOptions = process.env.NODE_ENV === 'development' ? { force: true } : { force: false };
 
 conn.sync(syncOptions).then(() => {
   server.listen(port, () => {

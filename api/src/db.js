@@ -47,7 +47,7 @@ let entries = Object.entries(sequelize.models);
 let capsEntries = entries.map((entry) => [entry[0][0].toUpperCase() + entry[0].slice(1), entry[1]]);
 sequelize.models = Object.fromEntries(capsEntries);
 
-const { Users, Messages, Companies, Categories, Subcategories, Locations, Tenders, Proposals, Documents, BankAccounts, FinanceProducts, CompanyGallery, CertificationGallery, CompanyInvitations, Permissions, Notifications, TenderInvitations } = sequelize.models;
+const { Users, Messages, Companies, Categories, Subcategories, Locations, Tenders, Proposals, Documents, BankAccounts, FinanceProducts, CompanyGallery, CertificationGallery, CompanyInvitations, Permissions, Notifications, TenderInvitations, Subscriptions, CompanySubscriptions } = sequelize.models;
 
 Companies.hasMany(Users);
 Users.belongsTo(Companies);
@@ -127,6 +127,13 @@ TenderInvitations.belongsTo(Users, { foreignKey: 'userId', as: 'user' });
 
 Users.hasMany(TenderInvitations, { foreignKey: 'invitedBy', as: 'sentTenderInvitations' });
 TenderInvitations.belongsTo(Users, { foreignKey: 'invitedBy', as: 'invitedByUser' });
+
+// Subscriptions relationships
+Companies.hasMany(CompanySubscriptions);
+CompanySubscriptions.belongsTo(Companies);
+
+Subscriptions.hasMany(CompanySubscriptions);
+CompanySubscriptions.belongsTo(Subscriptions);
 
 module.exports = {
   ...sequelize.models,

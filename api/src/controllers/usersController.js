@@ -40,7 +40,7 @@ const getAllUsers = async () => {
     include: [
       {
         model: Companies,
-        attributes: ['id', 'name', 'subscription'],
+        attributes: ['id', 'name', 'subscription', 'profilePicture'],
       }, 
       {
         model: Messages,
