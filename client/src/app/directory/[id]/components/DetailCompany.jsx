@@ -123,7 +123,7 @@ function DetailCompany({company}) {
             <h3 className="font-bold text-lg mb-4 text-gray-800 border-b border-gray-200 pb-2">
               💬 Chat con {companyData.name}
             </h3>
-            <div className="min-h-[400px]">
+            <div className="h-[500px] flex flex-col">
               <Chat id={companyData.id} company={companyData} />
             </div>
           </div>
