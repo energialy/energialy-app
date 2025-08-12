@@ -6,11 +6,11 @@ import UserRolesChart from "./RolesChart";
 import TailAdminLayout from './TailAdminLayout';
 
 // Import new components
-import { UserList } from './UserList';
+import { UserList } from './UserListTailAdmin';
 import { UserCreate } from './UserCreate';
-import { CompanyList } from './CompanyList';
+import { CompanyList } from './CompanyListTailAdmin';
 import { CompanyCreate } from './CompanyCreate';
-import { TenderList } from './TenderList';
+import { TenderList } from './TenderListTailAdmin';
 import { TenderCreate } from './TenderCreate';
 import { TenderEdit } from './TenderEdit';
 import { SubscriptionList } from './SubscriptionList';

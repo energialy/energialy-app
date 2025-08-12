@@ -1,12 +1,8 @@
-// Cards
-export { default as StatCard } from './cards/StatCard';
-export { default as TableCard } from './cards/TableCard';
-export { default as MetricsGrid } from './cards/MetricsGrid';
-export { default as ProgressCard } from './cards/ProgressCard';
-
-// Charts
-export { default as BarChartCard } from './charts/BarChartCard';
-export { default as DonutChartCard } from './charts/DonutChartCard';
-export { default as LineChartCard } from './charts/LineChartCard';
-export { default as AreaChartCard } from './charts/AreaChartCard';
-export { default as ComposedChartCard } from './charts/ComposedChartCard';
+// Exportaciones de componentes UI para fácil importación
+export { default as StatCard } from './StatCard';
+export { default as BarChartCard } from './BarChartCard';
+export { default as DonutChartCard } from './DonutChartCard';
+export { default as AreaChartCard } from './AreaChartCard';
+export { default as TableCard } from './TableCard';
+export { default as ProgressCard } from './ProgressCard';
+export { default as MetricsGrid } from './MetricsGrid';
