@@ -99,6 +99,36 @@ const Chat = ({ id, company }) => {
     !company && setShowPopup(true);
   }, []);
 
+  // Cargar mensajes específicos cuando hay una empresa determinada
+  useEffect(() => {
+    if (company && allUsers.length > 0 && allMessages.length > 0) {
+      // Encontrar el usuario de la empresa específica
+      const companyUser = allUsers.find(user => user.company?.name === company.name);
+      if (companyUser) {
+        setReceiver(companyUser);
+        setSelectedCompany(company.name);
+        
+        // Filtrar mensajes para esta empresa específica inmediatamente
+        const filtered = allMessages.filter((message) => {
+          const senderCompany = message.sender?.company
+            ? message.sender.company.name
+            : message.sender?.Company?.name;
+
+          const receiverCompany = message.receiver?.company
+            ? message.receiver.company.name
+            : message.receiver?.Company?.name;
+
+          return (
+            (senderCompany === company.name && receiverCompany === myName) ||
+            (senderCompany === myName && receiverCompany === company.name)
+          );
+        });
+        
+        setFilteredMessages(filtered);
+      }
+    }
+  }, [company, allUsers, allMessages, myName]);
+
   // Debug: Verificar estructura de datos
   useEffect(() => {
     console.log('All Users:', allUsers);
@@ -311,19 +341,17 @@ const Chat = ({ id, company }) => {
         <>
           {company ? (
             // Vista específica para chatear con una empresa en particular
-            <div className="w-full">
-              <div className="flex flex-col h-80">
-                {/* Área de mensajes */}
-                <div className="flex-1 overflow-y-auto border border-gray-200 rounded-lg p-3 mb-4">
-                  <Messages filteredMessages={filteredMessages} userId={userId} />
-                </div>
+            <div className="w-full h-full flex flex-col">
+              {/* Área de mensajes - sin doble scroll */}
+              <div className="flex-1 border border-gray-200 rounded-lg mb-4 overflow-hidden">
+                <Messages filteredMessages={filteredMessages} userId={userId} />
               </div>
               
               {/* Formulario para enviar mensajes */}
-              <form className="flex border-t border-gray-200 pt-4" onSubmit={handleSendMessage}>
+              <form className="flex gap-3" onSubmit={handleSendMessage}>
                 <input
                   type="text"
-                  className="flex-1 px-4 py-3 mr-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900 bg-white placeholder-gray-500"
                   value={messageText}
                   onChange={(event) => setMessageText(event.target.value)}
                   placeholder={`Escribe un mensaje a ${company.name}...`}
@@ -333,7 +361,7 @@ const Chat = ({ id, company }) => {
                   className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 min-w-[80px] ${
                     messageText.trim()
                       ? "bg-blue-500 hover:bg-blue-600 text-white shadow-md hover:shadow-lg"
-                      : "bg-gray-200 hover:bg-gray-300 text-gray-600 cursor-not-allowed border border-gray-300"
+                      : "bg-gray-300 hover:bg-gray-400 text-gray-600 cursor-not-allowed"
                   }`}
                   disabled={!messageText.trim()}
                 >
@@ -410,10 +438,10 @@ const Chat = ({ id, company }) => {
               </div>
 
               {/* Formulario para enviar mensajes */}
-              <form className="flex mt-4" onSubmit={handleSendMessage}>
+              <form className="flex gap-3 mt-4" onSubmit={handleSendMessage}>
                 <input
                   type="text"
-                  className="flex-1 px-4 py-2 mr-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900 bg-white placeholder-gray-500"
                   value={messageText}
                   onChange={(event) => setMessageText(event.target.value)}
                   placeholder={selectedCompany ? "Escribe tu mensaje..." : "Selecciona una empresa para chatear..."}
@@ -421,10 +449,10 @@ const Chat = ({ id, company }) => {
                 />
                 <button
                   type="submit"
-                  className={`px-4 py-2 rounded-lg font-medium ${
+                  className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 min-w-[80px] ${
                     selectedCompany && messageText.trim()
-                      ? "bg-blue-500 hover:bg-blue-600 text-white"
-                      : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                      ? "bg-blue-500 hover:bg-blue-600 text-white shadow-md hover:shadow-lg"
+                      : "bg-gray-300 hover:bg-gray-400 text-gray-600 cursor-not-allowed"
                   }`}
                   disabled={!selectedCompany || !messageText.trim()}
                 >
