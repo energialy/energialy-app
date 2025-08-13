@@ -17,7 +17,7 @@ import {
 } from "@/app/Func/sessionStorage";
 
 import io from "socket.io-client";
-const socketIo = io("http://localhost:3001");
+const socketIo = io(process.env.NEXT_PUBLIC_BASE_URL);
 
 const Chat = ({ id, company }) => {
   //id: Compañía seleccionada en el perfil
