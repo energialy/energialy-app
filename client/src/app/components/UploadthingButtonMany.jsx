@@ -21,7 +21,7 @@ export default function UploadthingButtonMany({onFilesUpload, user}) {
     console.log('props:',onFilesUpload)
     
     try {
-      const res = await axios.post("http://localhost:3001/documents", {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/documents`, {
         name: onFilesUpload,
         attachment: cleanRes[0],
         companyId: user.company.id,
