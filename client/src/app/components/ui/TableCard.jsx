@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 
 const TableCard = ({ 
   title, 
-  data, 
-  columns,
+  data = [], 
+  columns = [],
   className = "",
   showSearch = true,
   showFilter = true,
@@ -16,7 +16,7 @@ const TableCard = ({
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const filteredData = data.filter(item =>
+  const filteredData = (data || []).filter(item =>
     Object.values(item).some(value =>
       value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
     )
@@ -130,7 +130,7 @@ const TableCard = ({
           <table className="w-full table-auto">
             <thead>
               <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                {columns.map((column, index) => (
+                {columns && columns.length > 0 && columns.map((column, index) => (
                   <th
                     key={index}
                     className="min-w-[220px] px-4 py-4 font-medium text-black dark:text-white xl:pl-11"
@@ -141,7 +141,7 @@ const TableCard = ({
               </tr>
             </thead>
             <tbody>
-              {paginatedData.map((row, rowIndex) => (
+              {paginatedData && paginatedData.length > 0 && paginatedData.map((row, rowIndex) => (
                 <tr
                   key={rowIndex}
                   className={`cursor-pointer hover:bg-gray-2 dark:hover:bg-meta-4 ${
@@ -149,7 +149,7 @@ const TableCard = ({
                   }`}
                   onClick={() => onRowClick && onRowClick(row)}
                 >
-                  {columns.map((column, colIndex) => (
+                  {columns && columns.length > 0 && columns.map((column, colIndex) => (
                     <td
                       key={colIndex}
                       className="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11"
