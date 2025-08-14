@@ -56,26 +56,36 @@ const Chat = ({ id, company }) => {
   };
 
   const convertirFecha = (fechaISO) => {
-    let fecha = new Date(fechaISO);
+    try {
+      let fecha = new Date(fechaISO);
+      
+      // Verificar si la fecha es válida
+      if (isNaN(fecha.getTime())) {
+        return new Date().toISOString();
+      }
 
-    // Extraer componentes de la fecha
-    let dia = fecha.getUTCDate();
-    let mes = fecha.getUTCMonth() + 1; // Los meses empiezan desde 0
-    let año = fecha.getUTCFullYear();
+      // Extraer componentes de la fecha
+      let dia = fecha.getUTCDate();
+      let mes = fecha.getUTCMonth() + 1; // Los meses empiezan desde 0
+      let año = fecha.getUTCFullYear();
 
-    // Convertir la hora a la zona horaria deseada (ejemplo: UTC-3)
-    let hora = fecha.getUTCHours() - 3;
-    let minutos = fecha.getUTCMinutes();
+      // Convertir la hora a la zona horaria deseada (ejemplo: UTC-3)
+      let hora = fecha.getUTCHours() - 3;
+      let minutos = fecha.getUTCMinutes();
 
-    // Asegurarse de que la hora es válida después de la conversión
-    if (hora < 0) {
-      hora += 24;
-      dia -= 1;
+      // Asegurarse de que la hora es válida después de la conversión
+      if (hora < 0) {
+        hora += 24;
+        dia -= 1;
+      }
+
+      // Formatear la fecha y hora en el nuevo formato
+      let fechaString = `${dia}-${mes}-${año}-${hora}:${minutos}`;
+      return fechaString; // Ejemplo de salida: "26-6-2024-19:38"
+    } catch (error) {
+      console.error('Error al convertir fecha:', error);
+      return new Date().toISOString();
     }
-
-    // Formatear la fecha y hora en el nuevo formato
-    let fechaString = `${dia}-${mes}-${año}-${hora}:${minutos}`;
-    return (fechaString); // Ejemplo de salida: "26-6-2024-19:38"
   };
   //Envio de usuarios a server para su asignacion
   //Se envia el id de la compañía
@@ -131,15 +141,13 @@ const Chat = ({ id, company }) => {
 
   // Debug: Verificar estructura de datos
   useEffect(() => {
-    console.log('All Users:', allUsers);
-    console.log('Button Chat:', buttonChat);
     if (allUsers.length > 0) {
       console.log('Sample user structure:', allUsers[0]);
       if (allUsers[0]?.company) {
         console.log('Sample company structure:', allUsers[0].company);
       }
     }
-  }, [allUsers, buttonChat]);
+  }, [allUsers]);
 
   //Carga sender y receiver
   useEffect(() => {
@@ -164,15 +172,19 @@ const Chat = ({ id, company }) => {
 
   //Filtra chat por compañía seleccionada
   useEffect(() => {
-    if (selectedCompany) {
-      if (selectedCompany.slice(-2) === "🔔") {
-        const oldSelectedCompany = selectedCompany;
-        setSelectedCompany(selectedCompany.slice(0, -2));
-
-        const indice = buttonChat.indexOf(oldSelectedCompany);
-        const newButtonChat = buttonChat;
-        newButtonChat[indice] = oldSelectedCompany.slice(0, -2);
-        setButtonChat(newButtonChat);
+    if (selectedCompany && allMessages.length > 0) {
+      // Limpiar la compañía de notificaciones (🔔) si las tiene
+      const cleanCompanyName = selectedCompany.replace('🔔', '');
+      
+      // Actualizar el estado si tenía notificaciones
+      if (selectedCompany !== cleanCompanyName) {
+        setSelectedCompany(cleanCompanyName);
+        
+        // Actualizar buttonChat para remover la notificación
+        const updatedButtonChat = buttonChat.map(button => 
+          button === selectedCompany ? cleanCompanyName : button
+        );
+        setButtonChat(updatedButtonChat);
       }
 
       const filtered = allMessages.filter((message) => {
@@ -185,21 +197,22 @@ const Chat = ({ id, company }) => {
           : message.receiver?.Company?.name;
 
         return (
-          (senderCompany === selectedCompany && receiverCompany === myName) ||
-          (senderCompany === myName && receiverCompany === selectedCompany)
+          (senderCompany === cleanCompanyName && receiverCompany === myName) ||
+          (senderCompany === myName && receiverCompany === cleanCompanyName)
         );
       });
 
+      // Solo actualizar el receiver si realmente cambió la compañía
       const newReceiver = allUsers.find(
-        (user) => user.company?.name === selectedCompany
+        (user) => user.company?.name === cleanCompanyName
       );
 
       setFilteredMessages(filtered);
-      if (newReceiver) {
+      if (newReceiver && (!receiver || receiver.company?.name !== cleanCompanyName)) {
         setReceiver(newReceiver);
       }
     }
-  }, [allMessages, selectedCompany, myName, allUsers]);
+  }, [selectedCompany, allMessages, myName, allUsers]);
 
   //Agrega las compañías a los botones de seleccion del chat
   //excepto al usuario
@@ -231,7 +244,6 @@ const Chat = ({ id, company }) => {
 
   //Recibe los mensajes
   useEffect(() => {
-    console.log("Recibe allMessages", allMessages);
     if (!socketIo) return;
     const messageListener = (message) => {
       const { _message, _sender, _receiver } = message;
@@ -256,14 +268,20 @@ const Chat = ({ id, company }) => {
 
       const foundCompanyName = foundReceiver?.company?.name;
       if (selectedCompany !== foundCompanyName && foundCompanyName) {
-        const button = buttonChat.find((button) => button === foundCompanyName);
-        if (button) {
-          const button2 = button.concat("🔔");
-          const newButtonChat = buttonChat.filter(
-            (element) => element !== foundCompanyName
-          );
-          newButtonChat.unshift(button2);
+        // Buscar si la empresa ya existe en buttonChat (con o sin notificación)
+        const existingButtonIndex = buttonChat.findIndex(button => 
+          button === foundCompanyName || button === foundCompanyName + "🔔"
+        );
+        
+        if (existingButtonIndex !== -1) {
+          // Si existe, moverla al principio con notificación
+          const newButtonChat = [...buttonChat];
+          newButtonChat.splice(existingButtonIndex, 1); // Remover de posición actual
+          newButtonChat.unshift(foundCompanyName + "🔔"); // Agregar al principio con notificación
           setButtonChat(newButtonChat);
+        } else {
+          // Si no existe, agregarla al principio
+          setButtonChat(prev => [foundCompanyName + "🔔", ...prev]);
         }
       }
     };
@@ -278,7 +296,6 @@ const Chat = ({ id, company }) => {
   //Envia los mensajes
   const handleSendMessage = useCallback(
     (event) => {
-      console.log("Envia allMessages", allMessages);
       event.preventDefault();
 
       if (!socketIo || !messageText.trim()) return;
@@ -303,7 +320,6 @@ const Chat = ({ id, company }) => {
         receiver,
         createdAt: convertirFecha(new Date().toISOString()),
       };
-      console.log("Date", newMessage.createdAt);
 
       setAllMessages((prevMessages) => [...prevMessages, newMessage]);
 
@@ -326,7 +342,17 @@ const Chat = ({ id, company }) => {
 
   //Establece compañía seleccionada en boton del chat
   const handleSelectCompany = (companyName) => {
-    setSelectedCompany(companyName);
+    // Limpiar nombre de notificaciones
+    const cleanCompanyName = companyName.replace('🔔', '');
+    setSelectedCompany(cleanCompanyName);
+    
+    // Si tenía notificación, limpiarla del buttonChat
+    if (companyName.includes('🔔')) {
+      const updatedButtonChat = buttonChat.map(button => 
+        button === companyName ? cleanCompanyName : button
+      );
+      setButtonChat(updatedButtonChat);
+    }
   };
 
   return (
@@ -376,50 +402,53 @@ const Chat = ({ id, company }) => {
 
               <div className="grid grid-cols-12 gap-4 mb-4">
                 {/* Lista de empresas */}
-                <div className="col-span-3">
-                  <h3 className="text-sm font-semibold mb-2 text-gray-700">Empresas</h3>
-                  <div className="h-64 overflow-y-auto border border-gray-200 rounded-lg p-2">
+                <div className="col-span-1">
+                  <h3 className="text-sm font-semibold mb-2 text-gray-700 text-center">Empresas</h3>
+                  <div className="h-64 overflow-y-auto p-2 flex flex-col items-center">
                     {buttonChat.map((item) => {
                       const companyUser = allUsers.find(user => user.company?.name === item);
                       const profilePicture = companyUser?.company?.profilePicture;
-                      
-                      console.log('Company:', item, 'ProfilePicture:', profilePicture); // Debug log
+                      const companyName = item.replace('🔔', ''); // Remover notificación para obtener nombre limpio
                       
                       return (
                         <button
                           key={item}
-                          className={`w-full p-2 mb-2 text-sm text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center space-x-2 ${
-                            selectedCompany === item
-                              ? "bg-blue-500 hover:bg-blue-600"
-                              : "bg-gray-600 hover:bg-gray-700"
+                          className={`w-12 h-12 mb-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ${
+                            selectedCompany === companyName
+                              ? "ring-2 ring-blue-500 shadow-lg"
+                              : "hover:shadow-md"
                           }`}
-                          onClick={() => handleSelectCompany(item)}
-                          title={item}
+                          onClick={() => handleSelectCompany(companyName)}
+                          title={companyName}
                         >
                           {profilePicture ? (
-                            <div className="flex items-center space-x-2 w-full">
+                            <div className="relative w-full h-full">
                               <img
                                 src={profilePicture}
-                                alt={item}
-                                className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                                alt={companyName}
+                                className="w-full h-full rounded-full object-cover"
                                 onError={(e) => {
-                                  console.log('Error loading image for company:', item, 'URL:', profilePicture);
                                   e.target.style.display = 'none';
-                                  e.target.parentNode.querySelector('.fallback-text').style.display = 'block';
+                                  e.target.parentNode.querySelector('.fallback-avatar').style.display = 'flex';
                                 }}
                               />
-                              <span className="text-xs font-medium text-white truncate flex-1">
-                                {item}
-                              </span>
-                              <span className="fallback-text text-xs font-medium text-white w-full text-center" style={{ display: 'none' }}>
-                                {item}
-                              </span>
+                              <div className="fallback-avatar w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ display: 'none' }}>
+                                {companyName.charAt(0).toUpperCase()}
+                              </div>
+                              {item.includes('🔔') && (
+                                <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                                  <span className="text-white text-xs">!</span>
+                                </div>
+                              )}
                             </div>
                           ) : (
-                            <div className="flex items-center justify-center w-full">
-                              <span className="text-xs font-medium text-white text-center">
-                                {item}
-                              </span>
+                            <div className="relative w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                              {companyName.charAt(0).toUpperCase()}
+                              {item.includes('🔔') && (
+                                <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                                  <span className="text-white text-xs">!</span>
+                                </div>
+                              )}
                             </div>
                           )}
                         </button>
@@ -429,7 +458,7 @@ const Chat = ({ id, company }) => {
                 </div>
                 
                 {/* Área de mensajes */}
-                <div className="col-span-9">
+                <div className="col-span-11">
                   <h3 className="text-sm font-semibold mb-2 text-gray-700">
                     {selectedCompany ? `Conversación con ${selectedCompany}` : 'Selecciona una empresa'}
                   </h3>
