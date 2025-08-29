@@ -139,9 +139,9 @@ const Chat = ({ id, company }) => {
     }
   }, [company, allUsers, allMessages, myName]);
 
-  // Debug: Verificar estructura de datos
+  // Debug: Verificar estructura de datos (solo en desarrollo)
   useEffect(() => {
-    if (allUsers.length > 0) {
+    if (allUsers.length > 0 && process.env.NODE_ENV === 'development') {
       console.log('Sample user structure:', allUsers[0]);
       if (allUsers[0]?.company) {
         console.log('Sample company structure:', allUsers[0].company);
@@ -151,28 +151,36 @@ const Chat = ({ id, company }) => {
 
   //Carga sender y receiver
   useEffect(() => {
-    if (allUsers.length > 0 && id) {
-      const foundReceiver = allUsers.find((user) => user.company.id === id);
+    if (allUsers.length > 0) {
+      // SIEMPRE establecer el sender (usuario actual)
       const foundSender = allUsers.find(
         (user) => user.company.id === companyId
       );
-      setReceiver(foundReceiver);
-      setSender(foundSender);
-      //Seteo inicial de compañía seleccionada para filtrar en chat
-      if (foundReceiver) {
-        setSelectedCompany(foundReceiver.company.name);
+      
+      if (foundSender) {
+        setSender(foundSender);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Sender establecido:', foundSender);
+        }
       }
-    } else if (allUsers.length > 0 && !id) {
-      const foundSender = allUsers.find(
-        (user) => user.company.id === companyId
-      );
-      setSender(foundSender);
+
+      // Si hay un ID específico, establecer receiver
+      if (id) {
+        const foundReceiver = allUsers.find((user) => user.company.id === id);
+        if (foundReceiver) {
+          setReceiver(foundReceiver);
+          setSelectedCompany(foundReceiver.company.name);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Receiver establecido desde ID:', foundReceiver);
+          }
+        }
+      }
     }
   }, [allUsers, id, companyId]);
 
   //Filtra chat por compañía seleccionada
   useEffect(() => {
-    if (selectedCompany && allMessages.length > 0) {
+    if (selectedCompany && allUsers.length > 0) {
       // Limpiar la compañía de notificaciones (🔔) si las tiene
       const cleanCompanyName = selectedCompany.replace('🔔', '');
       
@@ -187,32 +195,38 @@ const Chat = ({ id, company }) => {
         setButtonChat(updatedButtonChat);
       }
 
-      const filtered = allMessages.filter((message) => {
-        const senderCompany = message.sender?.company
-          ? message.sender.company.name
-          : message.sender?.Company?.name;
-
-        const receiverCompany = message.receiver?.company
-          ? message.receiver.company.name
-          : message.receiver?.Company?.name;
-
-        return (
-          (senderCompany === cleanCompanyName && receiverCompany === myName) ||
-          (senderCompany === myName && receiverCompany === cleanCompanyName)
-        );
-      });
-
-      // Solo actualizar el receiver si realmente cambió la compañía
+      // Establecer el receiver SIEMPRE cuando se selecciona una empresa
       const newReceiver = allUsers.find(
         (user) => user.company?.name === cleanCompanyName
       );
 
-      setFilteredMessages(filtered);
-      if (newReceiver && (!receiver || receiver.company?.name !== cleanCompanyName)) {
+      if (newReceiver) {
         setReceiver(newReceiver);
       }
+
+      // Filtrar mensajes solo si hay mensajes
+      if (allMessages.length > 0) {
+        const filtered = allMessages.filter((message) => {
+          const senderCompany = message.sender?.company
+            ? message.sender.company.name
+            : message.sender?.Company?.name;
+
+          const receiverCompany = message.receiver?.company
+            ? message.receiver.company.name
+            : message.receiver?.Company?.name;
+
+          return (
+            (senderCompany === cleanCompanyName && receiverCompany === myName) ||
+            (senderCompany === myName && receiverCompany === cleanCompanyName)
+          );
+        });
+
+        setFilteredMessages(filtered);
+      } else {
+        setFilteredMessages([]);
+      }
     }
-  }, [selectedCompany, allMessages, myName, allUsers]);
+  }, [selectedCompany, allUsers, allMessages, myName]);
 
   //Agrega las compañías a los botones de seleccion del chat
   //excepto al usuario
@@ -300,6 +314,15 @@ const Chat = ({ id, company }) => {
 
       if (!socketIo || !messageText.trim()) return;
       
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Enviando mensaje:', {
+          selectedCompany,
+          receiver,
+          sender,
+          company
+        });
+      }
+      
       // Si hay una empresa específica (company prop), validar receiver
       // Si no hay empresa específica, validar que haya una compañía seleccionada
       if (company) {
@@ -308,8 +331,12 @@ const Chat = ({ id, company }) => {
           return;
         }
       } else {
-        if (!receiver || !receiver.company) {
+        if (!selectedCompany) {
           alert("Por favor, selecciona una empresa para enviar el mensaje.");
+          return;
+        }
+        if (!receiver || !receiver.company) {
+          alert("Error de conexión. Por favor, vuelve a seleccionar la empresa.");
           return;
         }
       }
@@ -344,6 +371,9 @@ const Chat = ({ id, company }) => {
   const handleSelectCompany = (companyName) => {
     // Limpiar nombre de notificaciones
     const cleanCompanyName = companyName.replace('🔔', '');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Selecting company:', cleanCompanyName);
+    }
     setSelectedCompany(cleanCompanyName);
     
     // Si tenía notificación, limpiarla del buttonChat
@@ -402,18 +432,18 @@ const Chat = ({ id, company }) => {
 
               <div className="grid grid-cols-12 gap-4 mb-4">
                 {/* Lista de empresas */}
-                <div className="col-span-1">
+                <div className="col-span-2">
                   <h3 className="text-sm font-semibold mb-2 text-gray-700 text-center">Empresas</h3>
-                  <div className="h-64 overflow-y-auto p-2 flex flex-col items-center">
+                  <div className="h-64 overflow-y-auto p-2 flex flex-col items-center space-y-2">
                     {buttonChat.map((item) => {
-                      const companyUser = allUsers.find(user => user.company?.name === item);
+                      const companyUser = allUsers.find(user => user.company?.name === item.replace('🔔', ''));
                       const profilePicture = companyUser?.company?.profilePicture;
                       const companyName = item.replace('🔔', ''); // Remover notificación para obtener nombre limpio
                       
                       return (
                         <button
                           key={item}
-                          className={`w-12 h-12 mb-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ${
+                          className={`w-16 h-16 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ${
                             selectedCompany === companyName
                               ? "ring-2 ring-blue-500 shadow-lg"
                               : "hover:shadow-md"
@@ -458,7 +488,7 @@ const Chat = ({ id, company }) => {
                 </div>
                 
                 {/* Área de mensajes */}
-                <div className="col-span-11">
+                <div className="col-span-10">
                   <h3 className="text-sm font-semibold mb-2 text-gray-700">
                     {selectedCompany ? `Conversación con ${selectedCompany}` : 'Selecciona una empresa'}
                   </h3>
