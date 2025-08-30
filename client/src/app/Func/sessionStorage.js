@@ -15,3 +15,9 @@ export function getCompanyName() {
     return sessionStorage.getItem("companyName");
   }
 }
+
+export function getAccessToken() {
+  if (typeof window !== "undefined") {
+    return sessionStorage.getItem("accessToken");
+  }
+}

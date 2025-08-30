@@ -104,6 +104,7 @@ const Chat = ({ id, company }) => {
 
   //Carga usuarios y mensajes al comienzo, y detalles del primer destinatario
   useEffect(() => {
+    console.log('🔄 Cargando usuarios y mensajes...');
     axiosGetAllUsers(setAllUsers);
     axiosGetAllMessages(setAllMessages);
     !company && setShowPopup(true);
@@ -139,15 +140,15 @@ const Chat = ({ id, company }) => {
     }
   }, [company, allUsers, allMessages, myName]);
 
-  // Debug: Verificar estructura de datos (solo en desarrollo)
+  // Debug: Verificar mensajes cargados
   useEffect(() => {
-    if (allUsers.length > 0 && process.env.NODE_ENV === 'development') {
-      console.log('Sample user structure:', allUsers[0]);
-      if (allUsers[0]?.company) {
-        console.log('Sample company structure:', allUsers[0].company);
-      }
+    if (allMessages.length > 0) {
+      console.log('📧 Mensajes cargados:', allMessages.length);
+      console.log('📧 Primer mensaje:', allMessages[0]);
+    } else {
+      console.log('📧 No hay mensajes cargados');
     }
-  }, [allUsers]);
+  }, [allMessages]);
 
   //Carga sender y receiver
   useEffect(() => {
@@ -222,8 +223,14 @@ const Chat = ({ id, company }) => {
         });
 
         setFilteredMessages(filtered);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔍 Mensajes filtrados para', cleanCompanyName + ':', filtered.length);
+        }
       } else {
         setFilteredMessages([]);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔍 No hay mensajes para filtrar');
+        }
       }
     }
   }, [selectedCompany, allUsers, allMessages, myName]);
@@ -309,7 +316,7 @@ const Chat = ({ id, company }) => {
 
   //Envia los mensajes
   const handleSendMessage = useCallback(
-    (event) => {
+    async (event) => {
       event.preventDefault();
 
       if (!socketIo || !messageText.trim()) return;
@@ -356,11 +363,23 @@ const Chat = ({ id, company }) => {
         _receiver: receiver.company.id,
       });
 
-      axiosPostMessage({
-        text: messageText,
-        senderId: sender.id,
-        receiverId: receiver.id,
-      });
+      try {
+        await axiosPostMessage({
+          text: messageText,
+          senderId: sender.id,
+          receiverId: receiver.id,
+        });
+      } catch (error) {
+        console.error('Error al guardar mensaje:', error);
+        // Si hay error al guardar, podrías mostrar una notificación
+        if (error.response?.status === 401) {
+          alert("Error de autenticación. Por favor, inicia sesión nuevamente.");
+        } else if (error.response?.status === 403) {
+          alert("No tienes permisos para enviar mensajes.");
+        } else {
+          alert("Error al guardar el mensaje. Inténtalo nuevamente.");
+        }
+      }
 
       setMessageText("");
     },
@@ -428,13 +447,14 @@ const Chat = ({ id, company }) => {
           ) : (
             // Vista original para cuando no hay company específica
             <div className="w-full">
-              <h2 className="font-bold text-center text-md mb-4">Chat</h2>
+              <h2 className="font-semibold text-center text-lg mb-4 text-gray-800 dark:text-gray-200">Chat</h2>
 
               <div className="grid grid-cols-12 gap-4 mb-4">
                 {/* Lista de empresas */}
-                <div className="col-span-2">
-                  <h3 className="text-sm font-semibold mb-2 text-gray-700 text-center">Empresas</h3>
-                  <div className="h-64 overflow-y-auto p-2 flex flex-col items-center space-y-2">
+                <div className="col-span-3">
+                  <h3 className="text-sm font-semibold mb-3 text-gray-700 text-center">Empresas</h3>
+                  <div className="max-h-80 overflow-y-auto p-2" style={{scrollbarWidth: 'thin', scrollbarColor: '#d1d5db #f3f4f6'}}>
+                    <div className="flex flex-col items-center space-y-3">
                     {buttonChat.map((item) => {
                       const companyUser = allUsers.find(user => user.company?.name === item.replace('🔔', ''));
                       const profilePicture = companyUser?.company?.profilePicture;
@@ -443,7 +463,7 @@ const Chat = ({ id, company }) => {
                       return (
                         <button
                           key={item}
-                          className={`w-16 h-16 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ${
+                          className={`w-20 h-20 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ${
                             selectedCompany === companyName
                               ? "ring-2 ring-blue-500 shadow-lg"
                               : "hover:shadow-md"
@@ -462,7 +482,7 @@ const Chat = ({ id, company }) => {
                                   e.target.parentNode.querySelector('.fallback-avatar').style.display = 'flex';
                                 }}
                               />
-                              <div className="fallback-avatar w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ display: 'none' }}>
+                              <div className="fallback-avatar w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg" style={{ display: 'none' }}>
                                 {companyName.charAt(0).toUpperCase()}
                               </div>
                               {item.includes('🔔') && (
@@ -472,7 +492,7 @@ const Chat = ({ id, company }) => {
                               )}
                             </div>
                           ) : (
-                            <div className="relative w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            <div className="relative w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
                               {companyName.charAt(0).toUpperCase()}
                               {item.includes('🔔') && (
                                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
@@ -484,11 +504,12 @@ const Chat = ({ id, company }) => {
                         </button>
                       );
                     })}
+                    </div>
                   </div>
                 </div>
                 
                 {/* Área de mensajes */}
-                <div className="col-span-10">
+                <div className="col-span-9">
                   <h3 className="text-sm font-semibold mb-2 text-gray-700">
                     {selectedCompany ? `Conversación con ${selectedCompany}` : 'Selecciona una empresa'}
                   </h3>

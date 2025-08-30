@@ -1,32 +1,76 @@
 import axios from "axios";
+import { getAccessToken } from "./sessionStorage";
 
 export async function axiosPostMessage(body) {
   try {
-    const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/messages`, body);
+    const token = getAccessToken();
+    if (!token) {
+      console.error("No access token found");
+      return;
+    }
+
+    const { data } = await axios.post(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/messages`, 
+      body,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
     console.log("post-message:", data);
+    return data;
   } catch (error) {
-    console.log("Error en axiosPostMessage por:", error);
+    console.log("Error en axiosPostMessage por:", error.response?.data || error.message);
+    throw error;
   }
 }
 
 export async function axiosGetAllMessages(setAllMessages) {
   try {
-    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/messages`);
+    const token = getAccessToken();
+    if (!token) {
+      console.error("No access token found");
+      return;
+    }
+
+    const { data } = await axios.get(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/messages`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
     console.log("get-message:", data);
-    setAllMessages(data)
+    setAllMessages(data);
   } catch (error) {
-    console.log("Error en axiosGetAllMessages por:", error);
+    console.log("Error en axiosGetAllMessages por:", error.response?.data || error.message);
   }
 }
 
 export async function axiosGetAllUsers(setAllUsers) {
   try {
-    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/users`);
+    const token = getAccessToken();
+    if (!token) {
+      console.error("No access token found");
+      return;
+    }
+
+    const { data } = await axios.get(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/users`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
     // console.log("get-users:", data);
-    const usersWithCompany = data.filter(user=>user.company!==null)
-    setAllUsers(usersWithCompany)
+    const usersWithCompany = data.filter(user=>user.company!==null);
+    setAllUsers(usersWithCompany);
   } catch (error) {
-    console.log("Error en axiosGetAllUsers por:", error);
+    console.log("Error en axiosGetAllUsers por:", error.response?.data || error.message);
   }
 }
 
