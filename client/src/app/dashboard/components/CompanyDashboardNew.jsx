@@ -168,10 +168,7 @@ function CompanyDashboardNew({ user }) {
         />
 
         <div className="rounded-sm border border-stroke bg-white p-7.5 shadow-default dark:border-strokedark dark:bg-boxdark">
-          <h4 className="mb-4 text-xl font-semibold text-black dark:text-white">
-            Centro de Comunicaciones
-          </h4>
-          <div className="h-96">
+          <div className="h-[400px]">
             <Chat />
           </div>
         </div>
