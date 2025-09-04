@@ -474,7 +474,7 @@ const Chat = ({ id, company }) => {
                     Empresas
                   </h3>
                   <div
-                    className="flex-1 overflow-y-auto p-1 min-h-0"
+                    className="flex-1 overflow-y-auto p-1 min-h-0 max-h-80"
                     style={{
                       scrollbarWidth: "thin",
                       scrollbarColor: "#d1d5db #f3f4f6",
@@ -493,7 +493,7 @@ const Chat = ({ id, company }) => {
                         return (
                           <button
                             key={item}
-                            className={`w-16 h-16 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ${
+                            className={`w-12 h-12 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 flex-shrink-0 ${
                               selectedCompany === companyName
                                 ? "ring-2 ring-blue-500 shadow-lg"
                                 : "hover:shadow-md"
