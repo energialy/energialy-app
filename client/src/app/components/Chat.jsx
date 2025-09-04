@@ -559,33 +559,34 @@ const Chat = ({ id, company }) => {
                     userId={userId}
                   />
                 </div>
-                {/* Formulario para enviar mensajes */}
-                <form className="flex gap-3 mt-4" onSubmit={handleSendMessage}>
-                  <input
-                    type="text"
-                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900 bg-white placeholder-gray-500"
-                    value={messageText}
-                    onChange={(event) => setMessageText(event.target.value)}
-                    placeholder={
-                      selectedCompany
-                        ? "Escribe tu mensaje..."
-                        : "Selecciona una empresa para chatear..."
-                    }
-                    disabled={!selectedCompany}
-                  />
-                  <button
-                    type="submit"
-                    className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 min-w-[80px] ${
-                      selectedCompany && messageText.trim()
-                        ? "bg-blue-500 hover:bg-blue-600 text-white shadow-md hover:shadow-lg"
-                        : "bg-gray-300 hover:bg-gray-400 text-gray-600 cursor-not-allowed"
-                    }`}
-                    disabled={!selectedCompany || !messageText.trim()}
-                  >
-                    Enviar
-                  </button>
-                </form>
               </div>
+
+              {/* Formulario para enviar mensajes */}
+              <form className="flex gap-3 mt-4" onSubmit={handleSendMessage}>
+                <input
+                  type="text"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900 bg-white placeholder-gray-500"
+                  value={messageText}
+                  onChange={(event) => setMessageText(event.target.value)}
+                  placeholder={
+                    selectedCompany
+                      ? "Escribe tu mensaje..."
+                      : "Selecciona una empresa para chatear..."
+                  }
+                  disabled={!selectedCompany}
+                />
+                <button
+                  type="submit"
+                  className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 min-w-[80px] ${
+                    selectedCompany && messageText.trim()
+                      ? "bg-blue-500 hover:bg-blue-600 text-white shadow-md hover:shadow-lg"
+                      : "bg-gray-300 hover:bg-gray-400 text-gray-600 cursor-not-allowed"
+                  }`}
+                  disabled={!selectedCompany || !messageText.trim()}
+                >
+                  Enviar
+                </button>
+              </form>
             </div>
           )}
         </>
