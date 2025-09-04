@@ -462,19 +462,19 @@ const Chat = ({ id, company }) => {
             </div>
           ) : (
             // Vista original para cuando no hay company específica
-            <div className="w-full">
+            <div className="w-full h-full flex flex-col">
               <h2 className="font-semibold text-center text-lg mb-4 text-gray-800 dark:text-gray-200">
                 Chat
               </h2>
 
-              <div className="grid grid-cols-12 gap-4 mb-4">
+              <div className="grid grid-cols-12 gap-4 flex-1 min-h-0">
                 {/* Lista de empresas */}
-                <div className="col-span-3">
+                <div className="col-span-3 flex flex-col">
                   <h3 className="text-sm font-semibold mb-3 text-gray-700 text-center">
                     Empresas
                   </h3>
                   <div
-                    className="max-h-80 overflow-y-auto p-2"
+                    className="flex-1 overflow-y-auto p-2 min-h-0"
                     style={{
                       scrollbarWidth: "thin",
                       scrollbarColor: "#d1d5db #f3f4f6",
@@ -548,21 +548,23 @@ const Chat = ({ id, company }) => {
                 </div>
 
                 {/* Área de mensajes */}
-                <div className="col-span-9">
+                <div className="col-span-9 flex flex-col min-h-0">
                   <h3 className="text-sm font-semibold mb-2 text-gray-700">
                     {selectedCompany
                       ? `Conversación con ${selectedCompany}`
                       : "Selecciona una empresa"}
                   </h3>
-                  <Messages
-                    filteredMessages={filteredMessages}
-                    userId={userId}
-                  />
+                  <div className="flex-1 min-h-0">
+                    <Messages
+                      filteredMessages={filteredMessages}
+                      userId={userId}
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Formulario para enviar mensajes */}
-              <form className="flex gap-3 mt-4" onSubmit={handleSendMessage}>
+              {/* Formulario para enviar mensajes - Fijo en la parte inferior */}
+              <form className="flex gap-3 mt-3 pt-3 border-t border-gray-200" onSubmit={handleSendMessage}>
                 <input
                   type="text"
                   className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900 bg-white placeholder-gray-500"
