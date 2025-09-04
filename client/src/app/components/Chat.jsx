@@ -45,12 +45,14 @@ const Chat = ({ id, company }) => {
   const checkCommunicationPermission = () => {
     const userData = getLocalStorage();
     if (!userData) return false;
-    
+
     // Si es company_collaborator, verificar que tenga permiso COMUNICACIONES
-    if (userData.role === 'company_collaborator') {
-      return userData.permissions && userData.permissions.includes('COMUNICACIONES');
+    if (userData.role === "company_collaborator") {
+      return (
+        userData.permissions && userData.permissions.includes("COMUNICACIONES")
+      );
     }
-    
+
     // Otros roles (admin, superAdmin, company_owner, bank) tienen acceso por defecto
     return true;
   };
@@ -58,7 +60,7 @@ const Chat = ({ id, company }) => {
   const convertirFecha = (fechaISO) => {
     try {
       let fecha = new Date(fechaISO);
-      
+
       // Verificar si la fecha es válida
       if (isNaN(fecha.getTime())) {
         return new Date().toISOString();
@@ -83,7 +85,7 @@ const Chat = ({ id, company }) => {
       let fechaString = `${dia}-${mes}-${año}-${hora}:${minutos}`;
       return fechaString; // Ejemplo de salida: "26-6-2024-19:38"
     } catch (error) {
-      console.error('Error al convertir fecha:', error);
+      console.error("Error al convertir fecha:", error);
       return new Date().toISOString();
     }
   };
@@ -92,7 +94,7 @@ const Chat = ({ id, company }) => {
   useEffect(() => {
     // Verificar permisos de comunicación al cargar el componente
     setHasPermission(checkCommunicationPermission());
-    
+
     // Emitir evento de autenticación para guardar el socket
     socketIo.emit("authenticate", { companyId });
 
@@ -104,7 +106,7 @@ const Chat = ({ id, company }) => {
 
   //Carga usuarios y mensajes al comienzo, y detalles del primer destinatario
   useEffect(() => {
-    console.log('🔄 Cargando usuarios y mensajes...');
+    console.log("🔄 Cargando usuarios y mensajes...");
     axiosGetAllUsers(setAllUsers);
     axiosGetAllMessages(setAllMessages);
     !company && setShowPopup(true);
@@ -114,11 +116,13 @@ const Chat = ({ id, company }) => {
   useEffect(() => {
     if (company && allUsers.length > 0 && allMessages.length > 0) {
       // Encontrar el usuario de la empresa específica
-      const companyUser = allUsers.find(user => user.company?.name === company.name);
+      const companyUser = allUsers.find(
+        (user) => user.company?.name === company.name
+      );
       if (companyUser) {
         setReceiver(companyUser);
         setSelectedCompany(company.name);
-        
+
         // Filtrar mensajes para esta empresa específica inmediatamente
         const filtered = allMessages.filter((message) => {
           const senderCompany = message.sender?.company
@@ -134,7 +138,7 @@ const Chat = ({ id, company }) => {
             (senderCompany === myName && receiverCompany === company.name)
           );
         });
-        
+
         setFilteredMessages(filtered);
       }
     }
@@ -143,10 +147,10 @@ const Chat = ({ id, company }) => {
   // Debug: Verificar mensajes cargados
   useEffect(() => {
     if (allMessages.length > 0) {
-      console.log('📧 Mensajes cargados:', allMessages.length);
-      console.log('📧 Primer mensaje:', allMessages[0]);
+      console.log("📧 Mensajes cargados:", allMessages.length);
+      console.log("📧 Primer mensaje:", allMessages[0]);
     } else {
-      console.log('📧 No hay mensajes cargados');
+      console.log("📧 No hay mensajes cargados");
     }
   }, [allMessages]);
 
@@ -157,11 +161,11 @@ const Chat = ({ id, company }) => {
       const foundSender = allUsers.find(
         (user) => user.company.id === companyId
       );
-      
+
       if (foundSender) {
         setSender(foundSender);
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Sender establecido:', foundSender);
+        if (process.env.NODE_ENV === "development") {
+          console.log("Sender establecido:", foundSender);
         }
       }
 
@@ -171,8 +175,8 @@ const Chat = ({ id, company }) => {
         if (foundReceiver) {
           setReceiver(foundReceiver);
           setSelectedCompany(foundReceiver.company.name);
-          if (process.env.NODE_ENV === 'development') {
-            console.log('Receiver establecido desde ID:', foundReceiver);
+          if (process.env.NODE_ENV === "development") {
+            console.log("Receiver establecido desde ID:", foundReceiver);
           }
         }
       }
@@ -183,14 +187,14 @@ const Chat = ({ id, company }) => {
   useEffect(() => {
     if (selectedCompany && allUsers.length > 0) {
       // Limpiar la compañía de notificaciones (🔔) si las tiene
-      const cleanCompanyName = selectedCompany.replace('🔔', '');
-      
+      const cleanCompanyName = selectedCompany.replace("🔔", "");
+
       // Actualizar el estado si tenía notificaciones
       if (selectedCompany !== cleanCompanyName) {
         setSelectedCompany(cleanCompanyName);
-        
+
         // Actualizar buttonChat para remover la notificación
-        const updatedButtonChat = buttonChat.map(button => 
+        const updatedButtonChat = buttonChat.map((button) =>
           button === selectedCompany ? cleanCompanyName : button
         );
         setButtonChat(updatedButtonChat);
@@ -217,19 +221,24 @@ const Chat = ({ id, company }) => {
             : message.receiver?.Company?.name;
 
           return (
-            (senderCompany === cleanCompanyName && receiverCompany === myName) ||
+            (senderCompany === cleanCompanyName &&
+              receiverCompany === myName) ||
             (senderCompany === myName && receiverCompany === cleanCompanyName)
           );
         });
 
         setFilteredMessages(filtered);
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🔍 Mensajes filtrados para', cleanCompanyName + ':', filtered.length);
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            "🔍 Mensajes filtrados para",
+            cleanCompanyName + ":",
+            filtered.length
+          );
         }
       } else {
         setFilteredMessages([]);
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🔍 No hay mensajes para filtrar');
+        if (process.env.NODE_ENV === "development") {
+          console.log("🔍 No hay mensajes para filtrar");
         }
       }
     }
@@ -290,10 +299,11 @@ const Chat = ({ id, company }) => {
       const foundCompanyName = foundReceiver?.company?.name;
       if (selectedCompany !== foundCompanyName && foundCompanyName) {
         // Buscar si la empresa ya existe en buttonChat (con o sin notificación)
-        const existingButtonIndex = buttonChat.findIndex(button => 
-          button === foundCompanyName || button === foundCompanyName + "🔔"
+        const existingButtonIndex = buttonChat.findIndex(
+          (button) =>
+            button === foundCompanyName || button === foundCompanyName + "🔔"
         );
-        
+
         if (existingButtonIndex !== -1) {
           // Si existe, moverla al principio con notificación
           const newButtonChat = [...buttonChat];
@@ -302,7 +312,7 @@ const Chat = ({ id, company }) => {
           setButtonChat(newButtonChat);
         } else {
           // Si no existe, agregarla al principio
-          setButtonChat(prev => [foundCompanyName + "🔔", ...prev]);
+          setButtonChat((prev) => [foundCompanyName + "🔔", ...prev]);
         }
       }
     };
@@ -320,21 +330,23 @@ const Chat = ({ id, company }) => {
       event.preventDefault();
 
       if (!socketIo || !messageText.trim()) return;
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Enviando mensaje:', {
+
+      if (process.env.NODE_ENV === "development") {
+        console.log("Enviando mensaje:", {
           selectedCompany,
           receiver,
           sender,
-          company
+          company,
         });
       }
-      
+
       // Si hay una empresa específica (company prop), validar receiver
       // Si no hay empresa específica, validar que haya una compañía seleccionada
       if (company) {
         if (!receiver || !receiver.company) {
-          alert(`No se pudo establecer conexión con ${company.name}. Inténtalo nuevamente.`);
+          alert(
+            `No se pudo establecer conexión con ${company.name}. Inténtalo nuevamente.`
+          );
           return;
         }
       } else {
@@ -343,11 +355,13 @@ const Chat = ({ id, company }) => {
           return;
         }
         if (!receiver || !receiver.company) {
-          alert("Error de conexión. Por favor, vuelve a seleccionar la empresa.");
+          alert(
+            "Error de conexión. Por favor, vuelve a seleccionar la empresa."
+          );
           return;
         }
       }
-      
+
       const newMessage = {
         text: messageText,
         sender,
@@ -370,7 +384,7 @@ const Chat = ({ id, company }) => {
           receiverId: receiver.id,
         });
       } catch (error) {
-        console.error('Error al guardar mensaje:', error);
+        console.error("Error al guardar mensaje:", error);
         // Si hay error al guardar, podrías mostrar una notificación
         if (error.response?.status === 401) {
           alert("Error de autenticación. Por favor, inicia sesión nuevamente.");
@@ -389,15 +403,15 @@ const Chat = ({ id, company }) => {
   //Establece compañía seleccionada en boton del chat
   const handleSelectCompany = (companyName) => {
     // Limpiar nombre de notificaciones
-    const cleanCompanyName = companyName.replace('🔔', '');
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Selecting company:', cleanCompanyName);
+    const cleanCompanyName = companyName.replace("🔔", "");
+    if (process.env.NODE_ENV === "development") {
+      console.log("Selecting company:", cleanCompanyName);
     }
     setSelectedCompany(cleanCompanyName);
-    
+
     // Si tenía notificación, limpiarla del buttonChat
-    if (companyName.includes('🔔')) {
-      const updatedButtonChat = buttonChat.map(button => 
+    if (companyName.includes("🔔")) {
+      const updatedButtonChat = buttonChat.map((button) =>
         button === companyName ? cleanCompanyName : button
       );
       setButtonChat(updatedButtonChat);
@@ -410,7 +424,9 @@ const Chat = ({ id, company }) => {
       {!hasPermission ? (
         <div className="p-4 text-center text-gray-500">
           <p className="text-sm">No tienes permisos para acceder al chat.</p>
-          <p className="text-xs">Contacta a tu empleador para solicitar permisos de comunicación.</p>
+          <p className="text-xs">
+            Contacta a tu empleador para solicitar permisos de comunicación.
+          </p>
         </div>
       ) : (
         <>
@@ -421,7 +437,7 @@ const Chat = ({ id, company }) => {
               <div className="flex-1 border border-gray-200 rounded-lg mb-4 overflow-hidden">
                 <Messages filteredMessages={filteredMessages} userId={userId} />
               </div>
-              
+
               {/* Formulario para enviar mensajes */}
               <form className="flex gap-3" onSubmit={handleSendMessage}>
                 <input
@@ -447,98 +463,129 @@ const Chat = ({ id, company }) => {
           ) : (
             // Vista original para cuando no hay company específica
             <div className="w-full">
-              <h2 className="font-semibold text-center text-lg mb-4 text-gray-800 dark:text-gray-200">Chat</h2>
+              <h2 className="font-semibold text-center text-lg mb-4 text-gray-800 dark:text-gray-200">
+                Chat
+              </h2>
 
               <div className="grid grid-cols-12 gap-4 mb-4">
                 {/* Lista de empresas */}
                 <div className="col-span-3">
-                  <h3 className="text-sm font-semibold mb-3 text-gray-700 text-center">Empresas</h3>
-                  <div className="max-h-80 overflow-y-auto p-2" style={{scrollbarWidth: 'thin', scrollbarColor: '#d1d5db #f3f4f6'}}>
+                  <h3 className="text-sm font-semibold mb-3 text-gray-700 text-center">
+                    Empresas
+                  </h3>
+                  <div
+                    className="max-h-80 overflow-y-auto p-2"
+                    style={{
+                      scrollbarWidth: "thin",
+                      scrollbarColor: "#d1d5db #f3f4f6",
+                    }}
+                  >
                     <div className="flex flex-col items-center space-y-3">
-                    {buttonChat.map((item) => {
-                      const companyUser = allUsers.find(user => user.company?.name === item.replace('🔔', ''));
-                      const profilePicture = companyUser?.company?.profilePicture;
-                      const companyName = item.replace('🔔', ''); // Remover notificación para obtener nombre limpio
-                      
-                      return (
-                        <button
-                          key={item}
-                          className={`w-20 h-20 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ${
-                            selectedCompany === companyName
-                              ? "ring-2 ring-blue-500 shadow-lg"
-                              : "hover:shadow-md"
-                          }`}
-                          onClick={() => handleSelectCompany(companyName)}
-                          title={companyName}
-                        >
-                          {profilePicture ? (
-                            <div className="relative w-full h-full">
-                              <img
-                                src={profilePicture}
-                                alt={companyName}
-                                className="w-full h-full rounded-full object-cover"
-                                onError={(e) => {
-                                  e.target.style.display = 'none';
-                                  e.target.parentNode.querySelector('.fallback-avatar').style.display = 'flex';
-                                }}
-                              />
-                              <div className="fallback-avatar w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg" style={{ display: 'none' }}>
-                                {companyName.charAt(0).toUpperCase()}
+                      {buttonChat.map((item) => {
+                        const companyUser = allUsers.find(
+                          (user) =>
+                            user.company?.name === item.replace("🔔", "")
+                        );
+                        const profilePicture =
+                          companyUser?.company?.profilePicture;
+                        const companyName = item.replace("🔔", ""); // Remover notificación para obtener nombre limpio
+
+                        return (
+                          <button
+                            key={item}
+                            className={`w-20 h-20 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ${
+                              selectedCompany === companyName
+                                ? "ring-2 ring-blue-500 shadow-lg"
+                                : "hover:shadow-md"
+                            }`}
+                            onClick={() => handleSelectCompany(companyName)}
+                            title={companyName}
+                          >
+                            {profilePicture ? (
+                              <div className="relative w-full h-full">
+                                <img
+                                  src={profilePicture}
+                                  alt={companyName}
+                                  className="w-full h-full rounded-full object-cover"
+                                  onError={(e) => {
+                                    e.target.style.display = "none";
+                                    e.target.parentNode.querySelector(
+                                      ".fallback-avatar"
+                                    ).style.display = "flex";
+                                  }}
+                                />
+                                <div
+                                  className="fallback-avatar w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg"
+                                  style={{ display: "none" }}
+                                >
+                                  {companyName.charAt(0).toUpperCase()}
+                                </div>
+                                {item.includes("🔔") && (
+                                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                                    <span className="text-white text-xs">
+                                      !
+                                    </span>
+                                  </div>
+                                )}
                               </div>
-                              {item.includes('🔔') && (
-                                <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                                  <span className="text-white text-xs">!</span>
-                                </div>
-                              )}
-                            </div>
-                          ) : (
-                            <div className="relative w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                              {companyName.charAt(0).toUpperCase()}
-                              {item.includes('🔔') && (
-                                <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
-                                  <span className="text-white text-xs">!</span>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
+                            ) : (
+                              <div className="relative w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                {companyName.charAt(0).toUpperCase()}
+                                {item.includes("🔔") && (
+                                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                                    <span className="text-white text-xs">
+                                      !
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Área de mensajes */}
                 <div className="col-span-9">
                   <h3 className="text-sm font-semibold mb-2 text-gray-700">
-                    {selectedCompany ? `Conversación con ${selectedCompany}` : 'Selecciona una empresa'}
+                    {selectedCompany
+                      ? `Conversación con ${selectedCompany}`
+                      : "Selecciona una empresa"}
                   </h3>
-                  <Messages filteredMessages={filteredMessages} userId={userId} />
+                  <Messages
+                    filteredMessages={filteredMessages}
+                    userId={userId}
+                  />
                 </div>
+                {/* Formulario para enviar mensajes */}
+                <form className="flex gap-3 mt-4" onSubmit={handleSendMessage}>
+                  <input
+                    type="text"
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900 bg-white placeholder-gray-500"
+                    value={messageText}
+                    onChange={(event) => setMessageText(event.target.value)}
+                    placeholder={
+                      selectedCompany
+                        ? "Escribe tu mensaje..."
+                        : "Selecciona una empresa para chatear..."
+                    }
+                    disabled={!selectedCompany}
+                  />
+                  <button
+                    type="submit"
+                    className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 min-w-[80px] ${
+                      selectedCompany && messageText.trim()
+                        ? "bg-blue-500 hover:bg-blue-600 text-white shadow-md hover:shadow-lg"
+                        : "bg-gray-300 hover:bg-gray-400 text-gray-600 cursor-not-allowed"
+                    }`}
+                    disabled={!selectedCompany || !messageText.trim()}
+                  >
+                    Enviar
+                  </button>
+                </form>
               </div>
-
-              {/* Formulario para enviar mensajes */}
-              <form className="flex gap-3 mt-4" onSubmit={handleSendMessage}>
-                <input
-                  type="text"
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900 bg-white placeholder-gray-500"
-                  value={messageText}
-                  onChange={(event) => setMessageText(event.target.value)}
-                  placeholder={selectedCompany ? "Escribe tu mensaje..." : "Selecciona una empresa para chatear..."}
-                  disabled={!selectedCompany}
-                />
-                <button
-                  type="submit"
-                  className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 min-w-[80px] ${
-                    selectedCompany && messageText.trim()
-                      ? "bg-blue-500 hover:bg-blue-600 text-white shadow-md hover:shadow-lg"
-                      : "bg-gray-300 hover:bg-gray-400 text-gray-600 cursor-not-allowed"
-                  }`}
-                  disabled={!selectedCompany || !messageText.trim()}
-                >
-                  Enviar
-                </button>
-              </form>
             </div>
           )}
         </>
