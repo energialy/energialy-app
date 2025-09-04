@@ -467,20 +467,20 @@ const Chat = ({ id, company }) => {
                 Chat
               </h2>
 
-              <div className="grid grid-cols-12 gap-4 flex-1 min-h-0">
+              <div className="grid grid-cols-12 gap-4 flex-1 min-h-0 mb-4">
                 {/* Lista de empresas */}
-                <div className="col-span-3 flex flex-col">
-                  <h3 className="text-sm font-semibold mb-3 text-gray-700 text-center">
+                <div className="col-span-2 flex flex-col">
+                  <h3 className="text-xs font-semibold mb-2 text-gray-700 text-center">
                     Empresas
                   </h3>
                   <div
-                    className="flex-1 overflow-y-auto p-2 min-h-0"
+                    className="flex-1 overflow-y-auto p-1 min-h-0"
                     style={{
                       scrollbarWidth: "thin",
                       scrollbarColor: "#d1d5db #f3f4f6",
                     }}
                   >
-                    <div className="flex flex-col items-center space-y-3">
+                    <div className="flex flex-col items-center space-y-2">
                       {buttonChat.map((item) => {
                         const companyUser = allUsers.find(
                           (user) =>
@@ -493,7 +493,7 @@ const Chat = ({ id, company }) => {
                         return (
                           <button
                             key={item}
-                            className={`w-20 h-20 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ${
+                            className={`w-16 h-16 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ${
                               selectedCompany === companyName
                                 ? "ring-2 ring-blue-500 shadow-lg"
                                 : "hover:shadow-md"
@@ -515,7 +515,7 @@ const Chat = ({ id, company }) => {
                                   }}
                                 />
                                 <div
-                                  className="fallback-avatar w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg"
+                                  className="fallback-avatar w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm"
                                   style={{ display: "none" }}
                                 >
                                   {companyName.charAt(0).toUpperCase()}
@@ -529,7 +529,7 @@ const Chat = ({ id, company }) => {
                                 )}
                               </div>
                             ) : (
-                              <div className="relative w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                              <div className="relative w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                                 {companyName.charAt(0).toUpperCase()}
                                 {item.includes("🔔") && (
                                   <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
@@ -548,13 +548,13 @@ const Chat = ({ id, company }) => {
                 </div>
 
                 {/* Área de mensajes */}
-                <div className="col-span-9 flex flex-col min-h-0">
+                <div className="col-span-10 flex flex-col min-h-0">
                   <h3 className="text-sm font-semibold mb-2 text-gray-700">
                     {selectedCompany
                       ? `Conversación con ${selectedCompany}`
                       : "Selecciona una empresa"}
                   </h3>
-                  <div className="flex-1 min-h-0">
+                  <div className="flex-1 min-h-0 bg-gray-50 rounded-lg border border-gray-200 p-2">
                     <Messages
                       filteredMessages={filteredMessages}
                       userId={userId}
@@ -564,7 +564,7 @@ const Chat = ({ id, company }) => {
               </div>
 
               {/* Formulario para enviar mensajes - Fijo en la parte inferior */}
-              <form className="flex gap-3 mt-3 pt-3 border-t border-gray-200" onSubmit={handleSendMessage}>
+              <form className="flex gap-3 pt-2 border-t border-gray-200" onSubmit={handleSendMessage}>
                 <input
                   type="text"
                   className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900 bg-white placeholder-gray-500"
