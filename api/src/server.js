@@ -14,11 +14,29 @@ const server = http.createServer(app);
 // Define allowed origins
 const allowedOrigins = [
   "https://energialy.vercel.app",           // Producción
-  "https://dev.energialy.vercel.app",       // Desarrollo ← AGREGAR
-  "https://dev-api-energialy.vercel.app",   // API Dev (para Socket.IO) ← AGREGAR
+  "https://dev.energialy.vercel.app",       // Desarrollo
+  "https://dev-api-energialy.vercel.app",   // API Dev (para Socket.IO)
   "http://localhost:3000",                   // Local
   "https://localhost:3000"
 ];
+
+// CORS origin checker function
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.includes('vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
+  optionsSuccessStatus: 200
+};
 
 const io = new socketIo(server, {
   cors: {
@@ -64,24 +82,11 @@ io.on("connection", (socket) => {
 
 app.name = "API";
 
-// CORS middleware with specific origins
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
-    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
-  })
-);
+// CORS middleware with dynamic origin checking
+app.use(cors(corsOptions));
 
-// Handle preflight requests
-app.options("*", cors({
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
-}));
+// Handle preflight requests for all routes
+app.options("*", cors(corsOptions));
 
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 app.use(bodyParser.json({ limit: "50mb" }));
