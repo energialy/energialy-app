@@ -13,8 +13,10 @@ const server = http.createServer(app);
 
 // Define allowed origins
 const allowedOrigins = [
-  "https://energialy.vercel.app",
-  "http://localhost:3000",
+  "https://energialy.vercel.app",           // Producción
+  "https://dev.energialy.vercel.app",       // Desarrollo ← AGREGAR
+  "https://dev-api-energialy.vercel.app",   // API Dev (para Socket.IO) ← AGREGAR
+  "http://localhost:3000",                   // Local
   "https://localhost:3000"
 ];
 
