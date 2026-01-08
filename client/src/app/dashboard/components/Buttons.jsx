@@ -20,9 +20,12 @@ export default function Buttons() {
     setUser(user);
   }, []);
 
-  const company = useGetCompaniesByIdQuery(user?.company?.id).data;
+  const { data: company } = useGetCompaniesByIdQuery(user?.company?.id, {
+    skip: !user?.company?.id,
+  });
 
   const handleOpenModal = (id, company) => {
+    if (!user?.company?.id) return;
     setModalData({ id: user.company.id });
     setOpenModal((cur) => !cur);
   };

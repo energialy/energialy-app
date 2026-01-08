@@ -7,6 +7,7 @@ const cleanSubcategories = (subcategories) => {
       id: subcategory.id,
       name: subcategory.name,
       parentCategory: subcategory.Category,
+      CategoryId: subcategory.CategoryId,
       isActive: subcategory.isActive,
       createdAt: subcategory.createdAt,
       updatedAt: subcategory.updatedAt,
@@ -17,6 +18,7 @@ const cleanSubcategories = (subcategories) => {
       id: subcategories.id,
       name: subcategories.name,
       parentCategory: subcategories.Category,
+      CategoryId: subcategories.CategoryId,
       companies: subcategories.Companies,
       isActive: subcategories.isActive,
       createdAt: subcategories.createdAt,
@@ -97,7 +99,7 @@ const createSubcategory = async (name, categoryId) => {
   return cleanSubcategories(createdSubcategory);
 };
 
-const updateSubcategory = async (id, name, isActive) => {
+const updateSubcategory = async (id, name, isActive, categoryId) => {
   const foundSubcategory = await Subcategories.findByPk(id, {
     include: {
       model: Categories,
@@ -110,7 +112,26 @@ const updateSubcategory = async (id, name, isActive) => {
     throw error;
   }
   await foundSubcategory.update({ name, isActive });
-  return cleanSubcategories(foundSubcategory);
+  
+  // Update category if provided
+  if (categoryId && categoryId !== foundSubcategory.CategoryId) {
+    const foundCategory = await Categories.findByPk(categoryId);
+    if (!foundCategory) {
+      const error = new Error(`Category with id ${categoryId} not found.`);
+      error.status = 404;
+      throw error;
+    }
+    await foundSubcategory.setCategory(foundCategory);
+  }
+  
+  // Reload to get updated category
+  const updatedSubcategory = await Subcategories.findByPk(id, {
+    include: {
+      model: Categories,
+      attributes: ['id', 'name'],
+    },
+  });
+  return cleanSubcategories(updatedSubcategory);
 };
 
 const deleteSubcategory = async (id) => {

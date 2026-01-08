@@ -1,8 +1,7 @@
 import React from "react";
 import { AiOutlineTwitter } from "react-icons/ai";
 import { BsLinkedin } from "react-icons/bs";
-import Logo from "@/app/assets/Energialy Logo-01.svg";
-import Image from "next/image";
+import Logo from "../assets/Energialy-Logo-01.svg";
 
 const oportunities = [
   { name: "Crear licitaciones", link: "https://energialy.ar/bid/crear-licitaciones/" },
@@ -18,8 +17,7 @@ export default function Footer() {
         <div className="flex flex-wrap">
           <div className="w-full sm:w-6/12 md:w-6/12 lg:w-6/12 xl:w-3/12 px-4 text-[#B4B4B4]">
             <a href="/">
-              <Image
-                src={Logo}
+              <Logo
                 alt="company logo here"
                 className="w-60"
               />

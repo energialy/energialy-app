@@ -2,18 +2,22 @@
 
 import React from 'react';
 import {
-  Create,
+  Edit,
   SimpleForm,
   TextInput,
   PasswordInput,
   ReferenceInput,
   SelectInput,
   required,
-  email
+  email,
+  BooleanInput,
+  useRecordContext
 } from 'react-admin';
 
-export const UserCreate = () => (
-  <Create title="Crear Nuevo Usuario">
+const UserEditForm = () => {
+  const record = useRecordContext();
+
+  return (
     <SimpleForm>
       <TextInput 
         source="firstName" 
@@ -34,8 +38,7 @@ export const UserCreate = () => (
       />
       <PasswordInput 
         source="password" 
-        label="Contraseña" 
-        validate={[required()]} 
+        label="Contraseña (dejar en blanco para no cambiar)" 
       />
       <SelectInput 
         source="role" 
@@ -48,7 +51,6 @@ export const UserCreate = () => (
           { id: 'company_collaborator', name: 'Colaborador de Empresa' },
         ]}
         validate={[required()]}
-        defaultValue="admin"
       />
       <TextInput 
         source="position" 
@@ -61,6 +63,16 @@ export const UserCreate = () => (
       >
         <SelectInput optionText="name" />
       </ReferenceInput>
+      <BooleanInput 
+        source="isActive" 
+        label="Usuario Activo" 
+      />
     </SimpleForm>
-  </Create>
+  );
+};
+
+export const UserEdit = () => (
+  <Edit title="Editar Usuario">
+    <UserEditForm />
+  </Edit>
 );

@@ -2,51 +2,32 @@
 
 import React, { useState, useEffect } from 'react';
 import { useDataProvider, useRedirect } from 'react-admin';
-import { TableCard, DonutChartCard, BarChartCard } from '../ui';
+import { TableCard, BarChartCard, DonutChartCard, AreaChartCard } from '../ui';
 import useCreateResource from '../../hooks/useCreateResource';
 import useDeleteResource from '../../hooks/useDeleteResource';
-import 'react-toastify/dist/ReactToastify.css';
 
-export const CompanyList = () => {
-  const [companies, setCompanies] = useState([]);
+export const ProposalList = () => {
+  const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(true);
   const dataProvider = useDataProvider();
   const redirect = useRedirect();
 
-  const createCompany = useCreateResource({
-    resource: 'companies',
-    action: 'create',
-  });
-
-  const handleEditCompany = (companyId) => {
-    redirect('edit', 'companies', companyId);
-  };
-
-  const handleDeleteCompany = useDeleteResource({
-    resource: 'companies',
-    resourceLabel: 'empresa',
-    successToastDuration: 3000,
-    errorToastDuration: 3000
-  });
-
-
   useEffect(() => {
-    const fetchCompanies = async () => {
+    const fetchProposals = async () => {
       try {
-        const { data } = await dataProvider.getList('companies', {
+        const { data } = await dataProvider.getList('proposals', {
           pagination: { page: 1, perPage: 100 },
           sort: { field: 'id', order: 'ASC' }
         });
-        setCompanies(Array.isArray(data) ? data : []);
+        setProposals(data);
       } catch (error) {
-        console.error('Error fetching companies:', error);
-        setCompanies([]); // Set empty array on error
+        console.error('Error fetching proposals:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCompanies();
+    fetchProposals();
   }, [dataProvider]);
 
   const tableColumns = [
@@ -56,25 +37,28 @@ export const CompanyList = () => {
     },
     { 
       header: 'Empresa', 
-      accessor: 'name', 
-      type: 'avatar' 
+      accessor: 'companyName' 
     },
     { 
-      header: 'Email', 
-      accessor: 'email' 
+      header: 'Licitación', 
+      accessor: 'tenderTitle' 
     },
     { 
-      header: 'Teléfono', 
-      accessor: 'phone' 
+      header: 'Monto Total', 
+      accessor: 'totalAmount' 
     },
     { 
-      header: 'Suscripción', 
-      accessor: 'subscription',
-      type: 'status'
+      header: 'Duración', 
+      accessor: 'projectDuration' 
     },
     { 
       header: 'Estado', 
       accessor: 'status',
+      type: 'status'
+    },
+    { 
+      header: 'Activa', 
+      accessor: 'activeStatus',
       type: 'status'
     },
     { 
@@ -84,52 +68,97 @@ export const CompanyList = () => {
     }
   ];
 
-  // Transform companies data for the table
-  const transformedCompanies = companies
-    .filter(company => company && company.id) // Filter out undefined or invalid companies
-    .map(company => ({
-      id: company.id,
-      name: company.name || 'Empresa Sin Nombre',
-      email: company.email || 'Sin email',
-      phone: company.phone || 'Sin teléfono',
-      subscription: company.subscription || 'free',
-      status: 'Active'
-    }));
-
-  // Prepare subscription distribution for donut chart
-  const subscriptionCounts = {};
-  companies
-    .filter(company => company && company.id) // Filter out undefined or invalid companies
-    .forEach(company => {
-      const subscription = company.subscription || 'free';
-      subscriptionCounts[subscription] = (subscriptionCounts[subscription] || 0) + 1;
-    });
-
-  const subscriptionData = Object.keys(subscriptionCounts).map(subscription => ({
-    name: subscription.charAt(0).toUpperCase() + subscription.slice(1),
-    value: subscriptionCounts[subscription]
+  // Transform proposals data for the table
+  const transformedProposals = proposals.map(proposal => ({
+    id: proposal.id,
+    companyName: proposal.Company?.name || 'Sin empresa',
+    tenderTitle: proposal.Tender?.title || 'Sin licitación',
+    totalAmount: proposal.totalAmount ? `$${proposal.totalAmount.toLocaleString()}` : '$0',
+    projectDuration: proposal.projectDuration || 'No especificado',
+    status: proposal.status === 'sent' ? 'Enviada' : 
+            proposal.status === 'accepted' ? 'Aceptada' : 
+            proposal.status === 'declined' ? 'Rechazada' : proposal.status,
+    activeStatus: proposal.isActive ? 'Activa' : 'Inactiva',
   }));
 
-  // Prepare monthly registrations data (mock data)
-  const monthlyRegistrations = [
-    { name: 'Ene', value: 12 },
-    { name: 'Feb', value: 19 },
-    { name: 'Mar', value: 15 },
-    { name: 'Abr', value: 22 },
-    { name: 'May', value: 18 },
-    { name: 'Jun', value: 25 },
-    { name: 'Jul', value: 28 },
-    { name: 'Ago', value: 20 },
-    { name: 'Sep', value: 24 },
-    { name: 'Oct', value: 30 },
-    { name: 'Nov', value: 26 },
-    { name: 'Dic', value: 18 }
+  // Prepare status distribution for donut chart
+  const statusCounts = {};
+  proposals.forEach(proposal => {
+    const status = proposal.status || 'sent';
+    statusCounts[status] = (statusCounts[status] || 0) + 1;
+  });
+
+  const statusData = Object.keys(statusCounts).map(status => ({
+    name: status === 'sent' ? 'Enviadas' : 
+          status === 'accepted' ? 'Aceptadas' : 
+          status === 'declined' ? 'Rechazadas' : status,
+    value: statusCounts[status]
+  }));
+
+  // Prepare active vs inactive distribution
+  const activeData = [
+    {
+      name: 'Activas',
+      value: proposals.filter(p => p.isActive).length
+    },
+    {
+      name: 'Inactivas', 
+      value: proposals.filter(p => !p.isActive).length
+    }
   ];
 
-  const handleRowClick = (company) => {
-    console.log('Company clicked:', company);
-    // Aquí puedes agregar navegación o modal de detalles
+  // Prepare monthly proposals data (mock data based on creation dates)
+  const monthlyProposals = [
+    { name: 'Ene', value: 5 },
+    { name: 'Feb', value: 8 },
+    { name: 'Mar', value: 12 },
+    { name: 'Abr', value: 10 },
+    { name: 'May', value: 15 },
+    { name: 'Jun', value: 18 },
+    { name: 'Jul', value: 20 },
+    { name: 'Ago', value: 16 },
+    { name: 'Sep', value: 14 },
+    { name: 'Oct', value: 22 },
+    { name: 'Nov', value: 19 },
+    { name: 'Dic', value: 17 }
+  ];
+
+  // Prepare proposal progress data for area chart
+  const proposalProgressData = [
+    { name: 'Ene', value: 60 },
+    { name: 'Feb', value: 65 },
+    { name: 'Mar', value: 70 },
+    { name: 'Abr', value: 68 },
+    { name: 'May', value: 75 },
+    { name: 'Jun', value: 80 },
+    { name: 'Jul', value: 85 },
+    { name: 'Ago', value: 82 },
+    { name: 'Sep', value: 78 },
+    { name: 'Oct', value: 88 },
+    { name: 'Nov', value: 90 },
+    { name: 'Dic', value: 92 }
+  ];
+
+  const handleRowClick = (proposal) => {
+    console.log('Proposal clicked:', proposal);
   };
+
+  //Create button action for Proposal creation
+  const createProposal = useCreateResource({
+    resource: 'proposals',
+    action: 'create',
+  });
+
+  const handleEditProposal = (proposalId) => {
+    redirect('edit', 'proposals', proposalId);
+  };
+
+  const handleDeleteProposal = useDeleteResource({
+    resource: 'proposals',
+    resourceLabel: 'propuesta',
+    successToastDuration: 3000,
+    errorToastDuration: 3000
+  });
 
   if (loading) {
     return (
@@ -144,11 +173,11 @@ export const CompanyList = () => {
       {/* Page Header */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-title-md2 font-semibold text-black dark:text-white">
-          Gestión de Empresas
+          Gestión de Propuestas
         </h2>
         
         <div className="flex gap-3">
-          <button onClick={createCompany} className="inline-flex items-center justify-center rounded-md bg-primary px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
+          <button onClick={createProposal} className="inline-flex items-center justify-center rounded-md bg-primary px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
             <span className="mr-2">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g opacity="0.8">
@@ -167,7 +196,7 @@ export const CompanyList = () => {
                 </g>
               </svg>
             </span>
-            Registrar Empresa
+            Crear Propuesta
           </button>
           
           <button className="inline-flex items-center justify-center rounded-md border border-primary px-10 py-4 text-center font-medium text-primary hover:bg-opacity-90 lg:px-8 xl:px-10">
@@ -197,9 +226,9 @@ export const CompanyList = () => {
           <div className="mt-4 flex items-end justify-between">
             <div>
               <h4 className="text-title-md font-bold text-black dark:text-white">
-                {companies.length}
+                {proposals.length}
               </h4>
-              <span className="text-sm font-medium">Total Empresas</span>
+              <span className="text-sm font-medium">Total Propuestas</span>
             </div>
             <span className="flex items-center gap-1 text-sm font-medium text-meta-3">
               12.5%
@@ -239,12 +268,12 @@ export const CompanyList = () => {
           <div className="mt-4 flex items-end justify-between">
             <div>
               <h4 className="text-title-md font-bold text-black dark:text-white">
-                {companies.filter(c => c && c.subscription === 'plus').length}
+                {proposals.filter(p => p.status === 'sent').length}
               </h4>
-              <span className="text-sm font-medium">Suscripción Plus</span>
+              <span className="text-sm font-medium">Enviadas</span>
             </div>
             <span className="flex items-center gap-1 text-sm font-medium text-meta-3">
-              8.2%
+              5.3%
               <svg
                 className="fill-meta-3"
                 width="10"
@@ -281,12 +310,12 @@ export const CompanyList = () => {
           <div className="mt-4 flex items-end justify-between">
             <div>
               <h4 className="text-title-md font-bold text-black dark:text-white">
-                {companies.filter(c => c && c.subscription === 'base').length}
+                {proposals.filter(p => p.status === 'accepted').length}
               </h4>
-              <span className="text-sm font-medium">Suscripción Base</span>
+              <span className="text-sm font-medium">Aceptadas</span>
             </div>
             <span className="flex items-center gap-1 text-sm font-medium text-meta-3">
-              5.7%
+              8.1%
               <svg
                 className="fill-meta-3"
                 width="10"
@@ -323,12 +352,12 @@ export const CompanyList = () => {
           <div className="mt-4 flex items-end justify-between">
             <div>
               <h4 className="text-title-md font-bold text-black dark:text-white">
-                {companies.filter(c => c && (!c.subscription || c.subscription === 'free')).length}
+                {proposals.filter(p => p.status === 'declined').length}
               </h4>
-              <span className="text-sm font-medium">Suscripción Free</span>
+              <span className="text-sm font-medium">Rechazadas</span>
             </div>
             <span className="flex items-center gap-1 text-sm font-medium text-meta-1">
-              -1.3%
+              -3.2%
               <svg
                 className="fill-meta-1"
                 width="10"
@@ -349,42 +378,51 @@ export const CompanyList = () => {
 
       {/* Charts Row */}
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-12 md:gap-6 2xl:gap-7.5">
-        {/* Monthly Registrations Chart */}
-        <div className="md:col-span-8">
+        {/* Monthly Proposals Chart */}
+        <div className="md:col-span-4">
           <BarChartCard
-            title="Registros Mensuales de Empresas"
-            data={monthlyRegistrations}
+            title="Propuestas por Mes"
+            data={monthlyProposals}
             dataKey="value"
-            height={300}
+            height={280}
           />
         </div>
 
-        {/* Subscription Distribution */}
-        <div className="md:col-span-4">
+        {/* Proposal Progress Area Chart */}
+        <div className="md:col-span-5">
+          <AreaChartCard
+            title="Progreso de Propuestas"
+            subtitle="Tasa de aceptación mensual"
+            data={proposalProgressData}
+            dataKey="value"
+            height={280}
+          />
+        </div>
+
+        {/* Status Distribution */}
+        <div className="md:col-span-3">
           <DonutChartCard
-            title="Distribución de Suscripciones"
-            data={subscriptionData}
-            centerValue={`${companies.length}`}
-            centerLabel="Total Empresas"
-            height={250}
+            title="Estado de Propuestas"
+            data={statusData}
+            centerValue={`${proposals.length}`}
+            centerLabel="Total"
+            height={200}
           />
         </div>
       </div>
 
-      {/* Companies Table */}
+      {/* Proposals Table */}
       <TableCard
-        title="Lista de Empresas"
-        data={transformedCompanies}
+        title="Lista de Propuestas"
+        data={transformedProposals}
         columns={tableColumns}
         onRowClick={handleRowClick}
-        onEdit={handleEditCompany}
-        onDelete={handleDeleteCompany}
+        onEdit={handleEditProposal}
+        onDelete={handleDeleteProposal}
         showSearch={true}
         showFilter={true}
-        searchPlaceholder="Buscar empresas..."
-        entityType="companies"
+        searchPlaceholder="Buscar propuestas..."
       />
-      <ToastContainer position="top-right" autoClose={1500} />
     </div>
   );
 };

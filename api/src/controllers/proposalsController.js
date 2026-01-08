@@ -6,6 +6,8 @@ const cleanProposals = (proposals) => {
   if (Array.isArray(proposals)) {
     const cleanProposalsArray = proposals.map((proposal) => ({
       id: proposal.id,
+      CompanyId: proposal.CompanyId,
+      TenderId: proposal.TenderId,
       company: proposal.Company,
       totalAmount: proposal.totalAmount,
       status: proposal.status,
@@ -17,6 +19,8 @@ const cleanProposals = (proposals) => {
   } else {
     const cleanProposalDetail = {
       id: proposals.id,
+      CompanyId: proposals.CompanyId,
+      TenderId: proposals.TenderId,
       company: proposals.Company,
       totalAmount: proposals.totalAmount,
       serviceFee: proposals.serviceFee,
@@ -117,7 +121,7 @@ const getProposalById = async (id) => {
   return cleanProposals(foundProposal);
 };
 
-const createProposal = async (body) => {
+const createProposal = async (body, userRole) => {
   const { totalAmount, projectDuration, description, tenderId, companyId, attachments } = body;
   if (!totalAmount || !projectDuration || !description || !tenderId || !companyId) {
     const error = new Error('Missing required attributes.');
@@ -131,14 +135,15 @@ const createProposal = async (body) => {
       attributes: ['id', 'name'],
     },
   });
-  if (foundTender.Company.id === companyId) {
+  // Permitir a superAdmin crear proposals sin restricción de misma compañía
+  if (foundTender.Company.id === companyId && userRole !== 'superAdmin') {
     const error = new Error("Can't create a proposal over your own tender.");
     error.status = 400;
     throw error;
   }
 
   const foundCompany = await Companies.findByPk(companyId);
-  if (foundCompany.subscription === 'free') {
+  if (foundCompany.subscription === 'free' && userRole !== 'superAdmin') {
     const error = new Error("Free subscriptions can't create proposals.");
     error.status = 400;
     throw error;
@@ -174,18 +179,31 @@ const createProposal = async (body) => {
       },
     ],
   });
-  const employerEmail = createdProposal.Tender.Company.Users[0].email;
-  const employerName = createdProposal.Tender.Company.Users[0].firstName;
-  const supplierCompanyName = createdProposal.Company.name;
-  const tenderTitle = createdProposal.Tender.title;
-  const proposalAmount = createdProposal.totalAmount;
-  const proposalDuration = createdProposal.projectDuration;
-  await sendEmployerEmailProposalReceived(employerEmail, employerName, supplierCompanyName, tenderTitle, proposalAmount, proposalDuration);
+  
+  // Enviar email solo si la compañía del tender tiene usuarios
+  if (createdProposal.Tender.Company.Users && createdProposal.Tender.Company.Users.length > 0) {
+    const employerEmail = createdProposal.Tender.Company.Users[0].email;
+    const employerName = createdProposal.Tender.Company.Users[0].firstName;
+    const supplierCompanyName = createdProposal.Company.name;
+    const tenderTitle = createdProposal.Tender.title;
+    const proposalAmount = createdProposal.totalAmount;
+    const proposalDuration = createdProposal.projectDuration;
+    await sendEmployerEmailProposalReceived(employerEmail, employerName, supplierCompanyName, tenderTitle, proposalAmount, proposalDuration);
+  }
+  
   return cleanProposals(createdProposal);
 };
 
 const updateProposal = async (id, body) => {
-  const { status } = body;
+  const { status, totalAmount } = body;
+  
+  // Si se está actualizando el totalAmount, recalcular serviceAmount y receiverAmount
+  if (totalAmount) {
+    const { serviceAmount, receiverAmount } = calculateFee(totalAmount);
+    body.serviceAmount = serviceAmount;
+    body.receiverAmount = receiverAmount;
+  }
+  
   const foundProposal = await Proposals.findByPk(id, {
     include: [
       {

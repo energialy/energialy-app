@@ -34,6 +34,10 @@ export const chekAuth = async (item, role) => {
 };
 
 export const bankAccountOpen = async (id) => {
+  if (!id) {
+    console.warn('bankAccountOpen called without company id');
+    return false;
+  }
   try {
     const res = await axios.get(`${urlProduction}/companies/${id}`);
     

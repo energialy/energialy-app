@@ -28,7 +28,8 @@ const getProposalByIdHandler = async (req, res) => {
 const createProposalHandler = async (req, res) => {
   try {
     const body = req.body;
-    const newProposal = await createProposal(body);
+    const userRole = req.userRole;
+    const newProposal = await createProposal(body, userRole);
     res.status(201).json(newProposal);
   } catch (error) {
     res.status(error.status || 500).json({ error: error.message });

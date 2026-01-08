@@ -8,7 +8,7 @@ const runSeeds = async () => {
     
     // Sync database (create tables if they don't exist)
     console.log('🔄 Synchronizing database...');
-    await conn.sync({ alter: true });
+    await conn.sync({ force: false });
     console.log('📊 Database synchronized successfully');
 
     // Run seeds

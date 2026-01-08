@@ -1,13 +1,33 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useDataProvider } from 'react-admin';
+import { useDataProvider, useRedirect } from 'react-admin';
 import { TableCard } from '../ui';
+import useCreateResource from '../../hooks/useCreateResource';
+import useDeleteResource from '../../hooks/useDeleteResource';
 
 export const UserList = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const dataProvider = useDataProvider();
+  const redirect = useRedirect();
+
+  //Create button action for User creation
+  const createUser = useCreateResource({
+    resource: 'users',
+    action: 'create',
+  });
+
+  const handleEditUser = (userId) => {
+    redirect('edit', 'users', userId);
+  };
+
+  const handleDeleteUser = useDeleteResource({
+    resource: 'users',
+    resourceLabel: 'usuario',
+    successToastDuration: 3000,
+    errorToastDuration: 3000
+  });
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -58,6 +78,11 @@ export const UserList = () => {
       header: 'Estado', 
       accessor: 'status',
       type: 'status'
+    },
+    { 
+      header: 'Acciones', 
+      accessor: 'actions',
+      type: 'actions'
     }
   ];
 
@@ -94,7 +119,7 @@ export const UserList = () => {
         </h2>
         
         <div className="flex gap-3">
-          <button className="inline-flex items-center justify-center rounded-md bg-primary px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
+          <button onClick={createUser} className="inline-flex items-center justify-center rounded-md bg-primary px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
             <span className="mr-2">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g opacity="0.8">
@@ -128,6 +153,8 @@ export const UserList = () => {
         data={transformedUsers}
         columns={tableColumns}
         onRowClick={handleRowClick}
+        onEdit={handleEditUser}
+        onDelete={handleDeleteUser}
         showSearch={true}
         showFilter={true}
         searchPlaceholder="Buscar usuarios..."

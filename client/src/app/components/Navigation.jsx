@@ -3,8 +3,7 @@
 import { Disclosure } from "@headlessui/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Image from "next/image";
-import Logo from "@/app/assets/Energialy Logo-01.svg";
+import Logo from "../assets/Energialy-Logo-01.svg";
 import UserProfile from "./UserProfile";
 import React, { useEffect, useState } from "react";
 
@@ -48,7 +47,7 @@ export default function Navigation() {
                       }
                     }}
                   >
-                    <Image src={Logo} alt="logo" />
+                    <Logo className="h-12 w-auto" alt="Energialy Logo" />
                   </div>
                 </div>
 

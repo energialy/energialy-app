@@ -5,7 +5,6 @@ import {
   Create,
   SimpleForm,
   TextInput,
-  EmailInput,
   ReferenceInput,
   SelectInput,
   BooleanInput,
@@ -27,9 +26,10 @@ export const CompanyCreate = () => (
         label="RUT/NIT" 
         validate={[required()]} 
       />
-      <EmailInput 
+      <TextInput 
         source="email" 
         label="Email Corporativo" 
+        type="email"
         validate={[required(), email()]} 
         fullWidth 
       />

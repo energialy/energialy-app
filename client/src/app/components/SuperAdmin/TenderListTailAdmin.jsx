@@ -1,13 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useDataProvider } from 'react-admin';
+import { useDataProvider, useRedirect } from 'react-admin';
 import { TableCard, BarChartCard, DonutChartCard, AreaChartCard } from '../ui';
+import useCreateResource from '../../hooks/useCreateResource';
+import useDeleteResource from '../../hooks/useDeleteResource';
 
 export const TenderList = () => {
   const [tenders, setTenders] = useState([]);
   const [loading, setLoading] = useState(true);
   const dataProvider = useDataProvider();
+  const redirect = useRedirect();
 
   useEffect(() => {
     const fetchTenders = async () => {
@@ -58,6 +61,11 @@ export const TenderList = () => {
     { 
       header: 'Fecha Cierre', 
       accessor: 'endDate' 
+    },
+    { 
+      header: 'Acciónes', 
+      accessor: 'actions',
+      type: 'actions'
     }
   ];
 
@@ -137,6 +145,24 @@ export const TenderList = () => {
     // Aquí puedes agregar navegación o modal de detalles
   };
 
+  //Create button action for Tender creation
+  const createTender = useCreateResource({
+    resource: 'tenders',
+    action: 'create',
+  });
+
+  const handleEditTender = (tenderId) => {
+    redirect('edit', 'tenders', tenderId);
+  };
+
+  const handleDeleteTender = useDeleteResource({
+    resource: 'tenders',
+    resourceLabel: 'licitación',
+    successToastDuration: 3000,
+    errorToastDuration: 3000
+  });
+
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-64">
@@ -154,7 +180,7 @@ export const TenderList = () => {
         </h2>
         
         <div className="flex gap-3">
-          <button className="inline-flex items-center justify-center rounded-md bg-primary px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
+          <button onClick={createTender} className="inline-flex items-center justify-center rounded-md bg-primary px-10 py-4 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10">
             <span className="mr-2">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g opacity="0.8">
@@ -394,9 +420,12 @@ export const TenderList = () => {
         data={transformedTenders}
         columns={tableColumns}
         onRowClick={handleRowClick}
+        onEdit={handleEditTender}
+        onDelete={handleDeleteTender}
         showSearch={true}
         showFilter={true}
         searchPlaceholder="Buscar licitaciones..."
+
       />
     </div>
   );

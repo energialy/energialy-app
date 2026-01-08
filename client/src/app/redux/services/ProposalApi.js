@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { urlProduction } from "@/app/data/dataGeneric";
+import { urlProduction } from "../../data/dataGeneric";
 
 export const proposalsApi = createApi({
   reducerPath: "proposal",

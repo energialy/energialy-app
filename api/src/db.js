@@ -14,12 +14,12 @@ const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}
     acquire: 30000,
     idle: 10000
   },
-  dialectOptions: {
+  dialectOptions: process.env.SSL_MODE ? {
     ssl: {
       require: true,
       rejectUnauthorized: false
     }
-  },
+  } : {},
   retry: {
     match: [
       /SequelizeConnectionError/,

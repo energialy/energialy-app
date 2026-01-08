@@ -43,10 +43,13 @@ const deleteUserHandler = async (req, res) => {
 
 const createUserHandler = async (req, res) => {
   try {
+    console.log('POST /users route hit');
+    console.log('Received user data:', JSON.stringify(req.body, null, 2));
     const userData = req.body;
     const newUser = await createUser(userData);
     res.status(201).json(newUser);
   } catch (error) {
+    console.error('Error creating user:', error.message);
     res.status(error.status || 500).json({ error: error.message });
   }
 };

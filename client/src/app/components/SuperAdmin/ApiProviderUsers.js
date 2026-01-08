@@ -2,6 +2,17 @@
 
 const apiUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
+// Helper function to get auth token
+const getAuthHeaders = () => {
+  const token = typeof window !== 'undefined' ? sessionStorage.getItem('accessToken') : null;
+  return token ? {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  } : {
+    'Content-Type': 'application/json'
+  };
+};
+
 const dataProvider = {
   getList: (resource, params) => {
     // Handle special resources
@@ -58,21 +69,35 @@ const dataProvider = {
     }
 
     const url = `${apiUrl}/${resource}`;
-    return fetch(url)
-      .then((response) => response.json())
-      .then((json) => ({
-        data: Array.isArray(json) ? json : [json],
-        total: Array.isArray(json) ? json.length : 1
-      }))
+    console.log(`[DataProvider] Fetching ${resource} from:`, url);
+    
+    return fetch(url, { headers: getAuthHeaders() })
+      .then((response) => {
+        console.log(`[DataProvider] Response status for ${resource}:`, response.status);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then((json) => {
+        console.log(`[DataProvider] Data received for ${resource}:`, json);
+        const dataArray = Array.isArray(json) ? json : [json];
+        console.log(`[DataProvider] Processed data for ${resource}:`, { total: dataArray.length, sample: dataArray[0] });
+        
+        return {
+          data: dataArray,
+          total: dataArray.length
+        };
+      })
       .catch(error => {
-        console.error(`Error fetching ${resource}:`, error);
+        console.error(`[DataProvider] Error fetching ${resource}:`, error);
         return { data: [], total: 0 };
       });
   },
 
   getOne: (resource, params) => {
     const url = `${apiUrl}/${resource}/${params.id}`;
-    return fetch(url)
+    return fetch(url, { headers: getAuthHeaders() })
       .then((response) => response.json())
       .then((json) => ({
         data: json,
@@ -80,6 +105,37 @@ const dataProvider = {
       .catch(error => {
         console.error(`Error fetching ${resource} ${params.id}:`, error);
         throw error;
+      });
+  },
+
+  getMany: (resource, params) => {
+    console.log(`[DataProvider] getMany called for ${resource}`, params);
+    // params.ids contains array of IDs to fetch
+    const ids = params.ids || [];
+    
+    if (ids.length === 0) {
+      return Promise.resolve({ data: [] });
+    }
+
+    // Fetch each resource individually and combine results
+    const promises = ids.map(id =>
+      fetch(`${apiUrl}/${resource}/${id}`, { headers: getAuthHeaders() })
+        .then(response => response.json())
+        .catch(error => {
+          console.error(`Error fetching ${resource} ${id}:`, error);
+          return null;
+        })
+    );
+
+    return Promise.all(promises)
+      .then(results => {
+        const data = results.filter(item => item !== null);
+        console.log(`[DataProvider] getMany results for ${resource}:`, data);
+        return { data };
+      })
+      .catch(error => {
+        console.error(`Error in getMany for ${resource}:`, error);
+        return { data: [] };
       });
   },
 
@@ -100,26 +156,35 @@ const dataProvider = {
     }
 
     const url = `${apiUrl}/${resource}`;
+    console.log(`[DataProvider] Creating ${resource}`, { url, data: params.data });
+    
     const options = {
       method: "POST",
       body: JSON.stringify(params.data),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
     };
 
     return fetch(url, options)
       .then((response) => {
+        console.log(`[DataProvider] Create response status for ${resource}:`, response.status);
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          return response.json().then(errorData => {
+            console.error(`[DataProvider] Error response data:`, errorData);
+            throw new Error(`HTTP error! status: ${response.status}, message: ${JSON.stringify(errorData)}`);
+          }).catch(err => {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          });
         }
         return response.json();
       })
-      .then((json) => ({
-        data: { ...params.data, id: json.id || Date.now() }
-      }))
+      .then((json) => {
+        console.log(`[DataProvider] Created ${resource}:`, json);
+        return {
+          data: { ...params.data, id: json.id || Date.now() }
+        };
+      })
       .catch(error => {
-        console.error(`Error creating ${resource}:`, error);
+        console.error(`[DataProvider] Error creating ${resource}:`, error);
         throw error;
       });
   },
@@ -128,9 +193,7 @@ const dataProvider = {
     const options = {
       method: "PUT", 
       body: JSON.stringify(params.data),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
     };
 
     return fetch(url, options)
@@ -153,12 +216,17 @@ const dataProvider = {
     const url = `${apiUrl}/${resource}/${params.id}`;
     const options = {
       method: "DELETE",
+      headers: getAuthHeaders(),
     };
 
     return fetch(url, options)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        // Status 204 No Content no tiene cuerpo
+        if (response.status === 204) {
+          return { id: params.id };
         }
         return response.json();
       })

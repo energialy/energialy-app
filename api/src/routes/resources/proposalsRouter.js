@@ -6,13 +6,14 @@ const {
   updateProposalHandler,
   deleteProposalHandler
 } = require('../../handlers/proposalsHandler');
+const verifyJWT = require('../../middlewares/verifyJWT');
 
 const proposalsRouter = Router();
 
-proposalsRouter.get('/', getProposalsHandler);
-proposalsRouter.get('/:id', getProposalByIdHandler);
-proposalsRouter.post('/', createProposalHandler);
-proposalsRouter.put('/:id', updateProposalHandler);
-proposalsRouter.delete('/:id', deleteProposalHandler);
+proposalsRouter.get('/', verifyJWT, getProposalsHandler);
+proposalsRouter.get('/:id', verifyJWT, getProposalByIdHandler);
+proposalsRouter.post('/', verifyJWT, createProposalHandler);
+proposalsRouter.put('/:id', verifyJWT, updateProposalHandler);
+proposalsRouter.delete('/:id', verifyJWT, deleteProposalHandler);
 
 module.exports = proposalsRouter;

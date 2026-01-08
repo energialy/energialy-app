@@ -12,7 +12,7 @@ const TailAdminLayout = ({ children }) => {
     <ThemeProvider>
       <div className="dark:bg-boxdark-2 dark:text-bodydark">
         {/* <!-- ===== Page Wrapper Start ===== --> */}
-        <div className="flex h-screen overflow-hidden">
+        <div className="flex overflow-hidden h-[calc(100vh-80px)]">
           {/* <!-- ===== Sidebar Start ===== --> */}
           <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
           {/* <!-- ===== Sidebar End ===== --> */}

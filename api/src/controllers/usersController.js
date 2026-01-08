@@ -1,4 +1,5 @@
 const { Users, Companies, Messages } = require('../db');
+const bcrypt = require('bcrypt');
 
 const cleanUsers = (users) => {
   if (Array.isArray(users)) {
@@ -133,8 +134,39 @@ const deleteUserById = async (id) => {
 }
 
 const createUser = async (userData) => {
-  const newUser = await Users.create(userData);
-  return newUser;
+  const { email, password, firstName, lastName, position, role, CompanyId, isActive } = userData;
+  
+  // Validate required fields
+  if (!email || !password) {
+    const error = new Error('Email and password are required.');
+    error.status = 400;
+    throw error;
+  }
+
+  // Check for duplicate email
+  const duplicate = await Users.findOne({ where: { email } });
+  if (duplicate) {
+    const error = new Error('Email already registered.');
+    error.status = 409;
+    throw error;
+  }
+
+  // Hash password
+  const hashedPwd = await bcrypt.hash(password, 10);
+
+  // Create user with hashed password
+  const newUser = await Users.create({
+    email,
+    hashedPassword: hashedPwd,
+    firstName,
+    lastName,
+    position,
+    role: role || 'user',
+    CompanyId,
+    isActive: isActive !== undefined ? isActive : true,
+  });
+
+  return cleanUsers(newUser);
 };
 
 module.exports = {

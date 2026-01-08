@@ -10,7 +10,10 @@ const TableCard = ({
   showSearch = true,
   showFilter = true,
   searchPlaceholder = "Search...",
-  onRowClick
+  onRowClick,
+  entityType,
+  onEdit,
+  onDelete
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,8 +43,8 @@ const TableCard = ({
       </span>
     );
   };
-
-  const renderCellContent = (value, column) => {
+  console.log(onEdit, onDelete);
+  const renderCellContent = (value, column, rowData) => {
     if (column.type === 'status') {
       return getStatusBadge(value);
     }
@@ -54,6 +57,28 @@ const TableCard = ({
             </span>
           </div>
           <span>{value}</span>
+        </div>
+      );
+    }
+    if (column.type === 'actions') {
+      return (
+        <div className="flex gap-4">
+          {onEdit && (
+            <button 
+              onClick={() => onEdit(rowData.id)} 
+              className="text-sm text-primary bg-primary font-medium text-white hover:bg-opacity-75 px-4 py-2 rounded"
+            >
+              Editar
+            </button>
+          )}
+          {onDelete && (
+            <button 
+              onClick={() => onDelete(rowData.id)} 
+              className="text-sm text-primary bg-danger font-medium text-white hover:bg-opacity-75 px-4 py-2 rounded"
+            >
+              Eliminar
+            </button>
+          )}
         </div>
       );
     }
@@ -154,7 +179,7 @@ const TableCard = ({
                       key={colIndex}
                       className="border-b border-[#eee] px-4 py-5 pl-9 dark:border-strokedark xl:pl-11"
                     >
-                      {renderCellContent(row[column.accessor], column)}
+                      {renderCellContent(row[column.accessor], column, row)}
                     </td>
                   ))}
                 </tr>
