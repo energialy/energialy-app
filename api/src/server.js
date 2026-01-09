@@ -16,7 +16,8 @@ const allowedOrigins = [
   "https://energialy.vercel.app",
   "https://dev.energialy.vercel.app",
   "http://localhost:3000",
-  "https://localhost:3000"
+  "https://localhost:3000",
+  
 ];
 
 const io = new socketIo(server, {
@@ -63,44 +64,25 @@ io.on("connection", (socket) => {
 
 app.name = "API";
 
-// IMPORTANT: Manual CORS headers first (for Vercel compatibility)
+// CORS middleware - Vercel headers config in vercel.json handles preflight
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   
-  // Check if origin is allowed
+  // Set CORS headers for all requests
   if (allowedOrigins.includes(origin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   }
   
-  // Handle preflight requests
+  // Handle preflight
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    return res.status(204).end();
   }
   
   next();
 });
-
-// CORS middleware with specific origins
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
-    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
-  })
-);
-
-// Handle preflight requests
-app.options("*", cors({
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
-}));
 
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 app.use(bodyParser.json({ limit: "50mb" }));
