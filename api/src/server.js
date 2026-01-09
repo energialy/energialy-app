@@ -15,7 +15,7 @@ const io = new socketIo(server, {
   cors: {
     origin: "*",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-    allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept",
+    allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
     credentials: true,
   },
 });
@@ -60,7 +60,7 @@ app.use(
     origin: "*", // allow all origins
     credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-    allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept",
+    allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
   })
 );
 
@@ -71,7 +71,7 @@ app.options(
     origin: "*", // allow all origins
     credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-    allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept",
+    allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
   })
 );
 
@@ -80,7 +80,7 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
   next();
