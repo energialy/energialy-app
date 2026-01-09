@@ -21,7 +21,7 @@ const allowedOrigins = [
 
 const io = new socketIo(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: "*",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
     credentials: true,
@@ -66,7 +66,7 @@ app.name = "API";
 // CORS middleware with specific origins
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: "*",
     credentials: true,
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
     allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
@@ -76,7 +76,7 @@ app.use(
 
 // Handle preflight requests
 app.options("*", cors({
-  origin: allowedOrigins,
+  origin: "*",
   credentials: true,
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
   allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
