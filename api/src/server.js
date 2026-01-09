@@ -1,105 +1,119 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
-const morgan = require("morgan");
 const cors = require("cors");
-const routes = require("./routes/index.js");
-const { BASE_URL } = process.env;
 const http = require("http");
-const { Server: socketIo } = require("socket.io");
+const { Server: SocketIOServer } = require("socket.io");
+
+const routes = require("./routes/index.js");
 
 const app = express();
 const server = http.createServer(app);
 
-// Define allowed origins
+/* =====================================================
+   CORS CONFIGURATION
+===================================================== */
+
 const allowedOrigins = [
   "https://energialy.vercel.app",
   "https://dev.energialy.vercel.app",
   "http://localhost:3000",
-  "https://localhost:3000"
 ];
 
-const io = new socketIo(server, {
-  cors: {
-    origin: "*",
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-    allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-    credentials: true,
-  },
-});
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Permite requests sin origin (Postman, server-to-server)
+    if (!origin) return callback(null, true);
 
-let userSockets = [];
-
-io.on("connection", (socket) => {
-  console.log("New user connected" + socket.id);
-
-  socket.on("authenticate", (data) => {
-    const { companyId } = data;
-
-    if (companyId) {
-      userSockets[companyId] = socket.id;
-      console.log(`User ${companyId} connected with socket ID: ${socket.id}`);
-      console.log(userSockets);
-    } else {
-      console.log("Authentication failed");
-      socket.disconnect();
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
     }
-  });
 
-  socket.on("sendMessage", (messageSended) => {
-    const { _message, _sender, _receiver } = messageSended;
-    console.log("receicer", _receiver)
-    console.log("usersocket",userSockets[_receiver]);
-    userSockets[_receiver]
-      ? io.to(userSockets[_receiver]).emit("message", messageSended)
-      : console.log("Mensaje enviado - Usuario no conectado");
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected socket:" + socket.id);
-    userSockets = userSockets.filter(user => user.socketId !== socket.id);
-  });
-});
-
-app.name = "API";
-
-// CORS middleware with specific origins
-app.use(
-  cors({
-    origin: "*",
-    credentials: true,
-    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
-    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
-  })
-);
-
-// Handle preflight requests
-app.options("*", cors({
-  origin: "*",
+    return callback(new Error("Not allowed by CORS"));
+  },
   credentials: true,
-  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
-}));
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+
+/* =====================================================
+   MIDDLEWARES
+===================================================== */
 
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(cookieParser());
-//app.use(morgan("dev"));
 
-// Define routes
+/* =====================================================
+   SOCKET.IO CONFIGURATION
+===================================================== */
+
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST"],
+  },
+});
+
+let userSockets = {};
+
+io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.id);
+
+  socket.on("authenticate", ({ companyId }) => {
+    if (!companyId) {
+      socket.disconnect();
+      return;
+    }
+
+    userSockets[companyId] = socket.id;
+    console.log(`Company ${companyId} connected with socket ${socket.id}`);
+  });
+
+  socket.on("sendMessage", (message) => {
+    const { _receiver } = message;
+    const receiverSocket = userSockets[_receiver];
+
+    if (receiverSocket) {
+      io.to(receiverSocket).emit("message", message);
+    } else {
+      console.log("User not connected:", _receiver);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected:", socket.id);
+
+    for (const key in userSockets) {
+      if (userSockets[key] === socket.id) {
+        delete userSockets[key];
+      }
+    }
+  });
+});
+
+/* =====================================================
+   ROUTES
+===================================================== */
+
 app.use("/", routes);
 
-app.get("/", (req, res) => {
+app.get("/", (_, res) => {
   res.send("Energialy API");
 });
 
-// Error catching middleware
+/* =====================================================
+   ERROR HANDLER
+===================================================== */
+
 app.use((err, req, res, next) => {
-  const status = err.status || 500;
-  const message = err.message || err;
   console.error(err);
-  res.status(status).send(message);
+  res
+    .status(err.status || 500)
+    .json({ error: err.message || "Internal server error" });
 });
 
 module.exports = { app, server, io };
