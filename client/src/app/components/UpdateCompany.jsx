@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Montserrat } from "next/font/google";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useRecordContext } from "react-admin";
 import { displayFailedMessage, displaySuccessMessage } from "./Toastify";
@@ -633,7 +632,6 @@ export default function UpdateCompany() {
             </div>
           </form>
         </div>
-        <ToastContainer style={{ marginTop: "100px" }} />
       </div>
     </div>
   );

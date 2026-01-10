@@ -13,8 +13,7 @@
 import Select from "react-select";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import getLocalStorage from "../Func/localStorage";
 //import UploadthingButton from "./UploadthingButton";
 import { urlProduction } from "../data/dataGeneric";
@@ -316,7 +315,6 @@ export function ProposalModal({open, handleOpen, data}) {
             </div>
           </div>
         </div>
-        <ToastContainer style={{ marginTop: "100px" }} />
       </div>
     </>
   );

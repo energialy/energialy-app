@@ -4,31 +4,35 @@ import { useEffect, useState } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function ToastProvider({ children }) {
-  const [ToastContainer, setToastContainer] = useState(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Only import on client side
-    import('react-toastify').then((module) => {
-      setToastContainer(() => module.ToastContainer);
-    });
+    setMounted(true);
   }, []);
 
   return (
     <>
       {children}
-      {ToastContainer && (
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
+      {mounted && (
+        <div>
+          {typeof window !== 'undefined' && (() => {
+            const { ToastContainer } = require('react-toastify');
+            return (
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+              />
+            );
+          })()}
+        </div>
       )}
     </>
   );

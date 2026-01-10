@@ -2,8 +2,7 @@
 
 import { Admin, Resource, Layout } from "react-admin";
 import { useEffect, useState } from "react";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+
 import dataProvider from "./ApiProviderUsers";
 import UserRolesChart from "./RolesChart";
 import TailAdminLayout from './TailAdminLayout';
@@ -65,7 +64,7 @@ const AdminApp = () => {
 
   return (
     <TailAdminLayout>
-      <ToastContainer />
+
       <Admin 
         dataProvider={dataProvider}
         layout={CustomReactAdminLayout}

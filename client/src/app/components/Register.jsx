@@ -2,8 +2,7 @@
 import React, { use, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import { RiEyeLine, RiEyeOffLine } from "react-icons/ri";
 import { urlProduction } from "../data/dataGeneric";
 
@@ -315,7 +314,7 @@ export default function Register() {
           </Link>
         </div>
       </div>
-      <ToastContainer style={{ marginTop: "100px" }} />
+
     </div>
   );
 }
