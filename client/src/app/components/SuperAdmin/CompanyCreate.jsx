@@ -11,9 +11,8 @@ import {
   ReferenceArrayInput,
   SelectArrayInput,
   required,
-  ImageInput,
-  ImageField,
 } from 'react-admin';
+import ImageUploadField from './ImageUploadField';
 
 const transform = (data) => {
   console.log('[CompanyCreate] Original data:', data);
@@ -28,10 +27,10 @@ const transform = (data) => {
     annualRevenue: data.annualRevenue,
     employeeCount: data.employeeCount,
     cuit: data.cuit,
-    profilePicture: data.profilePicture,
-    bannerPicture: data.bannerPicture,
+    profilePicture: data.profilePicture || null,
+    bannerPicture: data.bannerPicture || null,
     organizationType: data.organizationType,
-    userId: data.userId, // Debe ser proporcionado
+    userId: data.userId,
   };
   
   console.log('[CompanyCreate] Transformed data:', transformed);
@@ -193,25 +192,19 @@ export const CompanyCreate = () => (
         </div>
         
         <div className="md:col-span-2">
-          <ImageInput 
-            source="profilePicture" 
-            label="Foto de Perfil" 
-            accept="image/*"
-            className="w-full"
-          >
-            <ImageField source="src" title="title" />
-          </ImageInput>
+          <ImageUploadField
+            source="profilePicture"
+            label="Foto de Perfil"
+            helperText="Seleccione una imagen para subir a Cloudinary"
+          />
         </div>
         
         <div className="md:col-span-2">
-          <ImageInput 
-            source="bannerPicture" 
-            label="Banner" 
-            accept="image/*"
-            className="w-full"
-          >
-            <ImageField source="src" title="title" />
-          </ImageInput>
+          <ImageUploadField
+            source="bannerPicture"
+            label="Banner"
+            helperText="Seleccione una imagen para subir a Cloudinary"
+          />
         </div>
         
       </div>

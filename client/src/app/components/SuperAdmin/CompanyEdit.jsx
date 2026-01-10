@@ -11,9 +11,8 @@ import {
   ReferenceArrayInput,
   SelectArrayInput,
   required,
-  ImageInput,
-  ImageField,
 } from 'react-admin';
+import ImageUploadField from './ImageUploadField';
 
 const transform = (data) => {
   console.log('[CompanyEdit] Original data:', data);
@@ -34,25 +33,9 @@ const transform = (data) => {
     userId: data.userId,
   };
   
-  // Solo incluir imágenes si son strings (URLs), no objetos File
-  // ImageInput devuelve objetos cuando se carga nueva imagen, pero el backend espera URLs
-  // Si no se cambió la imagen, mantener la URL existente
-  if (data.profilePicture) {
-    if (typeof data.profilePicture === 'string') {
-      transformed.profilePicture = data.profilePicture;
-    } else if (typeof data.profilePicture === 'object' && data.profilePicture.src) {
-      // Si es un objeto con src (imagen ya existente), mantener la URL
-      transformed.profilePicture = data.profilePicture.src;
-    }
-  }
-  if (data.bannerPicture) {
-    if (typeof data.bannerPicture === 'string') {
-      transformed.bannerPicture = data.bannerPicture;
-    } else if (typeof data.bannerPicture === 'object' && data.bannerPicture.src) {
-      // Si es un objeto con src (imagen ya existente), mantener la URL
-      transformed.bannerPicture = data.bannerPicture.src;
-    }
-  }
+  // Imágenes como URLs string directamente
+  transformed.profilePicture = data.profilePicture || null;
+  transformed.bannerPicture = data.bannerPicture || null;
   
   console.log('[CompanyEdit] Transformed data:', transformed);
   return transformed;
@@ -213,25 +196,19 @@ export const CompanyEdit = () => (
         </div>
         
         <div className="md:col-span-2">
-          <ImageInput 
-            source="profilePicture" 
-            label="Foto de Perfil" 
-            accept="image/*"
-            className="w-full"
-          >
-            <ImageField source="src" title="title" />
-          </ImageInput>
+          <ImageUploadField
+            source="profilePicture"
+            label="Foto de Perfil"
+            helperText="Seleccione una imagen para subir a Cloudinary"
+          />
         </div>
         
         <div className="md:col-span-2">
-          <ImageInput 
-            source="bannerPicture" 
-            label="Banner" 
-            accept="image/*"
-            className="w-full"
-          >
-            <ImageField source="src" title="title" />
-          </ImageInput>
+          <ImageUploadField
+            source="bannerPicture"
+            label="Banner"
+            helperText="Seleccione una imagen para subir a Cloudinary"
+          />
         </div>
         
       </div>

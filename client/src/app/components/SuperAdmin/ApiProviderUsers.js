@@ -129,30 +129,13 @@ const dataProvider = {
               ? json.subcategories.map(sub => sub.id) 
               : [],
             userId: json.users?.[0]?.id || null, // Obtener el primer usuario asociado
+            // Mantener profilePicture y bannerPicture como strings para TextInput
+            profilePicture: json.profilePicture || '',
+            bannerPicture: json.bannerPicture || '',
           };
           
-          // Formatear imágenes para ImageInput de React Admin
-          // ImageInput espera un objeto o array de objetos con las propiedades que ImageField usa
-          if (json.profilePicture && typeof json.profilePicture === 'string') {
-            transformedData.profilePicture = {
-              src: json.profilePicture,
-              title: 'Profile Picture',
-              url: json.profilePicture // Agregar url también por si acaso
-            };
-            console.log('[DataProvider] Formatted profilePicture:', transformedData.profilePicture);
-          } else {
-            console.log('[DataProvider] profilePicture not formatted - value:', json.profilePicture);
-          }
-          if (json.bannerPicture && typeof json.bannerPicture === 'string') {
-            transformedData.bannerPicture = {
-              src: json.bannerPicture,
-              title: 'Banner Picture',
-              url: json.bannerPicture // Agregar url también por si acaso
-            };
-            console.log('[DataProvider] Formatted bannerPicture:', transformedData.bannerPicture);
-          } else {
-            console.log('[DataProvider] bannerPicture not formatted - value:', json.bannerPicture);
-          }
+          console.log('[DataProvider] Images - profilePicture:', transformedData.profilePicture);
+          console.log('[DataProvider] Images - bannerPicture:', transformedData.bannerPicture);
           
           console.log(`[DataProvider] getOne transformed data for ${resource}:`, transformedData);
           return { data: transformedData };
@@ -270,27 +253,10 @@ const dataProvider = {
   update: (resource, params) => { 
     console.log(`[DataProvider] Updating ${resource}/${params.id}`, params.data);
     
-    // Limpiar datos para companies - manejar imágenes
-    let dataToSend = { ...params.data };
-    
-    if (resource === 'companies') {
-      // Si profilePicture o bannerPicture son objetos (ImageInput devuelve objetos),
-      // excluirlos del update ya que no podemos enviar objetos File directamente
-      // El usuario tendría que usar un flujo separado para subir imágenes a Cloudinary
-      if (dataToSend.profilePicture && typeof dataToSend.profilePicture === 'object') {
-        console.log('[DataProvider] Removing profilePicture object from update');
-        delete dataToSend.profilePicture;
-      }
-      if (dataToSend.bannerPicture && typeof dataToSend.bannerPicture === 'object') {
-        console.log('[DataProvider] Removing bannerPicture object from update');
-        delete dataToSend.bannerPicture;
-      }
-    }
-    
     const url = `${apiUrl}/${resource}/${params.id}`;
     const options = {
       method: "PUT", 
-      body: JSON.stringify(dataToSend),
+      body: JSON.stringify(params.data),
       headers: getAuthHeaders(),
     };
 
