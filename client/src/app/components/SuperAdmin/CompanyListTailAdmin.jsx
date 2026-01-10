@@ -6,6 +6,7 @@ import { TableCard, DonutChartCard, BarChartCard } from '../ui';
 import useCreateResource from '../../hooks/useCreateResource';
 import useDeleteResource from '../../hooks/useDeleteResource';
 import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 export const CompanyList = () => {
   const [companies, setCompanies] = useState([]);
