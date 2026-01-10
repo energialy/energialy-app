@@ -33,7 +33,11 @@ export default function Attachment(props) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const companyId = user?.company.id;
+    const companyId = user?.company?.id;
+    if (!companyId) {
+      displayFailedMessage('No se pudo obtener la información de la empresa');
+      return;
+    }
     const id = {
       companyId: companyId,
     };
@@ -135,7 +139,11 @@ export default function Attachment(props) {
         [fieldName]: fileUrl,
       }));
 
-      const companyId = user.company.id;
+      const companyId = user?.company?.id;
+      if (!companyId) {
+        console.error('Company ID not available');
+        return;
+      }
       try {
         const response = await axios.post(`${urlProduction}/documents`, {
           companyId,

@@ -20,11 +20,17 @@ export default function UploadthingButtonMany({onFilesUpload, user}) {
     console.log(user)
     console.log('props:',onFilesUpload)
     
+    const companyId = user?.company?.id;
+    if (!companyId) {
+      console.error('Company ID not available');
+      return;
+    }
+    
     try {
       const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/documents`, {
         name: onFilesUpload,
         attachment: cleanRes[0],
-        companyId: user.company.id,
+        companyId: companyId,
       });
       console.log('res del servidor:',res.data)
     } catch (error) {

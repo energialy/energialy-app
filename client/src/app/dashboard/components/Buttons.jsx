@@ -26,7 +26,7 @@ export default function Buttons() {
 
   const handleOpenModal = (id, company) => {
     if (!user?.company?.id) return;
-    setModalData({ id: user.company.id });
+    setModalData({ id: user?.company?.id });
     setOpenModal((cur) => !cur);
   };
 
