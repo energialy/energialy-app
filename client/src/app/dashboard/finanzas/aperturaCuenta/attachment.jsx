@@ -4,13 +4,12 @@ import axios from 'axios';
 import getLocalStorage from '@/app/Func/localStorage';
 import { urlProduction } from '@/app/data/dataGeneric';
 import { displayFailedMessage, displaySuccessMessage } from '@/app/components/Toastify';
-import dynamic from 'next/dynamic';
 
-// Import ToastContainer dynamically to avoid SSR issues
-const ToastContainer = dynamic(
-  () => import('react-toastify').then((mod) => ({ default: mod.ToastContainer })),
-  { ssr: false }
-);
+// Dynamic import to avoid SSR issues
+let ToastContainer = null;
+if (typeof window !== 'undefined') {
+  ToastContainer = require('react-toastify').ToastContainer;
+}
 
 export default function Attachment(props) {
   const [files, setFiles] = useState({
@@ -33,11 +32,7 @@ export default function Attachment(props) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const companyId = user?.company?.id;
-    if (!companyId) {
-      displayFailedMessage('No se pudo obtener la información de la empresa');
-      return;
-    }
+    const companyId = user?.company.id;
     const id = {
       companyId: companyId,
     };
@@ -139,11 +134,7 @@ export default function Attachment(props) {
         [fieldName]: fileUrl,
       }));
 
-      const companyId = user?.company?.id;
-      if (!companyId) {
-        console.error('Company ID not available');
-        return;
-      }
+      const companyId = user.company.id;
       try {
         const response = await axios.post(`${urlProduction}/documents`, {
           companyId,
@@ -186,7 +177,7 @@ export default function Attachment(props) {
           </button>
         </div>
       </form>
-      <ToastContainer style={{ marginTop: '100px' }} />
+      {ToastContainer && <ToastContainer style={{ marginTop: '100px' }} />}
     </main>
   );
 }

@@ -2,14 +2,13 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { displaySuccessMessage, displayFailedMessage } from '@/app/components/Toastify';
-import dynamic from 'next/dynamic';
-
-// Import ToastContainer dynamically to avoid SSR issues
-const ToastContainer = dynamic(
-  () => import('react-toastify').then((mod) => ({ default: mod.ToastContainer })),
-  { ssr: false }
-);
 import axios from 'axios';
+
+// Dynamic import to avoid SSR issues
+let ToastContainer = null;
+if (typeof window !== 'undefined') {
+  ToastContainer = require('react-toastify').ToastContainer;
+}
 
 function EmailModal({ open, handleOpen, id, company }) {
   const [email, setEmail] = useState('');
@@ -84,7 +83,7 @@ function EmailModal({ open, handleOpen, id, company }) {
                 Enviar
               </button>
             </div>
-            <ToastContainer style={{ marginTop: '100px' }} />
+            {ToastContainer && <ToastContainer style={{ marginTop: '100px' }} />}
           </div>
         </div>
       )}

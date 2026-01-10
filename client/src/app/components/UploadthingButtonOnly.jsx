@@ -14,14 +14,10 @@ import getLocalStorage from "../Func/localStorage";
 export default function UploadthingButtonOnly({onFilesUpload}) {
   const [attachments, setAttachments] = useState([]);
   const user = getLocalStorage()
-  const companyId = user?.company?.id;
+  const companyId = user.company.id;
 
   const handleFiles = async (cleanRes) => {
     console.log('props:',onFilesUpload)
-    if (!companyId) {
-      console.error('Company ID not available');
-      return;
-    }
     try {
       const res = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/documents`, {
         name: onFilesUpload,

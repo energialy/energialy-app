@@ -4,19 +4,18 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-
-// Import ToastContainer dynamically to avoid SSR issues
-const ToastContainer = dynamic(
-  () => import('react-toastify').then((mod) => ({ default: mod.ToastContainer })),
-  { ssr: false }
-);
 import { useDispatch } from 'react-redux';
 import { setAccessToken, setUserData } from '../redux/features/userSlice';
 import { displayFailedMessage, displaySuccessMessage } from './Toastify';
 import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 import Link from 'next/link';
 import { Button } from 'antd';
+
+// Dynamic import to avoid SSR issues
+let ToastContainer = null;
+if (typeof window !== 'undefined') {
+  ToastContainer = require('react-toastify').ToastContainer;
+}
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -223,7 +222,7 @@ export default function Login() {
           </Link>
         </div>
       </div>
-      <ToastContainer style={{ marginTop: '100px' }} />
+      {ToastContainer && <ToastContainer style={{ marginTop: '100px' }} />}
     </div>
   );
 }

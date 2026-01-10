@@ -3,15 +3,14 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { displayFailedMessage, displaySuccessMessage } from '@/app/components/Toastify';
-import dynamic from 'next/dynamic';
-
-// Import ToastContainer dynamically to avoid SSR issues
-const ToastContainer = dynamic(
-  () => import('react-toastify').then((mod) => ({ default: mod.ToastContainer })),
-  { ssr: false }
-);
 import getLocalStorage from '@/app/Func/localStorage';
 import { urlProduction } from '@/app/data/dataGeneric';
+
+// Dynamic import to avoid SSR issues
+let ToastContainer = null;
+if (typeof window !== 'undefined') {
+  ToastContainer = require('react-toastify').ToastContainer;
+}
 
 export default function Data(props) {
   // Estados Locales
@@ -221,7 +220,7 @@ export default function Data(props) {
         </div>
       </div>
       {/* ToastContainer y UploadthingButton van aquí si es necesario */}
-      <ToastContainer style={{ marginTop: '100px' }} />
+      {ToastContainer && <ToastContainer style={{ marginTop: '100px' }} />}
     </main>
   );
 }

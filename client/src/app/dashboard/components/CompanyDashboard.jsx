@@ -21,12 +21,12 @@ function CompanyDashboard({ user }) {
   const companyId = getCompanyId();
 
   useEffect(() => {
-    if (user?.company?.id) {
-      setUserProposals(proposals?.filter((proposal) => proposal.company?.id === user.company.id) || []);
-      setProposalsToUser(proposals?.filter((proposal) => proposal.tender?.Company?.id === user.company.id) || []);
-      setUserTenders(tenders?.filter((tender) => tender.company?.id === user.company.id) || []);
+    if (user.company) {
+      setUserProposals(proposals?.filter((proposal) => proposal.company.id === user.company.id));
+      setProposalsToUser(proposals?.filter((proposal) => proposal.tender.Company.id === user.company.id));
+      setUserTenders(tenders?.filter((tender) => tender.company.id === user.company.id));
     }
-  }, [proposals, tenders, user?.company]);
+  }, [proposals, tenders, user.company]);
 
   return (
     <div>
