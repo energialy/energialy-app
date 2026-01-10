@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic';
 
 // Import ToastContainer dynamically to avoid SSR issues
 const ToastContainer = dynamic(
-  () => import('react-toastify').then((mod) => mod.ToastContainer),
+  () => import('react-toastify').then((mod) => ({ default: mod.ToastContainer })),
   { ssr: false }
 );
 
