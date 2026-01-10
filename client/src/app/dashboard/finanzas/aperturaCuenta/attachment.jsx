@@ -5,12 +5,6 @@ import getLocalStorage from '@/app/Func/localStorage';
 import { urlProduction } from '@/app/data/dataGeneric';
 import { displayFailedMessage, displaySuccessMessage } from '@/app/components/Toastify';
 
-// Dynamic import to avoid SSR issues
-let ToastContainer = null;
-if (typeof window !== 'undefined') {
-  ToastContainer = require('react-toastify').ToastContainer;
-}
-
 export default function Attachment(props) {
   const [files, setFiles] = useState({
     estatutoSocial: null,
@@ -177,7 +171,6 @@ export default function Attachment(props) {
           </button>
         </div>
       </form>
-      {ToastContainer && <ToastContainer style={{ marginTop: '100px' }} />}
     </main>
   );
 }

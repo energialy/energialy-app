@@ -6,12 +6,6 @@ import { displayFailedMessage, displaySuccessMessage } from '@/app/components/To
 import getLocalStorage from '@/app/Func/localStorage';
 import { urlProduction } from '@/app/data/dataGeneric';
 
-// Dynamic import to avoid SSR issues
-let ToastContainer = null;
-if (typeof window !== 'undefined') {
-  ToastContainer = require('react-toastify').ToastContainer;
-}
-
 export default function Data(props) {
   // Estados Locales
   const [envioExitoso, setEnvioExitoso] = useState(false);
@@ -219,8 +213,6 @@ export default function Data(props) {
           {error && <div className="flex justify-center text-danger mt-2 mb-2">{error}</div>}
         </div>
       </div>
-      {/* ToastContainer y UploadthingButton van aquí si es necesario */}
-      {ToastContainer && <ToastContainer style={{ marginTop: '100px' }} />}
     </main>
   );
 }

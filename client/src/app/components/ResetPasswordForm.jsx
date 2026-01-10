@@ -3,15 +3,8 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { urlProduction } from '../data/dataGeneric';
-
-// Dynamic import to avoid SSR issues
-let ToastContainer = null;
-if (typeof window !== 'undefined') {
-  ToastContainer = require('react-toastify').ToastContainer;
-}
 
 const ResetPasswordForm = () => {
   const [newPassword, setNewPassword] = useState('');
@@ -71,7 +64,6 @@ const ResetPasswordForm = () => {
         </button>
         {message && <p className={`mt-4 ${message.includes('éxito') ? 'text-green-500' : 'text-red-500'}`}>{message}</p>}
       </div>
-      {ToastContainer && <ToastContainer style={{ marginTop: '100px' }} />}
     </div>
   );
 };

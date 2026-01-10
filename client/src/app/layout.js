@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Navigation from './components/Navigation'; 
 import Footer from './components/Footer';
 import Providers from './redux/provider';
+import ToastProvider from './components/ToastProvider';
 import getLocalStorage from './Func/localStorage';
 //import "@uploadthing/react/styles.css";
 
@@ -31,11 +32,13 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <Providers>
         <body className={`${montserrat.className}bg-[#F7F7F7] flex flex-col`}>
-          <div className="flex-grow">
-            <Navigation />
-            <main className="mx-auto">{children}</main>
-          </div>
-          <Footer />
+          <ToastProvider>
+            <div className="flex-grow">
+              <Navigation />
+              <main className="mx-auto">{children}</main>
+            </div>
+            <Footer />
+          </ToastProvider>
         </body>
       </Providers>
     </html>

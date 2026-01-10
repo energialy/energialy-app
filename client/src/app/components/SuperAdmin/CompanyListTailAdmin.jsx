@@ -5,13 +5,6 @@ import { useDataProvider, useRedirect } from 'react-admin';
 import { TableCard, DonutChartCard, BarChartCard } from '../ui';
 import useCreateResource from '../../hooks/useCreateResource';
 import useDeleteResource from '../../hooks/useDeleteResource';
-import 'react-toastify/dist/ReactToastify.css';
-
-// Dynamic import to avoid SSR issues
-let ToastContainer = null;
-if (typeof window !== 'undefined') {
-  ToastContainer = require('react-toastify').ToastContainer;
-}
 
 export const CompanyList = () => {
   const [companies, setCompanies] = useState([]);
@@ -390,7 +383,6 @@ export const CompanyList = () => {
         searchPlaceholder="Buscar empresas..."
         entityType="companies"
       />
-      {ToastContainer && <ToastContainer position="top-right" autoClose={1500} />}
     </div>
   );
 };
