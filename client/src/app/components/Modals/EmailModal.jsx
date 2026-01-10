@@ -1,7 +1,14 @@
 'use client';
 import { useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { displaySuccessMessage, displayFailedMessage } from '@/app/components/Toastify';
+import dynamic from 'next/dynamic';
+
+// Import ToastContainer dynamically to avoid SSR issues
+const ToastContainer = dynamic(
+  () => import('react-toastify').then((mod) => mod.ToastContainer),
+  { ssr: false }
+);
 import axios from 'axios';
 
 function EmailModal({ open, handleOpen, id, company }) {

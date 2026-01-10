@@ -1,8 +1,15 @@
 'use client';
 import React, { useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
+import dynamic from 'next/dynamic';
+
+// Import ToastContainer dynamically to avoid SSR issues
+const ToastContainer = dynamic(
+  () => import('react-toastify').then((mod) => mod.ToastContainer),
+  { ssr: false }
+);
 import { urlProduction } from '../data/dataGeneric';
 
 const RequestResetPasswordForm = () => {

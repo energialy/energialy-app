@@ -4,7 +4,13 @@ import axios from 'axios';
 import getLocalStorage from '@/app/Func/localStorage';
 import { urlProduction } from '@/app/data/dataGeneric';
 import { displayFailedMessage, displaySuccessMessage } from '@/app/components/Toastify';
-import { ToastContainer } from 'react-toastify';
+import dynamic from 'next/dynamic';
+
+// Import ToastContainer dynamically to avoid SSR issues
+const ToastContainer = dynamic(
+  () => import('react-toastify').then((mod) => mod.ToastContainer),
+  { ssr: false }
+);
 
 export default function Attachment(props) {
   const [files, setFiles] = useState({

@@ -6,7 +6,13 @@ import { TableCard, DonutChartCard, BarChartCard } from '../ui';
 import useCreateResource from '../../hooks/useCreateResource';
 import useDeleteResource from '../../hooks/useDeleteResource';
 import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
+import dynamic from 'next/dynamic';
+
+// Import ToastContainer dynamically to avoid SSR issues
+const ToastContainer = dynamic(
+  () => import('react-toastify').then((mod) => mod.ToastContainer),
+  { ssr: false }
+);
 
 export const CompanyList = () => {
   const [companies, setCompanies] = useState([]);
