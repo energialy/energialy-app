@@ -304,15 +304,34 @@ const createCompany = async (body) => {
 };
 
 const updateCompany = async (id, body) => {
-  const { locations, subcategories } = body;
+  console.log('[updateCompany] Received body:', body);
+  const { locations, subcategories, userId } = body;
+  
   const foundCompany = await Companies.findByPk(id, {
-    include: [{ model: Categories }, { model: Subcategories }, { model: Locations }],
+    include: [
+      { model: Categories }, 
+      { model: Subcategories }, 
+      { model: Locations },
+      { model: Users }
+    ],
   });
+  
   if (!foundCompany) {
     const error = new Error(`Company with id ${id} not found.`);
     error.status = 404;
     throw error;
   }
+  
+  // Validar userId si se proporciona
+  if (userId) {
+    const foundUser = await Users.findByPk(userId);
+    if (!foundUser) {
+      const error = new Error(`User with id ${userId} not found.`);
+      error.status = 404;
+      throw error;
+    }
+  }
+  
   if (locations) {
     for (const locationId of locations) {
       const foundLocation = await Locations.findByPk(locationId);
@@ -335,6 +354,21 @@ const updateCompany = async (id, body) => {
   }
 
   await foundCompany.update(body);
+  
+  // Actualizar la relación con el usuario si userId cambió
+  if (userId) {
+    // Remover usuarios anteriores
+    if (foundCompany.Users && foundCompany.Users.length > 0) {
+      for (const user of foundCompany.Users) {
+        await foundCompany.removeUser(user);
+      }
+    }
+    // Agregar el nuevo usuario
+    const newUser = await Users.findByPk(userId);
+    await foundCompany.addUser(newUser);
+    console.log('[updateCompany] Updated user association to userId:', userId);
+  }
+  
   if (locations) {
     if (foundCompany.Locations) {
       for (const location of foundCompany.Locations) {
