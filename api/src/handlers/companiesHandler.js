@@ -29,10 +29,13 @@ const getCompanyByIdHandler = async (req, res) => {
 
 const createCompanyHandler = async (req, res) => {
   try {
+    console.log('[createCompanyHandler] Received body:', JSON.stringify(req.body, null, 2));
     const body = req.body;
     const newCompany = await createCompany(body);
     res.status(201).json(newCompany);
   } catch (error) {
+    console.error('[createCompanyHandler] Error:', error.message);
+    console.error('[createCompanyHandler] Stack:', error.stack);
     res.status(error.status || 500).json({ error: error.message });
   }
 };

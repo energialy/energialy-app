@@ -18,8 +18,8 @@ function CompanyCardContainer() {
   const filterCompanies = useSelector((state) => state.company.filterCompanies);
   // * SE OBTIENEN TODAS LA COMPAÑIAS MENOS A LA QUE EL USUARIO PERTENECE
   const companyId = getCompanyId();
-  const filterCompanyById = filterCompanies.filter(function(el) {
-    return el.id !== companyId;
+  const filterCompanyById = (filterCompanies || []).filter(function(el) {
+    return el && el.id && el.id !== companyId;
   })
 
   //console.log(PaginationComponent.perPage);
@@ -57,15 +57,17 @@ function CompanyCardContainer() {
         <h1>Cargando...</h1>
       ) : (
         <div className="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-4 justify-center">
-          {filterCompanies.length > 0 ? (
+          {filterCompanies?.length > 0 ? (
             companiesToShow.map((comp) => (
-              <CompanyCard
-                key={comp.id}
-                compBanner={comp.bannerPicture}
-                compLogo={comp.profilePicture}
-                compName={comp.name}
-                compId={comp.id}
-              />
+              comp && comp.id ? (
+                <CompanyCard
+                  key={comp.id}
+                  compBanner={comp.bannerPicture}
+                  compLogo={comp.profilePicture}
+                  compName={comp.name}
+                  compId={comp.id}
+                />
+              ) : null
             ))
           ) : (
             <h1>No hay companias que coincidan</h1>

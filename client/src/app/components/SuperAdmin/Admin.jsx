@@ -84,7 +84,7 @@ const AdminApp = () => {
         <Resource 
           name="companies" 
           list={CompanyList} 
-          create={RegisterCompany} 
+          create={CompanyCreate} 
           edit={CompanyEdit}
         />
         

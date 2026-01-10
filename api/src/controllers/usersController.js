@@ -5,7 +5,9 @@ const cleanUsers = (users) => {
   if (Array.isArray(users)) {
     const cleanUsersArray = users.map((user) => ({
       id: user.id,
-      fullName: `${user.firstName} ${user.lastName}`,
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      fullName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Sin nombre',
       email: user.email,
       role: user.role,
       company: user.Company,

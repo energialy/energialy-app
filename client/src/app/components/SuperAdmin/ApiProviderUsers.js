@@ -80,9 +80,16 @@ const dataProvider = {
         return response.json();
       })
       .then((json) => {
-        console.log(`[DataProvider] Data received for ${resource}:`, json);
+        console.log(`[DataProvider] Raw JSON for ${resource}:`, json);
+        console.log(`[DataProvider] Is array?`, Array.isArray(json));
+        console.log(`[DataProvider] First item:`, json?.[0]);
+        
         const dataArray = Array.isArray(json) ? json : [json];
-        console.log(`[DataProvider] Processed data for ${resource}:`, { total: dataArray.length, sample: dataArray[0] });
+        console.log(`[DataProvider] Processed data for ${resource}:`, { 
+          total: dataArray.length, 
+          sample: dataArray[0],
+          allIds: dataArray.map(item => item.id)
+        });
         
         return {
           data: dataArray,
@@ -97,11 +104,62 @@ const dataProvider = {
 
   getOne: (resource, params) => {
     const url = `${apiUrl}/${resource}/${params.id}`;
+    console.log(`[DataProvider] getOne called for ${resource}/${params.id}`);
+    
     return fetch(url, { headers: getAuthHeaders() })
       .then((response) => response.json())
-      .then((json) => ({
-        data: json,
-      }))
+      .then((json) => {
+        console.log(`[DataProvider] getOne raw data for ${resource}:`, json);
+        
+        // Para companies, transformar locations y subcategories a arrays de IDs
+        if (resource === 'companies' && json) {
+          console.log('[DataProvider] Processing company data...');
+          console.log('[DataProvider] json.profilePicture:', json.profilePicture, 'type:', typeof json.profilePicture);
+          console.log('[DataProvider] json.bannerPicture:', json.bannerPicture, 'type:', typeof json.bannerPicture);
+          console.log('[DataProvider] json.locations:', json.locations);
+          console.log('[DataProvider] json.subcategories:', json.subcategories);
+          console.log('[DataProvider] json.users:', json.users);
+          
+          const transformedData = {
+            ...json,
+            locations: Array.isArray(json.locations) 
+              ? json.locations.map(loc => loc.id) 
+              : [],
+            subcategories: Array.isArray(json.subcategories) 
+              ? json.subcategories.map(sub => sub.id) 
+              : [],
+            userId: json.users?.[0]?.id || null, // Obtener el primer usuario asociado
+          };
+          
+          // Formatear imágenes para ImageInput de React Admin
+          // ImageInput espera un objeto o array de objetos con las propiedades que ImageField usa
+          if (json.profilePicture && typeof json.profilePicture === 'string') {
+            transformedData.profilePicture = {
+              src: json.profilePicture,
+              title: 'Profile Picture',
+              url: json.profilePicture // Agregar url también por si acaso
+            };
+            console.log('[DataProvider] Formatted profilePicture:', transformedData.profilePicture);
+          } else {
+            console.log('[DataProvider] profilePicture not formatted - value:', json.profilePicture);
+          }
+          if (json.bannerPicture && typeof json.bannerPicture === 'string') {
+            transformedData.bannerPicture = {
+              src: json.bannerPicture,
+              title: 'Banner Picture',
+              url: json.bannerPicture // Agregar url también por si acaso
+            };
+            console.log('[DataProvider] Formatted bannerPicture:', transformedData.bannerPicture);
+          } else {
+            console.log('[DataProvider] bannerPicture not formatted - value:', json.bannerPicture);
+          }
+          
+          console.log(`[DataProvider] getOne transformed data for ${resource}:`, transformedData);
+          return { data: transformedData };
+        }
+        
+        return { data: json };
+      })
       .catch(error => {
         console.error(`Error fetching ${resource} ${params.id}:`, error);
         throw error;
@@ -136,6 +194,27 @@ const dataProvider = {
       .catch(error => {
         console.error(`Error in getMany for ${resource}:`, error);
         return { data: [] };
+      });
+  },
+
+  getManyReference: (resource, params) => {
+    console.log(`[DataProvider] getManyReference called for ${resource}`, params);
+    // For now, just call getList and filter if needed
+    const url = `${apiUrl}/${resource}`;
+    
+    return fetch(url, { headers: getAuthHeaders() })
+      .then((response) => response.json())
+      .then((json) => {
+        const dataArray = Array.isArray(json) ? json : [json];
+        console.log(`[DataProvider] getManyReference results for ${resource}:`, dataArray);
+        return {
+          data: dataArray,
+          total: dataArray.length
+        };
+      })
+      .catch(error => {
+        console.error(`[DataProvider] Error in getManyReference for ${resource}:`, error);
+        return { data: [], total: 0 };
       });
   },
 
@@ -189,23 +268,49 @@ const dataProvider = {
       });
   },
   update: (resource, params) => { 
+    console.log(`[DataProvider] Updating ${resource}/${params.id}`, params.data);
+    
+    // Limpiar datos para companies - manejar imágenes
+    let dataToSend = { ...params.data };
+    
+    if (resource === 'companies') {
+      // Si profilePicture o bannerPicture son objetos (ImageInput devuelve objetos),
+      // excluirlos del update ya que no podemos enviar objetos File directamente
+      // El usuario tendría que usar un flujo separado para subir imágenes a Cloudinary
+      if (dataToSend.profilePicture && typeof dataToSend.profilePicture === 'object') {
+        console.log('[DataProvider] Removing profilePicture object from update');
+        delete dataToSend.profilePicture;
+      }
+      if (dataToSend.bannerPicture && typeof dataToSend.bannerPicture === 'object') {
+        console.log('[DataProvider] Removing bannerPicture object from update');
+        delete dataToSend.bannerPicture;
+      }
+    }
+    
     const url = `${apiUrl}/${resource}/${params.id}`;
     const options = {
       method: "PUT", 
-      body: JSON.stringify(params.data),
+      body: JSON.stringify(dataToSend),
       headers: getAuthHeaders(),
     };
 
     return fetch(url, options)
       .then((response) => {
+        console.log(`[DataProvider] Update response status for ${resource}:`, response.status);
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          return response.json().then(errorData => {
+            console.error(`[DataProvider] Update error response:`, errorData);
+            throw new Error(`HTTP error! status: ${response.status}, message: ${JSON.stringify(errorData)}`);
+          }).catch(err => {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          });
         }
         return response.json();
       })
-      .then((json) => ({
-        data: json,
-      }))
+      .then((json) => {
+        console.log(`[DataProvider] Updated ${resource}:`, json);
+        return { data: json };
+      })
       .catch(error => {
         console.error(`Error updating ${resource} ${params.id}:`, error);
         throw error;

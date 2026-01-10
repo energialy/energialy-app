@@ -5,25 +5,33 @@ import { useRouter } from "next/navigation";
 
 function CompanyCard(props) {
   const router = useRouter()
+  
+  // Valores por defecto para imágenes faltantes
+  const defaultBanner = "/default-banner.jpg"
+  const defaultLogo = "/default-logo.png"
+  
   return (
     <>
       <div className="w-[360px] h-[320px] flex flex-col rounded-md bg-white shadow-md hover:shadow-2xl">
         <div
-          className="flex w-full h-1/2  -mb-[45px] rounded-tr-md rounded-tl-md"
+          className="flex w-full h-1/2  -mb-[45px] rounded-tr-md rounded-tl-md relative"
         >
           <Image
-            className="rounded-tr-md rounded-tl-md"
-            src={props.compBanner}
-            width={360}
-            height={120}
+            className="rounded-tr-md rounded-tl-md object-cover"
+            src={props.compBanner || defaultBanner}
+            alt={`Banner de ${props.compName || 'empresa'}`}
+            fill
+            sizes="360px"
+            priority={false}
           />
         </div>
-        <div className=" flex bg-white mx-auto my-0 z-50 rounded-md min-w-[90px] min-h-[90px]">
+        <div className=" flex bg-white mx-auto my-0 z-50 rounded-md min-w-[90px] min-h-[90px] relative">
           <Image
             width={90}
             height={90}
             className="p-2 shadow rounded-md"
-            src={props.compLogo}
+            src={props.compLogo || defaultLogo}
+            alt={`Logo de ${props.compName || 'empresa'}`}
           />
         </div>
         <div className="w-full h-1/2 rounded-br-md rounded-bl-md flex flex-col">

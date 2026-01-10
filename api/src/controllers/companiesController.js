@@ -174,25 +174,52 @@ const getCompanyById = async (id) => {
 };
 
 const createCompany = async (body) => {
-  const { name, description, locations, subcategories, profilePicture, bannerPicture, foundationYear, annualRevenue, employeeCount, cuit, userId } =
-    body;
-  if (
-    !name ||
-    !description ||
-    !locations ||
-    !subcategories ||
-    !profilePicture ||
-    !bannerPicture ||
-    !foundationYear ||
-    !annualRevenue ||
-    !employeeCount ||
-    !cuit ||
-    !userId
-  ) {
-    const error = new Error('Missing required attributes.');
+  console.log('[createCompany] Received body:', body);
+  
+  const { 
+    name, 
+    description, 
+    locations, 
+    subcategories, 
+    profilePicture, 
+    bannerPicture, 
+    foundationYear, 
+    annualRevenue, 
+    employeeCount, 
+    cuit, 
+    organizationType,
+    userId 
+  } = body;
+  
+  // Validar solo campos esenciales
+  if (!name || !description || !foundationYear || !cuit || !userId) {
+    const error = new Error('Missing required attributes: name, description, foundationYear, cuit, userId');
     error.status = 400;
     throw error;
   }
+  
+  // Validar que locations y subcategories sean arrays
+  if (!Array.isArray(locations) || locations.length === 0) {
+    const error = new Error('Locations must be a non-empty array');
+    error.status = 400;
+    throw error;
+  }
+  
+  if (!Array.isArray(subcategories) || subcategories.length === 0) {
+    const error = new Error('Subcategories must be a non-empty array');
+    error.status = 400;
+    throw error;
+  }
+  
+  // Validar userId existe
+  const foundUser = await Users.findByPk(userId);
+  if (!foundUser) {
+    const error = new Error(`User with id ${userId} not found.`);
+    error.status = 404;
+    throw error;
+  }
+  
+  // Validar locations existen
   for (const locationId of locations) {
     const foundLocation = await Locations.findByPk(locationId);
     if (!foundLocation) {
@@ -201,6 +228,8 @@ const createCompany = async (body) => {
       throw error;
     }
   }
+  
+  // Validar subcategories existen
   for (const subcategoryId of subcategories) {
     const foundSubcategory = await Subcategories.findByPk(subcategoryId);
     if (!foundSubcategory) {
@@ -209,9 +238,23 @@ const createCompany = async (body) => {
       throw error;
     }
   }
-  const newCompany = await Companies.create(body);
+  
+  // Crear la empresa con los datos disponibles
+  const companyData = {
+    name,
+    description,
+    foundationYear,
+    cuit,
+    annualRevenue: annualRevenue || null,
+    employeeCount: employeeCount || null,
+    organizationType: organizationType || null,
+    profilePicture: profilePicture || null,
+    bannerPicture: bannerPicture || null,
+  };
+  
+  console.log('[createCompany] Creating company with data:', companyData);
+  const newCompany = await Companies.create(companyData);
 
-  const foundUser = await Users.findByPk(userId);
   await newCompany.addUser(foundUser);
 
   for (const locationId of locations) {
