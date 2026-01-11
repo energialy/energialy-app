@@ -12,7 +12,7 @@ import {
 } from 'react-admin';
 
 export const SubcategoryCreate = () => (
-  <Create title="Crear Nueva Subcategoría">
+  <Create title="Crear Nueva Subcategoría" redirect="list">
     <SimpleForm>
       <TextInput 
         source="name" 

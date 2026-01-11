@@ -10,7 +10,7 @@ import {
 } from 'react-admin';
 
 export const CategoryCreate = () => (
-  <Create title="Crear Nueva Categoría">
+  <Create title="Crear Nueva Categoría" redirect="list">
     <SimpleForm>
       <TextInput 
         source="name" 

@@ -38,7 +38,7 @@ const transform = (data) => {
 };
 
 export const CompanyCreate = () => (
-  <Create title="Crear Nueva Empresa" transform={transform}>
+  <Create title="Crear Nueva Empresa" transform={transform} redirect="list">
     <SimpleForm className="p-6 bg-white rounded-lg shadow-md">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         

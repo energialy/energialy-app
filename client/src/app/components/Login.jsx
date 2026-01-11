@@ -115,12 +115,24 @@ export default function Login() {
       window.location.href = '/dashboard';
     } catch (error) {
       console.log("Error:", error);
-      if (error.response.data.error == 'Incorrect password.') {
-        displayFailedMessage('Contraseña incorrecta');
-      } else if (error.response.data.error == 'Email not registered.') {
-        displayFailedMessage('El usuario no esta registrado');
+      
+      // Verificar si error.response existe antes de acceder a sus propiedades
+      if (error.response && error.response.data && error.response.data.error) {
+        const errorMessage = error.response.data.error;
+        
+        if (errorMessage === 'Incorrect password.') {
+          displayFailedMessage('Contraseña incorrecta');
+        } else if (errorMessage === 'Email not registered.') {
+          displayFailedMessage('El usuario no está registrado');
+        } else {
+          displayFailedMessage(errorMessage);
+        }
+      } else if (error.request) {
+        // La solicitud se hizo pero no se recibió respuesta
+        displayFailedMessage('No se pudo conectar con el servidor. Por favor, intenta nuevamente.');
       } else {
-        displayFailedMessage(error.response.data.error);
+        // Algo más sucedió al configurar la solicitud
+        displayFailedMessage('Ocurrió un error inesperado. Por favor, intenta nuevamente.');
       }
     }
   };

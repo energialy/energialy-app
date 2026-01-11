@@ -13,7 +13,7 @@ import {
 } from 'react-admin';
 
 export const UserCreate = () => (
-  <Create title="Crear Nuevo Usuario">
+  <Create title="Crear Nuevo Usuario" redirect="list">
     <SimpleForm>
       <TextInput 
         source="firstName" 

@@ -10,7 +10,7 @@ import {
 } from 'react-admin';
 
 export const LocationCreate = () => (
-  <Create title="Crear Nueva Ubicación">
+  <Create title="Crear Nueva Ubicación" redirect="list">
     <SimpleForm>
       <TextInput 
         source="name" 
