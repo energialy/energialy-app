@@ -8,7 +8,7 @@ export const menuBar = [
   {
     title: "Dashboard",
     url: "/dashboard",
-    auth: ["admin", "superAdmin", "bank", "company_collaborator"],
+    auth: ["admin", "superAdmin", "bank", "company_collaborator", "company_owner"],
     icon: <MdSpaceDashboard />,
   },
   {
