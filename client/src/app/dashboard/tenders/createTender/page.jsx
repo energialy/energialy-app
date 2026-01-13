@@ -4,7 +4,7 @@ import { useGetLocationsQuery } from "@/app/redux/services/locationApi";
 import { Card, Typography } from "@material-tailwind/react";
 import { FormGroup } from "react-bootstrap";
 import Select from "react-select";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   duration,
   etapa,
@@ -22,6 +22,7 @@ import ErrorMensage from "@/app/components/ErrorMensage";
 import { ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
 import getLocalStorage from "@/app/Func/localStorage";
+import { useScrollToError } from "@/app/components/ui/useScrollToError";
 
 function CreateTenderForm() {
   //fetch states
@@ -93,6 +94,36 @@ function CreateTenderForm() {
 
   // Estados para servicios y precios
   const [servicePrices, setServicePrices] = useState([]);
+
+  // Referencias para hacer scroll a los campos con error
+  const titleRef = useRef(null);
+  const descriptionRef = useRef(null);
+  const contractTypeRef = useRef(null);
+  const budgetRef = useRef(null);
+  const majorSectorRef = useRef(null);
+  const projectDurationRef = useRef(null);
+  const validityDateRef = useRef(null);
+  const locationRef = useRef(null);
+  const subcategoriesRef = useRef(null);
+  const filesRef = useRef(null);
+  const customFieldsRef = useRef(null);
+  const servicePricesRef = useRef(null);
+
+  // Hook para hacer scroll al primer campo con error
+  const scrollToFirstError = useScrollToError({
+    title: titleRef,
+    description: descriptionRef,
+    contractType: contractTypeRef,
+    budget: budgetRef,
+    majorSector: majorSectorRef,
+    projectDuration: projectDurationRef,
+    validityDate: validityDateRef,
+    locationId: locationRef,
+    subcategories: subcategoriesRef,
+    files: filesRef,
+    customFields: customFieldsRef,
+    servicePrices: servicePricesRef,
+  });
 
   //Handlers
   const handleChangeCategories = (e) => {
@@ -325,6 +356,10 @@ function CreateTenderForm() {
     }
     console.log("Errors:", errors);
     setInputError(errors);
+    
+    // Hacer scroll al primer campo con error
+    scrollToFirstError(errors);
+    
     return Object.keys(errors).length === 0;
   };
 
@@ -386,6 +421,7 @@ function CreateTenderForm() {
             </div>
             <div className="ml-5 md:flex md:flex-col md:gap-2">
               <input
+                ref={titleRef}
                 className="w-full border-1 border-gray-300 rounded-md p-3"
                 type="text"
                 placeholder="Título"
@@ -397,6 +433,7 @@ function CreateTenderForm() {
               ) : null}
               <div className="md:flex md:gap-3">
                 <select
+                  ref={contractTypeRef}
                   className="w-1/2 border-1 bg-transparent border-gray-300 rounded-md p-3 text-gray-500"
                   onChange={handleInputsChanges}
                   name="contractType"
@@ -410,6 +447,7 @@ function CreateTenderForm() {
                   <ErrorMensage message={inputError.contractType} />
                 ) : null}
                 <select
+                  ref={projectDurationRef}
                   className="w-1/2 border-1 bg-transparent border-gray-300 rounded-md p-3 text-gray-500"
                   name="projectDuration"
                   onChange={handleInputsChanges}
@@ -425,6 +463,7 @@ function CreateTenderForm() {
               </div>
               <div className="md:flex md:gap-3">
                 <select
+                  ref={majorSectorRef}
                   className="w-1/2 border-1 bg-transparent border-gray-300 rounded-md p-3 text-gray-500"
                   name="majorSector"
                   onChange={handleInputsChanges}
@@ -440,6 +479,7 @@ function CreateTenderForm() {
                 <div className="w-1/2 border-1 bg-transparent border-gray-300 rounded-md p-3 text-gray-500 flex justify-between">
                   <label htmlFor="">Fecha límite para enviar Propuestas</label>
                   <input
+                    ref={validityDateRef}
                     className="focus:border-none"
                     type="date"
                     name="validityDate"
@@ -452,6 +492,7 @@ function CreateTenderForm() {
               </div>
               <div className="md:flex md:gap-3">
                 <input
+                  ref={budgetRef}
                   className="w-1/2 border-1 bg-transparent border-gray-300 rounded-md p-3 text-gray-500"
                   type="number"
                   name="budget"
@@ -516,16 +557,18 @@ function CreateTenderForm() {
             </div>
             <div className="ml-5 flex flex-col gap-2">
               {categoriesLoading && "Loading..."}
-              <Select
-                options={subCatSelected?.map((subCat) => ({
-                  label: subCat.name,
-                  value: subCat.value,
-                  key: subCat.id,
-                }))}
-                name="subcategories"
-                placeholder="SUBCATEGORIA"
-                onChange={handleSubcategorieChange}
-              />
+              <div ref={subcategoriesRef}>
+                <Select
+                  options={subCatSelected?.map((subCat) => ({
+                    label: subCat.name,
+                    value: subCat.value,
+                    key: subCat.id,
+                  }))}
+                  name="subcategories"
+                  placeholder="SUBCATEGORIA"
+                  onChange={handleSubcategorieChange}
+                />
+              </div>
               {inputError.subcategories !== "" ? (
                 <ErrorMensage message={inputError.subcategories} />
               ) : null}
@@ -540,14 +583,16 @@ function CreateTenderForm() {
             </div>
             <div className="ml-5 flex flex-col gap-2">
               {loadingLocations && "Loading..."}
-              <Select
-                options={displayLocations?.map((loc) => ({
-                  value: loc.id,
-                  label: loc.name,
-                }))}
-                placeholder="SELECCIONAR UBICACIÓN"
-                onChange={handleChangeLocation}
-              />
+              <div ref={locationRef}>
+                <Select
+                  options={displayLocations?.map((loc) => ({
+                    value: loc.id,
+                    label: loc.name,
+                  }))}
+                  placeholder="SELECCIONAR UBICACIÓN"
+                  onChange={handleChangeLocation}
+                />
+              </div>
               {inputError.locationId !== "" ? (
                 <ErrorMensage message={inputError.locationId} />
               ) : null}
@@ -616,6 +661,7 @@ function CreateTenderForm() {
             </div>
             <div className="ml-5 flex flex-col gap-2">
               <textarea
+                ref={descriptionRef}
                 className="w-full border-1 border-gray-300 rounded-md p-3"
                 name="description"
                 onChange={handleInputsChanges}
@@ -631,7 +677,7 @@ function CreateTenderForm() {
                 Requisitos
               </Typography>
             </div>
-            <div className="flex border-dashed w-full border-2 border-gray-300 rounded-md p-3 justify-between items-center">
+            <div ref={filesRef} className="flex border-dashed w-full border-2 border-gray-300 rounded-md p-3 justify-between items-center">
               <button className="bg-secondary-500 text-white py-3 px-5 rounded-lg inline-block text-center uppercase font-semibold tracking-wide text-sm">
                 <label
                   htmlFor="filePicker"
@@ -685,7 +731,7 @@ function CreateTenderForm() {
             </div>
 
             {/* Lista de campos personalizados */}
-            <div className="ml-5 space-y-3">
+            <div ref={customFieldsRef} className="ml-5 space-y-3">
               {customFields.map((field) => (
                 <div
                   key={field.id}
@@ -792,7 +838,7 @@ function CreateTenderForm() {
               </div>
 
               {/* Lista de servicios */}
-              <div className="space-y-3">
+              <div ref={servicePricesRef} className="space-y-3">
                 {servicePrices.map((service, index) => (
                   <div
                     key={service.id}
